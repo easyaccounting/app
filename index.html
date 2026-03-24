@@ -20,11 +20,24 @@
             --cat-ent: #8BA89C; --cat-beauty: #DDA7A5; --cat-other: #C4B7CB;
         }
 
-        /* 改用 100dvh 徹底解決 iOS Safari 網址列縮放造成的畫面抖動 */
-        body { margin: 0; padding: 0; background: var(--bg-gradient); color: var(--text-main); font-family: -apple-system, sans-serif; height: 100dvh; display: flex; justify-content: center; overflow: hidden; -webkit-tap-highlight-color: transparent; user-select: none; }
-        
-        /* 確保絕對不會有右側白框擠壓 */
-        .app-viewport { width: 100%; max-width: 400px; height: 100%; position: relative; overflow-x: hidden; overflow-y: hidden; }
+        /* 替換原本的 body 與 .app-viewport */
+body { 
+    margin: 0; padding: 0; background: #000; /* 外圍設為深色，讓中間的 App 更立體 */
+    color: var(--text-main); font-family: -apple-system, sans-serif; 
+    height: 100dvh; width: 100vw; 
+    display: flex; justify-content: center; align-items: center; 
+    overflow: hidden; 
+    position: fixed; /* ★ 救命關鍵 1：徹底鎖死畫面，禁止任何上下拖拽與回彈 */
+    -webkit-tap-highlight-color: transparent; user-select: none; 
+}
+
+.app-viewport { 
+    width: 100vw; max-width: 400px; height: 100dvh; 
+    background: var(--bg-gradient); /* App 專屬背景 */
+    position: relative; overflow: hidden; 
+    box-shadow: 0 0 20px rgba(0,0,0,0.2); /* 讓 App 邊緣有立體感 */
+}
+
         
         .view-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
         #main-view { transform: translateX(0); } #report-view { transform: translateX(100%); }
@@ -67,13 +80,13 @@
         .sub-tag.selected { background: rgba(255, 255, 255, 0.9); color: var(--text-main); border-color: var(--accent-gold); font-weight: 500; transform: scale(0.96); }
         .sub-tag-income.selected { border-color: var(--accent-green); }
 
-        .input-display { text-align: right; font-size: 2.5rem; color: var(--text-main); height: 50px; display: flex; align-items: center; justify-content: flex-end; margin-bottom: 15px; border-bottom: 1px solid rgba(92, 84, 78, 0.1); }
-        .key-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .key { background: transparent; border: none; font-size: 1.5rem; color: var(--text-main); height: 55px; border-radius: 15px; display: flex; justify-content: center; align-items: center; cursor: pointer; font-weight: 300; }
-        .key:active { background: rgba(0, 0, 0, 0.05); }
-        .key-enter { grid-row: span 2; background: var(--accent-gold); color: white; border-radius: 20px; font-size: 1.8rem; transition: background 0.3s; }
-        .income-mode .key-enter { background: var(--accent-green); }
-
+       /* 替換原本的 .input-display (防止數字太大爆框) */
+.input-display { 
+    text-align: right; font-size: 2.2rem; color: var(--text-main); 
+    height: 50px; display: flex; align-items: center; justify-content: flex-end; 
+    margin-bottom: 15px; border-bottom: 1px solid rgba(92, 84, 78, 0.1);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+}
         /* Report View */
         .chart-card { width: 90%; background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-radius: 30px; box-shadow: var(--glass-shadow); padding: 30px 20px; display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; flex-shrink: 0; box-sizing: border-box; }
         .chart-container { position: relative; width: 180px; height: 180px; }
@@ -100,9 +113,21 @@
         .modal-overlay.show { display: flex; opacity: 1; }
         .glass-modal { background: rgba(249, 248, 246, 0.95); width: 85%; max-width: 320px; border-radius: 25px; padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.8); text-align: center; }
         
-        /* 輸入框發光質感 */
-        .modal-input { width: 100%; padding: 12px; margin: 10px 0 20px; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.6); font-size: 1rem; color: var(--text-main); box-sizing: border-box; text-align: center; transition: all 0.3s ease; }
-        .modal-input:focus { outline: none; border-color: var(--accent-gold); background: rgba(255, 255, 255, 0.9); box-shadow: 0 0 12px rgba(212, 163, 115, 0.25); }
+      /* 替換原本的 .modal-input (修復卡住與放大破格) */
+.modal-input { 
+    width: 100%; padding: 12px; margin: 10px 0 20px; 
+    border-radius: 12px; border: 1px solid var(--glass-border); 
+    background: rgba(255,255,255,0.6); color: var(--text-main); 
+    box-sizing: border-box; text-align: center; transition: all 0.3s ease;
+    
+    /* ★ 救命關鍵 2：強制解除輸入框的防選取，解決卡住無法輸入 */
+    user-select: auto; -webkit-user-select: auto; 
+    
+    /* ★ 救命關鍵 3：iOS 規定字體必須 >= 16px，否則點擊會強制畫面放大破格！ */
+    font-size: 16px; 
+}
+.modal-input:focus { outline: none; border-color: var(--accent-gold); background: rgba(255, 255, 255, 0.9); box-shadow: 0 0 12px rgba(212, 163, 115, 0.25); }
+
         
         .modal-btn { background: var(--accent-gold); color: white; border: none; padding: 10px 25px; border-radius: 20px; font-size: 1rem; cursor: pointer; margin: 5px; }
         .modal-btn-alt { background: var(--glass-bg); color: var(--text-main); border: 1px solid var(--glass-border); padding: 10px 25px; border-radius: 20px; font-size: 1rem; cursor: pointer; margin: 5px; }
@@ -343,7 +368,17 @@
     }
 
     function toggleInvoice() { hasInvoice = !hasInvoice; document.getElementById('invoice-btn').classList.toggle('active', hasInvoice); }
-    function inputNum(num) { if (currentInput === "0" && num !== "00") currentInput = num.toString(); else if(currentInput.length < 8) currentInput += num.toString(); updateDisplay(); }
+    // 替換原本的 inputNum 函數
+function inputNum(num) { 
+    if (currentInput === "0" && num !== "00") {
+        currentInput = num.toString(); 
+    } else if (currentInput.length < 7) {
+        // ★ 限制最多輸入 7 位數 (例如 9,999,999)，防止排版爆掉
+        currentInput += num.toString(); 
+    }
+    updateDisplay(); 
+}
+
     function deleteNum() { if (currentInput.length > 1) currentInput = currentInput.slice(0, -1); else currentInput = "0"; updateDisplay(); }
 
     function submitEntry() {
