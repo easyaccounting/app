@@ -20,9 +20,13 @@
             --cat-ent: #8BA89C; --cat-beauty: #DDA7A5; --cat-other: #C4B7CB;
         }
 
+        /* 改用 100dvh 徹底解決 iOS Safari 網址列縮放造成的畫面抖動 */
         body { margin: 0; padding: 0; background: var(--bg-gradient); color: var(--text-main); font-family: -apple-system, sans-serif; height: 100dvh; display: flex; justify-content: center; overflow: hidden; -webkit-tap-highlight-color: transparent; user-select: none; }
-        .app-viewport { width: 100%; max-width: 400px; height: 100%; position: relative; overflow: hidden; }
-        .view-layer { position: absolute; top: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        
+        /* 確保絕對不會有右側白框擠壓 */
+        .app-viewport { width: 100%; max-width: 400px; height: 100%; position: relative; overflow-x: hidden; overflow-y: hidden; }
+        
+        .view-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
         #main-view { transform: translateX(0); } #report-view { transform: translateX(100%); }
 
         /* Header */
@@ -45,8 +49,8 @@
         .cat-btn-income.active svg { stroke: var(--accent-green); }
         .cat-btn span { font-size: 0.8rem; color: var(--text-main); font-weight: 500; }
 
-        /* Keyboard */
-        .keyboard-panel { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(249, 248, 246, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--glass-border); box-shadow: 0 -10px 40px rgba(180, 175, 170, 0.1); border-radius: 30px 30px 0 0; padding: 15px 20px max(30px, env(safe-area-inset-bottom)) 20px; box-sizing: border-box; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.4s; z-index: 100; }
+        /* Keyboard - 加大底部安全距離，保護 0 鍵 */
+        .keyboard-panel { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(249, 248, 246, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--glass-border); box-shadow: 0 -10px 40px rgba(180, 175, 170, 0.1); border-radius: 30px 30px 0 0; padding: 15px 20px max(40px, env(safe-area-inset-bottom)) 20px; box-sizing: border-box; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.4s; z-index: 100; }
         .keyboard-panel.open { transform: translateY(0); }
         .keyboard-panel.income-mode { background: rgba(240, 248, 245, 0.95); }
 
@@ -59,7 +63,7 @@
         .sub-tags-wrapper { width: 100%; overflow-x: auto; white-space: nowrap; padding: 0 0 15px 0; -ms-overflow-style: none; scrollbar-width: none; opacity: 0; transition: opacity 0.3s; }
         .sub-tags-wrapper::-webkit-scrollbar { display: none; }
         .sub-tags-wrapper.show { opacity: 1; }
-        .sub-tag { display: inline-block; background: rgba(255, 255, 255, 0.5); border: 1px solid var(--glass-border); color: var(--text-light); padding: 7px 14px; border-radius: 20px; font-size: 0.8rem; margin-right: 8px; cursor: pointer; transition: all 0.2s; }
+        .sub-tag { display: inline-block; background: rgba(255, 255, 255, 0.5); border: 1px solid var(--glass-border); color: var(--text-light); padding: 7px 14px; border-radius: 20px; font-size: 0.8rem; margin-right: 8px; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; }
         .sub-tag.selected { background: rgba(255, 255, 255, 0.9); color: var(--text-main); border-color: var(--accent-gold); font-weight: 500; transform: scale(0.96); }
         .sub-tag-income.selected { border-color: var(--accent-green); }
 
@@ -95,29 +99,13 @@
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100dvh; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 999; opacity: 0; transition: opacity 0.3s; }
         .modal-overlay.show { display: flex; opacity: 1; }
         .glass-modal { background: rgba(249, 248, 246, 0.95); width: 85%; max-width: 320px; border-radius: 25px; padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.8); text-align: center; }
-        .modal-input { width: 100%; padding: 12px; margin: 10px 0 20px; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.6); font-size: 1rem; color: var(--text-main); box-sizing: border-box; text-align: center; }
+        
+        /* 輸入框發光質感 */
+        .modal-input { width: 100%; padding: 12px; margin: 10px 0 20px; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.6); font-size: 1rem; color: var(--text-main); box-sizing: border-box; text-align: center; transition: all 0.3s ease; }
+        .modal-input:focus { outline: none; border-color: var(--accent-gold); background: rgba(255, 255, 255, 0.9); box-shadow: 0 0 12px rgba(212, 163, 115, 0.25); }
+        
         .modal-btn { background: var(--accent-gold); color: white; border: none; padding: 10px 25px; border-radius: 20px; font-size: 1rem; cursor: pointer; margin: 5px; }
         .modal-btn-alt { background: var(--glass-bg); color: var(--text-main); border: 1px solid var(--glass-border); padding: 10px 25px; border-radius: 20px; font-size: 1rem; cursor: pointer; margin: 5px; }
-        /* 1. 修復鍵盤底部被吃掉的 0 (加大 iOS 安全距離與底部留白) */
-.keyboard-panel { 
-    /* ...保留原有設定... */
-    padding: 15px 20px max(40px, env(safe-area-inset-bottom)) 20px; 
-}
-
-/* 2. 讓輸入框更有質感，點擊時散發柔和金光，不出現死硬黑框 */
-.modal-input:focus {
-    outline: none;
-    border-color: var(--accent-gold);
-    background: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 0 12px rgba(212, 163, 115, 0.25);
-    transition: all 0.3s ease;
-}
-
-/* 3. 確保畫面絕對不會被原生的鍵盤擠壓出右側白框 */
-body, .app-viewport {
-    overflow-x: hidden; 
-}
-
     </style>
 </head>
 <body>
@@ -225,6 +213,17 @@ body, .app-viewport {
     </div>
 </div>
 
+<div class="modal-overlay" id="custom-tag-modal" onclick="closeModal('custom-tag-modal')">
+    <div class="glass-modal" onclick="event.stopPropagation()">
+        <h3 style="margin-top:0; color:var(--text-main); font-weight: 500; font-size: 1.1rem; letter-spacing: 1px;">新增專屬細項</h3>
+        <input type="text" id="custom-tag-input" class="modal-input" placeholder="例如：給媽媽的禮物" maxlength="10">
+        <div style="display: flex; justify-content: center; gap: 10px; margin-top: 15px;">
+            <button class="modal-btn-alt" onclick="closeModal('custom-tag-modal')">取消</button>
+            <button class="modal-btn" onclick="confirmCustomTag()">確定</button>
+        </div>
+    </div>
+</div>
+
 <script>
     // ================= Code 39 條碼引擎 =================
     const Code39 = {
@@ -247,16 +246,15 @@ body, .app-viewport {
 
     // ================= 核心系統與 LocalStorage =================
     const STORAGE_KEY = 'joy_accounting_app_data';
+    // ★ 結餘初始為 0
     let appData = { budget: 15000, carrier: '/12ABCDE', transactions: [] };
     
     function loadData() {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) appData = JSON.parse(stored);
         
-        // 初始化今天日期
         let today = new Date();
         document.getElementById('date-str').innerText = `${today.getMonth()+1}月${today.getDate()}日`;
-        
         updateSystemUI();
     }
 
@@ -266,7 +264,6 @@ body, .app-viewport {
     }
 
     function updateSystemUI() {
-        // 計算結餘
         let bal = appData.transactions.reduce((acc, t) => t.type === 'income' ? acc + t.amt : acc - t.amt, 0);
         document.getElementById('main-balance').innerText = "$" + bal.toLocaleString();
         document.getElementById('carrier-top-txt').innerText = appData.carrier;
@@ -276,61 +273,55 @@ body, .app-viewport {
     const categoryData = { '飲食': ['早餐','午餐','晚餐','宵夜','飲料','便利商店','水果'], '服飾美容': ['衣服','鞋包','保養品','理髮','醫美'], '交通': ['捷運公車','計程車','加油/充電','停車費','車保養'], '居住': ['房租/房貸','水電瓦斯','管理費','網路費','居家用品'], '育樂進修': ['電影展覽','數位訂閱','旅遊','書籍','學雜費','3C產品'], '其他生活': ['電話費','保險費','醫療','交際孝親','信用卡'], '收入': ['薪水','獎金','投資收益','政府回饋','其他收入'] };
     const colorMap = { '飲食': 'var(--cat-food)', '服飾美容': 'var(--cat-beauty)', '居住': 'var(--cat-house)', '交通': 'var(--cat-trans)', '育樂進修': 'var(--cat-ent)', '其他生活': 'var(--cat-other)' };
 
-    let currentCustomEl = null; // 暫存目前點擊的自訂標籤元素
-
-function renderSubTags(categoryName, isIncome) {
-    subContainer.innerHTML = ''; currentSubTag = "";
+    let currentInput = "0", activeBtn = null, currentSubTag = "", isIncomeMode = false, hasInvoice = false;
+    let currentCustomEl = null; // 用於記憶點擊的自訂標籤
     
-    // 複製清單
-    let tags = (categoryData[categoryName] || []).slice();
-    tags.push('ADD_CUSTOM'); // 使用特定常數代表新增按鈕
+    const kb = document.getElementById('keyboard'), display = document.getElementById('input-amt'), subContainer = document.getElementById('sub-tags-container');
 
-    tags.forEach(tag => {
-        const el = document.createElement('div');
-        el.className = `sub-tag ${isIncome ? 'sub-tag-income' : ''}`;
+    function updateDisplay() { display.innerText = currentInput === "0" ? "0" : Number(currentInput).toLocaleString(); }
+    
+    function renderSubTags(categoryName, isIncome) {
+        subContainer.innerHTML = ''; currentSubTag = "";
+        let tags = (categoryData[categoryName] || []).slice();
+        tags.push('ADD_CUSTOM'); // 加入自訂按鈕代碼
         
-        if (tag === 'ADD_CUSTOM') {
-            // 使用純 SVG 取代 emoji，極致極簡
-            el.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="margin-right:4px; vertical-align:-1px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>新增`;
-            el.onclick = function() {
-                // 清空並呼叫我們的高質感遮罩
-                document.getElementById('custom-tag-input').value = '';
-                showModal('custom-tag-modal');
-                currentCustomEl = this; // 記住這個按鈕，稍後填字用
-                
-                // 為了流暢度，延遲一下讓輸入框自動聚焦 (Focus)
-                setTimeout(() => document.getElementById('custom-tag-input').focus(), 100);
-            };
-        } else {
-            el.innerText = tag;
-            el.onclick = function() {
-                Array.from(subContainer.children).forEach(t => t.classList.remove('selected'));
-                this.classList.add('selected');
-                currentSubTag = tag;
-                this.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-            };
-        }
-        subContainer.appendChild(el);
-    });
-    setTimeout(() => subContainer.classList.add('show'), 50);
-}
-
-// 接收來自高質感遮罩的確認動作
-function confirmCustomTag() {
-    let val = document.getElementById('custom-tag-input').value.trim();
-    if (val !== "" && currentCustomEl) {
-        currentSubTag = val;
-        // 將「+ 新增」替換為使用者輸入的文字，並維持清淨排版
-        currentCustomEl.innerText = val;
-        
-        // 移除其他人的選取狀態，並將自己設為選取
-        Array.from(subContainer.children).forEach(t => t.classList.remove('selected'));
-        currentCustomEl.classList.add('selected');
-        currentCustomEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        tags.forEach(tag => {
+            const el = document.createElement('div'); el.className = `sub-tag ${isIncome ? 'sub-tag-income' : ''}`;
+            
+            if (tag === 'ADD_CUSTOM') {
+                el.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="margin-right:4px; vertical-align:-1px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>新增`;
+                el.onclick = function() {
+                    document.getElementById('custom-tag-input').value = '';
+                    showModal('custom-tag-modal');
+                    currentCustomEl = this;
+                    setTimeout(() => document.getElementById('custom-tag-input').focus(), 100);
+                };
+            } else {
+                el.innerText = tag;
+                el.onclick = function() {
+                    Array.from(subContainer.children).forEach(t => t.classList.remove('selected'));
+                    this.classList.add('selected');
+                    currentSubTag = tag;
+                    this.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                };
+            }
+            subContainer.appendChild(el);
+        });
+        setTimeout(() => subContainer.classList.add('show'), 50);
     }
-    closeModal('custom-tag-modal');
-}
 
+    // 接收自訂標籤的確認
+    function confirmCustomTag() {
+        let val = document.getElementById('custom-tag-input').value.trim();
+        if (val !== "" && currentCustomEl) {
+            currentSubTag = val;
+            currentCustomEl.innerText = val;
+            Array.from(subContainer.children).forEach(t => t.classList.remove('selected'));
+            currentCustomEl.classList.add('selected');
+            currentCustomEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+        closeModal('custom-tag-modal');
+    }
 
     function openKeyboard(btn, category, isIncome = false) {
         if(activeBtn) activeBtn.classList.remove('active'); activeBtn = btn; activeBtn.classList.add('active');
@@ -404,10 +395,13 @@ function confirmCustomTag() {
         totalDisp.innerText = '$' + expenseTotal.toLocaleString();
         totalDisp.style.color = 'var(--text-main)'; budgetDisp.style.color = 'var(--accent-gold)';
 
-        if (expenseTotal > appData.budget) {
+        if (expenseTotal > appData.budget && appData.budget > 0) {
             totalDisp.style.color = 'var(--accent-red)'; budgetDisp.innerText = '已超預算'; budgetDisp.style.color = 'var(--accent-red)';
-        } else if (expenseTotal > appData.budget * 0.8) { budgetDisp.innerText = `剩餘 $${(appData.budget - expenseTotal).toLocaleString()}`;
-        } else { budgetDisp.innerText = `預算 $${appData.budget.toLocaleString()}`; }
+        } else if (expenseTotal > appData.budget * 0.8 && appData.budget > 0) { 
+            budgetDisp.innerText = `剩餘 $${(appData.budget - expenseTotal).toLocaleString()}`;
+        } else { 
+            budgetDisp.innerText = `預算 $${appData.budget.toLocaleString()}`; 
+        }
 
         let cumulativePercent = 0; donut.innerHTML = '';
         if(expenseTotal > 0) {
@@ -443,11 +437,10 @@ function confirmCustomTag() {
 
     function saveSettings() {
         appData.budget = Number(document.getElementById('setting-budget').value) || 0;
-        appData.carrier = document.getElementById('setting-carrier').value || '/12ABCDE';
-        saveData(); closeModal('settings-modal'); alert("設定已更新！");
+        appData.carrier = document.getElementById('setting-carrier').value || '';
+        saveData(); closeModal('settings-modal'); 
     }
 
-    // 純前端資料匯出 (CSV/JSON)
     function exportData(type) {
         let content, filename, mimeType;
         if (type === 'json') {
@@ -455,7 +448,6 @@ function confirmCustomTag() {
             filename = `JoyAccounting_Backup_${new Date().getTime()}.json`;
             mimeType = 'application/json';
         } else {
-            // CSV 需要加上 BOM 讓 Excel 讀取中文不亂碼
             content = "\uFEFF類型,日期,分類,細項,金額,有發票\n";
             appData.transactions.forEach(t => {
                 content += `${t.type === 'income'?'收入':'支出'},${t.date},${t.cat},${t.sub},${t.amt},${t.invoice?'是':'否'}\n`;
@@ -469,20 +461,8 @@ function confirmCustomTag() {
         document.body.appendChild(link); link.click(); document.body.removeChild(link);
     }
 
-    // 啟動 App
     window.onload = loadData;
 </script>
-<div class="modal-overlay" id="custom-tag-modal" onclick="closeModal('custom-tag-modal')">
-    <div class="glass-modal" onclick="event.stopPropagation()">
-        <h3 style="margin-top:0; color:var(--text-main); font-weight: 500; font-size: 1.1rem; letter-spacing: 1px;">新增專屬細項</h3>
-        <input type="text" id="custom-tag-input" class="modal-input" placeholder="例如：給媽媽的禮物" maxlength="8">
-        
-        <div style="display: flex; justify-content: center; gap: 10px; margin-top: 15px;">
-            <button class="modal-btn-alt" onclick="closeModal('custom-tag-modal')">取消</button>
-            <button class="modal-btn" onclick="confirmCustomTag()">確定</button>
-        </div>
-    </div>
-</div>
 
 </body>
 </html>
