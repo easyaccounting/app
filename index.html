@@ -67,10 +67,31 @@
         .invoice-toggle { width: 32px; height: 32px; display: flex; justify-content: center; align-items: center; border-radius: 50%; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-light); cursor: pointer; transition: all 0.2s; }
         .invoice-toggle.active { background: var(--accent-gold); color: white; border-color: transparent; box-shadow: 0 2px 8px rgba(212, 163, 115, 0.3); }
 
-        .sub-tags-wrapper { width: 100%; overflow-x: auto; white-space: nowrap; padding: 0 0 15px 0; -ms-overflow-style: none; scrollbar-width: none; opacity: 0; transition: opacity 0.3s; }
+        .sub-tags-wrapper { 
+    width: 100%; 
+    display: flex; 
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0 0 15px 0; 
+    opacity: 0; 
+    transition: opacity 0.3s; 
+}
+
         .sub-tags-wrapper::-webkit-scrollbar { display: none; }
         .sub-tags-wrapper.show { opacity: 1; }
-        .sub-tag { display: inline-block; background: rgba(255, 255, 255, 0.5); border: 1px solid var(--glass-border); color: var(--text-light); padding: 7px 14px; border-radius: 20px; font-size: 0.8rem; margin-right: 8px; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; }
+        .sub-tag { 
+    background: rgba(255, 255, 255, 0.5); 
+    border: 1px solid var(--glass-border); 
+    color: var(--text-light); 
+    padding: 7px 14px; 
+    border-radius: 20px; 
+    font-size: 0.8rem; 
+    cursor: pointer; 
+    transition: all 0.2s; 
+    display: inline-flex; 
+    align-items: center; 
+}
+
         .sub-tag.selected { background: rgba(255, 255, 255, 0.9); color: var(--text-main); border-color: var(--accent-gold); font-weight: 500; transform: scale(0.96); }
         .sub-tag-income.selected { border-color: var(--accent-green); }
 
