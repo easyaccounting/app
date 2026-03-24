@@ -10,35 +10,29 @@
             --glass-bg: rgba(255, 255, 255, 0.45);
             --glass-border: rgba(255, 255, 255, 0.7);
             --glass-shadow: 0 8px 32px rgba(180, 175, 170, 0.15);
-            --text-main: #5C544E;
-            --text-light: #9A928B;
-            --accent-gold: #D4A373;
-            --accent-green: #8BA89C; 
-            --accent-red: #D89A9E;
-            
+            --text-main: #5C544E; --text-light: #9A928B;
+            --accent-gold: #D4A373; --accent-green: #8BA89C; --accent-red: #D89A9E;
             --cat-food: #E2B4B7; --cat-trans: #A8C2CB; --cat-house: #D4A373;
             --cat-ent: #8BA89C; --cat-beauty: #DDA7A5; --cat-other: #C4B7CB;
         }
 
-        /* 替換原本的 body 與 .app-viewport */
-body { 
-    margin: 0; padding: 0; background: #000; /* 外圍設為深色，讓中間的 App 更立體 */
-    color: var(--text-main); font-family: -apple-system, sans-serif; 
-    height: 100dvh; width: 100vw; 
-    display: flex; justify-content: center; align-items: center; 
-    overflow: hidden; 
-    position: fixed; /* ★ 救命關鍵 1：徹底鎖死畫面，禁止任何上下拖拽與回彈 */
-    -webkit-tap-highlight-color: transparent; user-select: none; 
-}
+        /* 終極防抖與鎖定策略：利用 touch-action 取代 position: fixed */
+        html, body { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            background: #000; color: var(--text-main); 
+            font-family: -apple-system, sans-serif; 
+            overflow: hidden; touch-action: none; /* 徹底禁止下拉刷新與縮放 */
+            -webkit-user-select: none; user-select: none; 
+            -webkit-tap-highlight-color: transparent; 
+        }
 
-.app-viewport { 
-    width: 100vw; max-width: 400px; height: 100dvh; 
-    background: var(--bg-gradient); /* App 專屬背景 */
-    position: relative; overflow: hidden; 
-    box-shadow: 0 0 20px rgba(0,0,0,0.2); /* 讓 App 邊緣有立體感 */
-}
+        .app-viewport { 
+            width: 100%; max-width: 400px; height: 100dvh; 
+            margin: 0 auto; background: var(--bg-gradient); 
+            position: relative; overflow: hidden; 
+            box-shadow: 0 0 20px rgba(0,0,0,0.5); 
+        }
 
-        
         .view-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
         #main-view { transform: translateX(0); } #report-view { transform: translateX(100%); }
 
@@ -62,8 +56,8 @@ body {
         .cat-btn-income.active svg { stroke: var(--accent-green); }
         .cat-btn span { font-size: 0.8rem; color: var(--text-main); font-weight: 500; }
 
-        /* Keyboard - 加大底部安全距離，保護 0 鍵 */
-        .keyboard-panel { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(249, 248, 246, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--glass-border); box-shadow: 0 -10px 40px rgba(180, 175, 170, 0.1); border-radius: 30px 30px 0 0; padding: 15px 20px max(40px, env(safe-area-inset-bottom)) 20px; box-sizing: border-box; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.4s; z-index: 100; }
+        /* Keyboard - 安全距離修正 */
+        .keyboard-panel { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(249, 248, 246, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--glass-border); box-shadow: 0 -10px 40px rgba(180, 175, 170, 0.1); border-radius: 30px 30px 0 0; padding: 15px 20px calc(20px + env(safe-area-inset-bottom)) 20px; box-sizing: border-box; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.4s; z-index: 100; }
         .keyboard-panel.open { transform: translateY(0); }
         .keyboard-panel.income-mode { background: rgba(240, 248, 245, 0.95); }
 
@@ -80,13 +74,15 @@ body {
         .sub-tag.selected { background: rgba(255, 255, 255, 0.9); color: var(--text-main); border-color: var(--accent-gold); font-weight: 500; transform: scale(0.96); }
         .sub-tag-income.selected { border-color: var(--accent-green); }
 
-       /* 替換原本的 .input-display (防止數字太大爆框) */
-.input-display { 
-    text-align: right; font-size: 2.2rem; color: var(--text-main); 
-    height: 50px; display: flex; align-items: center; justify-content: flex-end; 
-    margin-bottom: 15px; border-bottom: 1px solid rgba(92, 84, 78, 0.1);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
-}
+        /* 修復：改為 display: block，讓文字過長時自動變成 ... */
+        .input-display { display: block; line-height: 50px; text-align: right; font-size: 2.2rem; color: var(--text-main); height: 50px; margin-bottom: 15px; border-bottom: 1px solid rgba(92, 84, 78, 0.1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        .key-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .key { background: transparent; border: none; font-size: 1.5rem; color: var(--text-main); height: 55px; border-radius: 15px; display: flex; justify-content: center; align-items: center; cursor: pointer; font-weight: 300; }
+        .key:active { background: rgba(0, 0, 0, 0.05); }
+        .key-enter { grid-row: span 2; background: var(--accent-gold); color: white; border-radius: 20px; font-size: 1.8rem; transition: background 0.3s; }
+        .income-mode .key-enter { background: var(--accent-green); }
+
         /* Report View */
         .chart-card { width: 90%; background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-radius: 30px; box-shadow: var(--glass-shadow); padding: 30px 20px; display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; flex-shrink: 0; box-sizing: border-box; }
         .chart-container { position: relative; width: 180px; height: 180px; }
@@ -108,26 +104,22 @@ body {
         .trans-time { font-size: 0.75rem; color: var(--text-light); }
         .trans-amt { font-size: 1.1rem; font-weight: 400; }
 
-        /* Modals (Fixed) */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100dvh; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 999; opacity: 0; transition: opacity 0.3s; }
+        /* Modals */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 999; opacity: 0; transition: opacity 0.3s; }
         .modal-overlay.show { display: flex; opacity: 1; }
         .glass-modal { background: rgba(249, 248, 246, 0.95); width: 85%; max-width: 320px; border-radius: 25px; padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.8); text-align: center; }
         
-      /* 替換原本的 .modal-input (修復卡住與放大破格) */
-.modal-input { 
-    width: 100%; padding: 12px; margin: 10px 0 20px; 
-    border-radius: 12px; border: 1px solid var(--glass-border); 
-    background: rgba(255,255,255,0.6); color: var(--text-main); 
-    box-sizing: border-box; text-align: center; transition: all 0.3s ease;
-    
-    /* ★ 救命關鍵 2：強制解除輸入框的防選取，解決卡住無法輸入 */
-    user-select: auto; -webkit-user-select: auto; 
-    
-    /* ★ 救命關鍵 3：iOS 規定字體必須 >= 16px，否則點擊會強制畫面放大破格！ */
-    font-size: 16px; 
-}
-.modal-input:focus { outline: none; border-color: var(--accent-gold); background: rgba(255, 255, 255, 0.9); box-shadow: 0 0 12px rgba(212, 163, 115, 0.25); }
-
+        /* 修復：強制字體 16px 阻擋放大，並設定 user-select: text 允許點擊輸入 */
+        .modal-input { 
+            width: 100%; padding: 12px; margin: 10px 0 20px; 
+            border-radius: 12px; border: 1px solid var(--glass-border); 
+            background: rgba(255,255,255,0.6); color: var(--text-main); 
+            box-sizing: border-box; text-align: center; transition: all 0.3s ease;
+            font-size: 16px !important; 
+            -webkit-user-select: text !important; user-select: text !important; 
+            touch-action: manipulation;
+        }
+        .modal-input:focus { outline: none; border-color: var(--accent-gold); background: rgba(255, 255, 255, 0.9); box-shadow: 0 0 12px rgba(212, 163, 115, 0.25); }
         
         .modal-btn { background: var(--accent-gold); color: white; border: none; padding: 10px 25px; border-radius: 20px; font-size: 1rem; cursor: pointer; margin: 5px; }
         .modal-btn-alt { background: var(--glass-bg); color: var(--text-main); border: 1px solid var(--glass-border); padding: 10px 25px; border-radius: 20px; font-size: 1rem; cursor: pointer; margin: 5px; }
@@ -136,7 +128,6 @@ body {
 <body>
 
 <div class="app-viewport">
-    
     <div id="main-view" class="view-layer">
         <div class="header-bar">
             <div style="display: flex; gap: 10px;">
@@ -241,7 +232,7 @@ body {
 <div class="modal-overlay" id="custom-tag-modal" onclick="closeModal('custom-tag-modal')">
     <div class="glass-modal" onclick="event.stopPropagation()">
         <h3 style="margin-top:0; color:var(--text-main); font-weight: 500; font-size: 1.1rem; letter-spacing: 1px;">新增專屬細項</h3>
-        <input type="text" id="custom-tag-input" class="modal-input" placeholder="例如：給媽媽的禮物" maxlength="10">
+        <input type="text" id="custom-tag-input" class="modal-input" placeholder="例如：給媽媽的禮物" maxlength="8">
         <div style="display: flex; justify-content: center; gap: 10px; margin-top: 15px;">
             <button class="modal-btn-alt" onclick="closeModal('custom-tag-modal')">取消</button>
             <button class="modal-btn" onclick="confirmCustomTag()">確定</button>
@@ -250,7 +241,6 @@ body {
 </div>
 
 <script>
-    // ================= Code 39 條碼引擎 =================
     const Code39 = {
         chars: { '0':'000110100','1':'100100001','2':'001100001','3':'101100000','4':'000110001','5':'100110000','6':'001110000','7':'000100101','8':'100100100','9':'001100100','A':'100001001','B':'001001001','C':'101001000','D':'000011001','E':'100011000','F':'001011000','G':'000001101','H':'100001100','I':'001001100','J':'000011100','K':'100000011','L':'001000011','M':'101000010','N':'000010011','O':'100010010','P':'001010010','Q':'000000111','R':'100000110','S':'001000110','T':'000010110','U':'110000001','V':'011000001','W':'111000000','X':'010010001','Y':'110010000','Z':'011010000','-':'010000101','.':'110000100',' ':'011000100','*':'010010100','+':'010001010','/':'010100010','%':'000101010','$':'010101000' },
         generateSVG: function(text) {
@@ -269,15 +259,12 @@ body {
         }
     };
 
-    // ================= 核心系統與 LocalStorage =================
     const STORAGE_KEY = 'joy_accounting_app_data';
-    // ★ 結餘初始為 0
     let appData = { budget: 15000, carrier: '/12ABCDE', transactions: [] };
     
     function loadData() {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) appData = JSON.parse(stored);
-        
         let today = new Date();
         document.getElementById('date-str').innerText = `${today.getMonth()+1}月${today.getDate()}日`;
         updateSystemUI();
@@ -294,12 +281,11 @@ body {
         document.getElementById('carrier-top-txt').innerText = appData.carrier;
     }
 
-    // ================= UI 互動與輸入 =================
     const categoryData = { '飲食': ['早餐','午餐','晚餐','宵夜','飲料','便利商店','水果'], '服飾美容': ['衣服','鞋包','保養品','理髮','醫美'], '交通': ['捷運公車','計程車','加油/充電','停車費','車保養'], '居住': ['房租/房貸','水電瓦斯','管理費','網路費','居家用品'], '育樂進修': ['電影展覽','數位訂閱','旅遊','書籍','學雜費','3C產品'], '其他生活': ['電話費','保險費','醫療','交際孝親','信用卡'], '收入': ['薪水','獎金','投資收益','政府回饋','其他收入'] };
     const colorMap = { '飲食': 'var(--cat-food)', '服飾美容': 'var(--cat-beauty)', '居住': 'var(--cat-house)', '交通': 'var(--cat-trans)', '育樂進修': 'var(--cat-ent)', '其他生活': 'var(--cat-other)' };
 
     let currentInput = "0", activeBtn = null, currentSubTag = "", isIncomeMode = false, hasInvoice = false;
-    let currentCustomEl = null; // 用於記憶點擊的自訂標籤
+    let currentCustomEl = null; 
     
     const kb = document.getElementById('keyboard'), display = document.getElementById('input-amt'), subContainer = document.getElementById('sub-tags-container');
 
@@ -308,18 +294,17 @@ body {
     function renderSubTags(categoryName, isIncome) {
         subContainer.innerHTML = ''; currentSubTag = "";
         let tags = (categoryData[categoryName] || []).slice();
-        tags.push('ADD_CUSTOM'); // 加入自訂按鈕代碼
+        tags.push('ADD_CUSTOM');
         
         tags.forEach(tag => {
             const el = document.createElement('div'); el.className = `sub-tag ${isIncome ? 'sub-tag-income' : ''}`;
-            
             if (tag === 'ADD_CUSTOM') {
                 el.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="margin-right:4px; vertical-align:-1px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>新增`;
                 el.onclick = function() {
                     document.getElementById('custom-tag-input').value = '';
                     showModal('custom-tag-modal');
                     currentCustomEl = this;
-                    setTimeout(() => document.getElementById('custom-tag-input').focus(), 100);
+                    // 取消 setTimeout 自動聚焦，避免 iOS 亂彈鍵盤破壞版面
                 };
             } else {
                 el.innerText = tag;
@@ -335,12 +320,10 @@ body {
         setTimeout(() => subContainer.classList.add('show'), 50);
     }
 
-    // 接收自訂標籤的確認
     function confirmCustomTag() {
         let val = document.getElementById('custom-tag-input').value.trim();
         if (val !== "" && currentCustomEl) {
-            currentSubTag = val;
-            currentCustomEl.innerText = val;
+            currentSubTag = val; currentCustomEl.innerText = val;
             Array.from(subContainer.children).forEach(t => t.classList.remove('selected'));
             currentCustomEl.classList.add('selected');
             currentCustomEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
@@ -368,16 +351,16 @@ body {
     }
 
     function toggleInvoice() { hasInvoice = !hasInvoice; document.getElementById('invoice-btn').classList.toggle('active', hasInvoice); }
-    // 替換原本的 inputNum 函數
-function inputNum(num) { 
-    if (currentInput === "0" && num !== "00") {
-        currentInput = num.toString(); 
-    } else if (currentInput.length < 7) {
-        // ★ 限制最多輸入 7 位數 (例如 9,999,999)，防止排版爆掉
-        currentInput += num.toString(); 
+    
+    /* 修復：限制字串長度，防止破格 */
+    function inputNum(num) { 
+        if (currentInput === "0" && num !== "00") {
+            currentInput = num.toString(); 
+        } else if (currentInput.length < 8) { // 最多 8 碼 (99,999,999)
+            currentInput += num.toString(); 
+        }
+        updateDisplay(); 
     }
-    updateDisplay(); 
-}
 
     function deleteNum() { if (currentInput.length > 1) currentInput = currentInput.slice(0, -1); else currentInput = "0"; updateDisplay(); }
 
@@ -397,7 +380,6 @@ function inputNum(num) {
         closeKeyboard();
     }
 
-    // ================= 報表與視圖切換 =================
     function toggleView(target) {
         const main = document.getElementById('main-view'), report = document.getElementById('report-view');
         if (target === 'report') {
@@ -454,7 +436,6 @@ function inputNum(num) {
         }
     }
 
-    // ================= 遮罩模組與匯出 =================
     function showModal(id) {
         if(id === 'settings-modal') {
             document.getElementById('setting-budget').value = appData.budget;
@@ -462,6 +443,7 @@ function inputNum(num) {
         }
         document.getElementById(id).classList.add('show'); 
     }
+    
     function closeModal(id) { document.getElementById(id).classList.remove('show'); }
     
     function showCarrier() {
@@ -498,6 +480,5 @@ function inputNum(num) {
 
     window.onload = loadData;
 </script>
-
 </body>
 </html>
