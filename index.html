@@ -3,321 +3,230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>柔光記帳</title>
+    <title>柔光記帳 - 智慧大圓滿</title>
     <style>
         :root {
-            /* 柔光玻璃色彩系統 */
             --bg-gradient: linear-gradient(135deg, #F9F8F6, #EAE6DF);
             --glass-bg: rgba(255, 255, 255, 0.45);
             --glass-border: rgba(255, 255, 255, 0.7);
             --glass-shadow: 0 8px 32px rgba(180, 175, 170, 0.15);
-            
             --text-main: #5C544E;
             --text-light: #9A928B;
             --accent-gold: #D4A373;
-            --accent-red: #D89A9E;
-            
-            /* 分類專屬柔和色彩 */
-            --cat-food: #E2B4B7;   /* 飲食: 柔玫瑰 */
-            --cat-trans: #A8C2CB;  /* 交通: 灰霧藍 */
-            --cat-house: #D4A373;  /* 居住: 陶土金 */
-            --cat-ent: #8BA89C;    /* 育樂: 青蓮綠 */
-            --cat-beauty: #DDA7A5; /* 服飾美容: 胭脂粉 */
-            --cat-other: #C4B7CB;  /* 其他: 丁香紫 */
+            --accent-green: #8BA89C; /* 收入專用色 */
+            --accent-inc-bg: rgba(139, 168, 156, 0.1); /* 收入模式輕微背景色 */
         }
 
-        body {
-            margin: 0; padding: 0; background: var(--bg-gradient); color: var(--text-main);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            height: 100vh; display: flex; justify-content: center; overflow: hidden;
-            -webkit-tap-highlight-color: transparent; user-select: none;
-        }
+        body { margin: 0; padding: 0; background: var(--bg-gradient); color: var(--text-main); font-family: -apple-system, sans-serif; height: 100vh; display: flex; justify-content: center; overflow: hidden; -webkit-tap-highlight-color: transparent; user-select: none; }
+        .app-container { width: 100%; max-width: 400px; height: 100%; position: relative; display: flex; flex-direction: column; align-items: center; }
 
-        /* 視窗總容器 (限制手機寬度，隱藏超出部分) */
-        .app-viewport {
-            width: 100%; max-width: 400px; height: 100%; position: relative; overflow: hidden;
-        }
+        /* 頂部載具 */
+        .carrier-pill { margin-top: 20px; background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow); padding: 8px 20px; border-radius: 30px; font-size: 0.85rem; color: var(--text-light); display: flex; align-items: center; gap: 8px; }
 
-        /* 單一視圖的基礎設定 */
-        .view-layer {
-            position: absolute; top: 0; width: 100%; height: 100%; 
-            display: flex; flex-direction: column; align-items: center;
-            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
+        /* 中部結餘 */
+        .balance-section { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; transition: transform 0.4s ease; }
+        .balance-label { font-size: 0.9rem; letter-spacing: 2px; color: var(--text-light); }
+        .balance-amount { font-size: 3.5rem; font-weight: 300; color: var(--accent-gold); text-shadow: 0 4px 15px rgba(212, 163, 115, 0.2); }
 
-        /* 第一層：主畫面 (初始位置 0) */
-        #main-view { transform: translateX(0); }
-        /* 第二層：報表畫面 (初始位置在右側視線外 100%) */
-        #report-view { transform: translateX(100%); }
-
-        /* ================= 頂部導航 ================= */
-        .header-bar {
-            width: 90%; display: flex; justify-content: space-between; align-items: center;
-            margin-top: 20px; margin-bottom: 10px; z-index: 10;
-        }
-        .nav-btn {
-            background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border);
-            padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; color: var(--text-main);
-            display: flex; align-items: center; gap: 8px; cursor: pointer; box-shadow: var(--glass-shadow);
-            transition: all 0.2s;
-        }
-        .nav-btn:active { transform: scale(0.95); }
-        .icon-btn { padding: 8px; border-radius: 50%; width: 36px; height: 36px; justify-content: center; }
-
-        /* ================= 主畫面區塊 ================= */
-        .balance-section { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; transition: transform 0.4s; }
-        .balance-label { font-size: 0.9rem; letter-spacing: 2px; color: var(--text-light); margin-bottom: 5px; }
-        .balance-amount { font-size: 3.5rem; font-weight: 300; color: var(--accent-gold); text-shadow: 0 4px 15px rgba(212, 163, 115, 0.2); transition: opacity 0.3s;}
-        
-        .category-grid {
-            width: 90%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding-bottom: 40px; transition: transform 0.4s;
-        }
-        .cat-btn {
-            background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border);
-            box-shadow: var(--glass-shadow); border-radius: 20px; aspect-ratio: 1 / 1;
-            display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 10px; cursor: pointer; transition: all 0.2s;
-        }
+        /* 下方網格 - 增加一列容納收入 */
+        .category-grid { width: 90%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding-bottom: 30px; transition: transform 0.4s ease; }
+        .cat-btn { background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow); border-radius: 20px; aspect-ratio: 1.1 / 1; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s; }
         .cat-btn:active, .cat-btn.active { background: rgba(255, 255, 255, 0.8); transform: scale(0.95); border-color: var(--accent-gold); }
-        .cat-btn svg { width: 28px; height: 28px; stroke: var(--text-main); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+        /* 收入按鈕專屬樣式 */
+        .cat-btn-income.active { border-color: var(--accent-green); }
+        
+        .cat-btn svg { width: 26px; height: 26px; stroke: var(--text-main); fill: none; stroke-width: 1.2; }
         .cat-btn.active svg { stroke: var(--accent-gold); }
-        .cat-btn span { font-size: 0.85rem; color: var(--text-main); font-weight: 500; }
+        .cat-btn-income.active svg { stroke: var(--accent-green); }
+        .cat-btn span { font-size: 0.8rem; color: var(--text-main); font-weight: 500; }
 
-        /* ================= 鍵盤與細項膠囊 ================= */
-        .keyboard-panel {
-            position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(249, 248, 246, 0.85);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--glass-border);
-            box-shadow: 0 -10px 40px rgba(180, 175, 170, 0.1); border-radius: 30px 30px 0 0; padding: 20px;
-            box-sizing: border-box; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); z-index: 100;
-        }
+        /* 滑出式鍵盤與細項 */
+        .keyboard-panel { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(249, 248, 246, 0.95); backdrop-filter: blur(20px); border-top: 1px solid var(--glass-border); border-radius: 30px 30px 0 0; padding: 15px 20px 30px 20px; box-sizing: border-box; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.4s ease; z-index: 100; }
         .keyboard-panel.open { transform: translateY(0); }
+        /* 收入模式時鍵盤背景微變色 */
+        .keyboard-panel.income-mode { background: rgba(240, 248, 245, 0.95); }
 
-        .input-display {
-            text-align: right; font-size: 2.5rem; color: var(--text-main); padding: 0 10px; margin-bottom: 15px;
-            border-bottom: 1px solid rgba(92, 84, 78, 0.1); height: 50px; display: flex; align-items: center; justify-content: flex-end;
-        }
+        /* 鍵盤上方工具列：日期與發票標記 */
+        .kb-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 0 5px; margin-bottom: 10px; opacity: 0; transition: opacity 0.3s ease; }
+        .kb-toolbar.show { opacity: 1; }
+        .date-display { font-size: 0.8rem; color: var(--text-light); display: flex; align-items: center; gap: 5px; cursor: pointer; }
+        .invoice-toggle { width: 32px; height: 32px; display: flex; justify-content: center; align-items: center; border-radius: 50%; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-light); cursor: pointer; transition: all 0.2s; }
+        .invoice-toggle.active { background: var(--accent-gold); color: white; border-color: transparent; box-shadow: 0 2px 8px rgba(212, 163, 115, 0.3); }
 
-        /* 橫向滑動細項膠囊 */
-        .sub-tags-wrapper {
-            width: 100%; overflow-x: auto; white-space: nowrap; padding: 0 0 15px 0; margin-bottom: 10px;
-            -ms-overflow-style: none; scrollbar-width: none; opacity: 0; transition: opacity 0.3s;
-        }
+        /* 橫向滑動細項 */
+        .sub-tags-wrapper { width: 100%; overflow-x: auto; white-space: nowrap; padding: 0 0 15px 0; -ms-overflow-style: none; scrollbar-width: none; opacity: 0; transition: opacity 0.3s ease; }
         .sub-tags-wrapper::-webkit-scrollbar { display: none; }
         .sub-tags-wrapper.show { opacity: 1; }
-        .sub-tag {
-            display: inline-block; background: rgba(255, 255, 255, 0.5); border: 1px solid var(--glass-border);
-            color: var(--text-light); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; margin-right: 10px; cursor: pointer; transition: all 0.2s;
-        }
-        .sub-tag.selected { background: rgba(255, 255, 255, 0.9); color: var(--text-main); border-color: var(--accent-gold); font-weight: 500; transform: scale(0.95);}
+        .sub-tag { display: inline-block; background: rgba(255, 255, 255, 0.5); border: 1px solid var(--glass-border); color: var(--text-light); padding: 7px 14px; border-radius: 20px; font-size: 0.8rem; margin-right: 8px; cursor: pointer; transition: all 0.2s; }
+        .sub-tag.selected { background: rgba(255, 255, 255, 0.9); color: var(--text-main); border-color: var(--accent-gold); font-weight: 500; transform: scale(0.96); }
+        .sub-tag-income.selected { border-color: var(--accent-green); }
 
-        .key-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .key { background: transparent; border: none; font-size: 1.5rem; color: var(--text-main); height: 55px; border-radius: 15px; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: background 0.2s; font-weight: 300; }
-        .key:active { background: rgba(0, 0, 0, 0.05); }
-        .key-enter { grid-row: span 2; background: var(--accent-gold); color: white; border-radius: 20px; font-size: 1.8rem; box-shadow: 0 4px 15px rgba(212, 163, 115, 0.4); }
-
-        /* ================= 報表畫面區塊 ================= */
-        .chart-card {
-            width: 90%; background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--glass-border);
-            border-radius: 30px; box-shadow: var(--glass-shadow); padding: 30px 20px; display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; flex-shrink: 0; box-sizing: border-box;
-        }
-        .chart-container { position: relative; width: 180px; height: 180px; }
-        svg.donut { width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible; }
-        .donut-segment { fill: transparent; stroke-width: 3.5; stroke-linecap: round; transition: stroke-dasharray 1s ease-out; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.08)); }
+        .input-display { text-align: right; font-size: 2.5rem; color: var(--text-main); height: 50px; display: flex; align-items: center; justify-content: flex-end; margin-bottom: 15px; border-bottom: 1px solid rgba(92, 84, 78, 0.1); }
         
-        .chart-center-text { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .total-label { font-size: 0.8rem; color: var(--text-light); letter-spacing: 1px; margin-bottom: 4px; }
-        .total-amount { font-size: 1.8rem; font-weight: 300; color: var(--text-main); }
-        .budget-hint { font-size: 0.7rem; color: var(--accent-gold); margin-top: 4px; opacity: 0.8; }
-
-        .list-container { width: 90%; flex: 1; overflow-y: auto; padding-bottom: 40px; -ms-overflow-style: none; scrollbar-width: none; }
-        .list-container::-webkit-scrollbar { display: none; }
-        .list-header { font-size: 0.85rem; color: var(--text-light); letter-spacing: 1px; margin-bottom: 15px; padding-left: 5px; }
-        .trans-item { background: var(--glass-bg); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 20px; padding: 15px 20px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(180, 175, 170, 0.08); }
-        .trans-left { display: flex; align-items: center; gap: 15px; }
-        .cat-color-dot { width: 12px; height: 12px; border-radius: 50%; }
-        .trans-info { display: flex; flex-direction: column; gap: 4px; }
-        .trans-title { font-size: 0.95rem; font-weight: 500; color: var(--text-main); }
-        .trans-time { font-size: 0.75rem; color: var(--text-light); }
-        .trans-amt { font-size: 1.1rem; font-weight: 400; color: var(--text-main); }
+        .key-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .key { background: transparent; border: none; font-size: 1.5rem; color: var(--text-main); height: 55px; border-radius: 15px; display: flex; justify-content: center; align-items: center; cursor: pointer; font-weight: 300; }
+        .key:active { background: rgba(0, 0, 0, 0.05); }
+        .key-enter { grid-row: span 2; background: var(--accent-gold); color: white; border-radius: 20px; font-size: 1.8rem; transition: background 0.3s ease; }
+        .income-mode .key-enter { background: var(--accent-green); }
     </style>
 </head>
 <body>
 
-<div class="app-viewport">
-    
-    <div id="main-view" class="view-layer">
-        <div class="header-bar">
-            <div class="nav-btn">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5v14M8 5v14M12 5v14M16 5v14M20 5v14"/></svg>
-                /12ABCDE
-            </div>
-            <div class="nav-btn icon-btn" onclick="toggleView('report')">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
-            </div>
-        </div>
+<div class="app-container">
+    <div class="carrier-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5v14M8 5v14M12 5v14M16 5v14M20 5v14"/></svg>
+        發票載具 /12ABCDE
+    </div>
 
-        <div class="balance-section" id="balance-sec">
-            <div class="balance-label">本月結餘</div>
-            <div class="balance-amount" id="main-balance">$15,000</div>
-        </div>
+    <div class="balance-section" id="balance-sec">
+        <div class="balance-label">本月結餘</div>
+        <div class="balance-amount" id="main-balance">$15,000</div>
+    </div>
 
-        <div class="category-grid" id="cat-grid">
-            <div class="cat-btn" onclick="openKeyboard(this, '飲食')">
-                <svg viewBox="0 0 24 24"><path d="M4 11h16a8 8 0 0 1-16 0z"/><path d="M12 3v4M8 4v3M16 4v3"/></svg><span>飲食</span>
-            </div>
-            <div class="cat-btn" onclick="openKeyboard(this, '服飾美容')">
-                <svg viewBox="0 0 24 24"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg><span>服飾美容</span>
-            </div>
-            <div class="cat-btn" onclick="openKeyboard(this, '居住')">
-                <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>居住</span>
-            </div>
-            <div class="cat-btn" onclick="openKeyboard(this, '交通')">
-                <svg viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="10" rx="2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/><path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg><span>交通</span>
-            </div>
-            <div class="cat-btn" onclick="openKeyboard(this, '育樂進修')">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg><span>育樂進修</span>
-            </div>
-            <div class="cat-btn" onclick="openKeyboard(this, '其他生活')">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/><circle cx="5" cy="12" r="2"/></svg><span>其他生活</span>
-            </div>
-        </div>
-
-        <div class="keyboard-panel" id="keyboard">
-            <div class="sub-tags-wrapper" id="sub-tags-container"></div>
-            
-            <div class="input-display" id="input-amt">0</div>
-            <div class="key-grid">
-                <button class="key" onclick="inputNum(1)">1</button>
-                <button class="key" onclick="inputNum(2)">2</button>
-                <button class="key" onclick="inputNum(3)">3</button>
-                <button class="key" onclick="deleteNum()">⌫</button>
-                <button class="key" onclick="inputNum(4)">4</button>
-                <button class="key" onclick="inputNum(5)">5</button>
-                <button class="key" onclick="inputNum(6)">6</button>
-                <button class="key key-enter" onclick="submitEntry()">✓</button>
-                <button class="key" onclick="inputNum(7)">7</button>
-                <button class="key" onclick="inputNum(8)">8</button>
-                <button class="key" onclick="inputNum(9)">9</button>
-                <button class="key" onclick="closeKeyboard()">取消</button>
-                <button class="key" onclick="inputNum(0)">0</button>
-                <button class="key" onclick="inputNum('00')">00</button>
-            </div>
+    <div class="category-grid" id="cat-grid">
+        <div class="cat-btn" onclick="openKeyboard(this, '飲食')"><svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1z"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><path d="M6 1v3M10 1v3M14 1v3"/></svg><span>飲食</span></div>
+        <div class="cat-btn" onclick="openKeyboard(this, '服飾美容')"><svg viewBox="0 0 24 24"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg><span>服飾美容</span></div>
+        <div class="cat-btn" onclick="openKeyboard(this, '交通')"><svg viewBox="0 0 24 24"><rect x="1" y="3" width="22" height="13" rx="2"/><path d="M4 16v4M20 16v4M1 9h22M6 3v2M18 3v2"/></svg><span>交通</span></div>
+        <div class="cat-btn" onclick="openKeyboard(this, '居住')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg><span>居住</span></div>
+        <div class="cat-btn" onclick="openKeyboard(this, '育樂進修')"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="15" rx="2"/><path d="M17 22V5a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v17M12 7v15M7 11h10M7 15h10M7 19h10"/></svg><span>育樂進修</span></div>
+        <div class="cat-btn" onclick="openKeyboard(this, '其他生活')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg><span>其他生活</span></div>
+        <div class="cat-btn cat-btn-income" style="grid-column: span 3; aspect-ratio: auto; height: 50px; flex-direction: row; gap: 15px; border-color: rgba(139, 168, 156, 0.3);" onclick="openKeyboard(this, '收入', true)">
+            <svg viewBox="0 0 24 24" style="stroke: var(--accent-green);"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            <span style="color: var(--accent-green); font-size: 0.9rem; letter-spacing: 2px;">記一筆收入</span>
         </div>
     </div>
 
-    <div id="report-view" class="view-layer">
-        <div class="header-bar">
-            <div class="nav-btn icon-btn" onclick="toggleView('main')">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+    <div class="keyboard-panel" id="keyboard">
+        <div class="kb-toolbar" id="kb-tools">
+            <div class="date-display">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <span id="date-str">3月24日</span>
             </div>
-            <div style="font-weight: 500; letter-spacing: 2px;">本月分析</div>
-            <div style="width: 36px;"></div> </div>
-
-        <div class="chart-card">
-            <div class="chart-container">
-                <svg class="donut" viewBox="0 0 42 42" id="donut-chart"></svg>
-                <div class="chart-center-text">
-                    <div class="total-label">總支出</div>
-                    <div class="total-amount" id="total-disp">$0</div>
-                    <div class="budget-hint" id="budget-disp">預算 $15,000</div>
-                </div>
+            <div class="invoice-toggle" id="invoice-btn" onclick="toggleInvoice()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1z"/><path d="M16 8h-8M16 12h-8M16 16h-8"/></svg>
             </div>
         </div>
 
-        <div class="list-container">
-            <div class="list-header">近期明細</div>
-            <div id="trans-list"></div>
+        <div class="sub-tags-wrapper" id="sub-tags-container"></div>
+        <div class="input-display" id="input-amt">0</div>
+        
+        <div class="key-grid">
+            <button class="key" onclick="inputNum(1)">1</button>
+            <button class="key" onclick="inputNum(2)">2</button>
+            <button class="key" onclick="inputNum(3)">3</button>
+            <button class="key" onclick="deleteNum()">⌫</button>
+            <button class="key" onclick="inputNum(4)">4</button>
+            <button class="key" onclick="inputNum(5)">5</button>
+            <button class="key" onclick="inputNum(6)">6</button>
+            <button class="key key-enter" onclick="submitEntry()">✓</button>
+            <button class="key" onclick="inputNum(7)">7</button>
+            <button class="key" onclick="inputNum(8)">8</button>
+            <button class="key" onclick="inputNum(9)">9</button>
+            <button class="key" onclick="closeKeyboard()">取消</button>
+            <button class="key" onclick="inputNum(0)">0</button>
+            <button class="key" onclick="inputNum('00')">00</button>
         </div>
     </div>
-
 </div>
 
 <script>
-    // ================= 核心狀態與資料庫 =================
-    let balance = 15000;
-    const budgetLimit = 15000;
-    let transactions = []; // 初始為空，記帳後動態新增
-
-    // 分類顏色對應 (用於報表)
-    const colorMap = {
-        '飲食': 'var(--cat-food)', '服飾美容': 'var(--cat-beauty)',
-        '居住': 'var(--cat-house)', '交通': 'var(--cat-trans)',
-        '育樂進修': 'var(--cat-ent)', '其他生活': 'var(--cat-other)'
-    };
-
-    // 視圖切換邏輯 (水平滑動)
-    function toggleView(target) {
-        const main = document.getElementById('main-view');
-        const report = document.getElementById('report-view');
-        
-        if (target === 'report') {
-            closeKeyboard(); // 確保鍵盤收起
-            main.style.transform = 'translateX(-100%)';
-            report.style.transform = 'translateX(0)';
-            initReport(); // 每次進入報表時重新繪製最新資料
-        } else {
-            main.style.transform = 'translateX(0)';
-            report.style.transform = 'translateX(100%)';
-        }
-    }
-
-    // ================= 鍵盤與細項邏輯 =================
+    // ================= 資料與狀態 =================
     const categoryData = {
-        '飲食': ['早餐', '午餐', '晚餐', '宵夜', '飲料', '小吃點心', '便利商店', '水果'],
-        '服飾美容': ['衣服', '鞋包', '化妝保養品', '理髮', '醫美'],
-        '交通': ['大眾運輸', '計程車', '加油/充電', '停車費', '車子美容', '車子保養'],
-        '居住': ['租金/房貸', '管理費', '網路費'],
-        '育樂進修': ['電影展覽', '數位訂閱', '國內外旅遊', '書籍', '補習費', '學費', '3C產品'],
-        '其他生活': ['電話費', '保險費', '醫療', '交際孝親', '信用卡']
+        '飲食': ['早餐', '午餐', '晚餐', '宵夜', '飲料', '便利商店', '水果'],
+        '服飾美容': ['衣服', '鞋包', '保養品', '理髮', '醫美'],
+        '交通': ['捷運公車', '計程車', '加油/充電', '停車費', '車保養'],
+        '居住': ['房租/房貸', '水電瓦斯', '管理費', '網路費', '居家用品'],
+        '育樂進修': ['電影展覽', '數位訂閱', '旅遊', '書籍', '學雜費', '3C產品'],
+        '其他生活': ['電話費', '保險費', '醫療', '交際孝親', '信用卡'],
+        // ★ 收入細項清單 ★
+        '收入': ['薪水', '獎金', '投資收益', '政府回饋', '其他收入']
     };
 
     let currentInput = "0";
     let activeBtn = null;
     let currentSubTag = "";
-    
+    let isIncomeMode = false;
+    let hasInvoice = false; // 紀錄是否有發票
+    let balance = 15000;
+
     const kb = document.getElementById('keyboard');
     const display = document.getElementById('input-amt');
     const mainBal = document.getElementById('main-balance');
+    const tools = document.getElementById('kb-tools');
+    const invoiceBtn = document.getElementById('invoice-btn');
+    const subContainer = document.getElementById('sub-tags-container');
 
-    function renderSubTags(categoryName) {
-        const container = document.getElementById('sub-tags-container');
-        container.innerHTML = ''; currentSubTag = "";
-        
-        const tags = categoryData[categoryName] || [];
-        tags.forEach(tag => {
-            const el = document.createElement('div');
-            el.className = 'sub-tag';
-            el.innerText = tag;
-            el.onclick = function() {
-                Array.from(container.children).forEach(t => t.classList.remove('selected'));
-                this.classList.add('selected');
-                currentSubTag = tag;
-                this.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-            };
-            container.appendChild(el);
-        });
-        setTimeout(() => container.classList.add('show'), 50);
-    }
+    // ================= 核心邏輯 =================
+    
+    function updateDisplay() { display.innerText = currentInput === "0" ? "0" : Number(currentInput).toLocaleString(); }
 
-    function openKeyboard(btn, category) {
+    // 開啟鍵盤，整合收入模式判斷
+    function openKeyboard(btn, category, isIncome = false) {
         if(activeBtn) activeBtn.classList.remove('active');
-        activeBtn = btn; activeBtn.classList.add('active');
-        currentInput = "0"; updateDisplay(); renderSubTags(category);
+        activeBtn = btn;
+        activeBtn.classList.add('active');
+        
+        isIncomeMode = isIncome;
+        hasInvoice = false; // 重置發票狀態
+        invoiceBtn.classList.remove('active');
+        currentInput = "0";
+        updateDisplay();
+        
+        // 渲染細項，若是收入模式，加上特殊樣式
+        renderSubTags(category, isIncome);
+        
+        // UI 狀態切換
+        if (isIncome) {
+            kb.classList.add('income-mode');
+            invoiceBtn.style.display = 'none'; // 收入模式不需要發票標記
+        } else {
+            kb.classList.remove('income-mode');
+            invoiceBtn.style.display = 'flex';
+        }
         
         document.getElementById('balance-sec').style.transform = "translateY(-20px) scale(0.95)";
         document.getElementById('cat-grid').style.transform = "translateY(-15px)";
         kb.classList.add('open');
+        setTimeout(() => tools.classList.add('show'), 100);
     }
 
     function closeKeyboard() {
         if(activeBtn) activeBtn.classList.remove('active');
         activeBtn = null;
+        kb.classList.remove('open', 'income-mode');
+        tools.classList.remove('show');
+        subContainer.classList.remove('show');
         document.getElementById('balance-sec').style.transform = "translateY(0) scale(1)";
         document.getElementById('cat-grid').style.transform = "translateY(0)";
-        kb.classList.remove('open');
-        document.getElementById('sub-tags-container').classList.remove('show');
     }
 
-    function updateDisplay() { display.innerText = currentInput === "" ? "0" : Number(currentInput).toLocaleString(); }
+    // 渲染免打字細項
+    function renderSubTags(categoryName, isIncome) {
+        subContainer.innerHTML = ''; currentSubTag = "";
+        const tags = categoryData[categoryName] || [];
+        tags.forEach(tag => {
+            const el = document.createElement('div');
+            el.className = `sub-tag ${isIncome ? 'sub-tag-income' : ''}`;
+            el.innerText = tag;
+            el.onclick = function() {
+                Array.from(subContainer.children).forEach(t => t.classList.remove('selected'));
+                this.classList.add('selected');
+                currentSubTag = tag;
+                this.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            };
+            subContainer.appendChild(el);
+        });
+        setTimeout(() => subContainer.classList.add('show'), 50);
+    }
+
+    // 切換發票狀態
+    function toggleInvoice() {
+        hasInvoice = !hasInvoice;
+        if (hasInvoice) invoiceBtn.classList.add('active');
+        else invoiceBtn.classList.remove('active');
+    }
+
+    // 數字輸入邏輯
     function inputNum(num) { 
         if (currentInput === "0" && num !== "00") currentInput = num.toString();
         else if(currentInput.length < 8) currentInput += num.toString();
@@ -329,25 +238,25 @@
         updateDisplay();
     }
 
-    // ★ 關鍵：記帳送出並連動報表資料 ★
+    // ★ 關鍵送出：整合支出/收入邏輯 ★
     function submitEntry() {
         let amt = Number(currentInput);
-        let category = activeBtn ? activeBtn.querySelector('span').innerText : '未分類';
         let subCategory = currentSubTag || '一般';
+        let date = document.getElementById('date-str').innerText;
         
         if(amt > 0) {
-            balance -= amt; // 扣除結餘
-            
-            // 動態新增一筆交易紀錄到陣列最前面
-            transactions.unshift({
-                id: Date.now(),
-                cat: category,
-                sub: subCategory,
-                amt: amt,
-                time: '剛剛',
-                color: colorMap[category] || 'var(--cat-other)'
-            });
+            // 根據模式加或減結餘
+            if (isIncomeMode) {
+                balance += amt;
+                // 未來 LocalStorage：{ date: '...', type: 'income', cat: '薪水', amt: 1000 }
+                console.log(`[收入] ${date} ${subCategory} +$${amt}`);
+            } else {
+                balance -= amt;
+                // 未來 LocalStorage：{ date: '...', type: 'expense', cat: '飲食-早餐', amt: 60, invoice: true }
+                console.log(`[支出] ${date} ${subCategory} -$${amt} (發票: ${hasInvoice})`);
+            }
 
+            // 更新結餘顯示 (簡單動畫)
             mainBal.style.opacity = 0;
             setTimeout(() => {
                 mainBal.innerText = "$" + balance.toLocaleString();
@@ -355,74 +264,6 @@
             }, 200);
         }
         closeKeyboard();
-    }
-
-    // ================= 報表生成邏輯 =================
-    function initReport() {
-        const listDiv = document.getElementById('trans-list');
-        const donut = document.getElementById('donut-chart');
-        let totalAmt = 0; let catTotals = {};
-        
-        listDiv.innerHTML = ''; // 清空舊明細
-
-        if(transactions.length === 0) {
-            listDiv.innerHTML = '<div style="text-align:center; color:var(--text-light); margin-top:20px; font-size:0.85rem;">目前尚無紀錄，開始記下第一筆帳吧。</div>';
-        }
-
-        transactions.forEach(t => {
-            totalAmt += t.amt;
-            if(!catTotals[t.cat]) catTotals[t.cat] = { amt: 0, color: t.color };
-            catTotals[t.cat].amt += t.amt;
-
-            const item = document.createElement('div');
-            item.className = 'trans-item';
-            item.innerHTML = `
-                <div class="trans-left">
-                    <div class="cat-color-dot" style="background: ${t.color}"></div>
-                    <div class="trans-info">
-                        <div class="trans-title">${t.cat} - ${t.sub}</div>
-                        <div class="trans-time">${t.time}</div>
-                    </div>
-                </div>
-                <div class="trans-amt">-$${t.amt}</div>
-            `;
-            listDiv.appendChild(item);
-        });
-
-        const totalDisp = document.getElementById('total-disp');
-        const budgetDisp = document.getElementById('budget-disp');
-        totalDisp.innerText = '$' + totalAmt.toLocaleString();
-        totalDisp.style.color = 'var(--text-main)'; // 重置顏色
-        budgetDisp.style.color = 'var(--accent-gold)';
-
-        if (totalAmt > budgetLimit) {
-            totalDisp.style.color = 'var(--accent-red)';
-            budgetDisp.innerText = '已超預算';
-            budgetDisp.style.color = 'var(--accent-red)';
-        } else if (totalAmt > budgetLimit * 0.8) {
-            budgetDisp.innerText = `剩餘 $${(budgetLimit - totalAmt).toLocaleString()}`;
-        } else {
-            budgetDisp.innerText = `預算 $${budgetLimit.toLocaleString()}`;
-        }
-
-        let cumulativePercent = 0;
-        donut.innerHTML = '';
-        
-        Object.keys(catTotals).forEach(cat => {
-            let percent = (catTotals[cat].amt / totalAmt) * 100;
-            let visiblePercent = percent > 2 ? percent - 1.5 : percent; // 留白處理
-
-            const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-            circle.setAttribute("cx", "21"); circle.setAttribute("cy", "21"); circle.setAttribute("r", "15.9155");
-            circle.setAttribute("class", "donut-segment"); circle.setAttribute("stroke", catTotals[cat].color);
-            
-            circle.style.strokeDasharray = `0 100`;
-            circle.style.strokeDashoffset = `-${cumulativePercent}`;
-            donut.appendChild(circle);
-
-            setTimeout(() => { circle.style.strokeDasharray = `${visiblePercent} ${100 - visiblePercent}`; }, 50);
-            cumulativePercent += percent;
-        });
     }
 </script>
 
