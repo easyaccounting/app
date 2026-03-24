@@ -98,6 +98,26 @@
         .modal-input { width: 100%; padding: 12px; margin: 10px 0 20px; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.6); font-size: 1rem; color: var(--text-main); box-sizing: border-box; text-align: center; }
         .modal-btn { background: var(--accent-gold); color: white; border: none; padding: 10px 25px; border-radius: 20px; font-size: 1rem; cursor: pointer; margin: 5px; }
         .modal-btn-alt { background: var(--glass-bg); color: var(--text-main); border: 1px solid var(--glass-border); padding: 10px 25px; border-radius: 20px; font-size: 1rem; cursor: pointer; margin: 5px; }
+        /* 1. 修復鍵盤底部被吃掉的 0 (加大 iOS 安全距離與底部留白) */
+.keyboard-panel { 
+    /* ...保留原有設定... */
+    padding: 15px 20px max(40px, env(safe-area-inset-bottom)) 20px; 
+}
+
+/* 2. 讓輸入框更有質感，點擊時散發柔和金光，不出現死硬黑框 */
+.modal-input:focus {
+    outline: none;
+    border-color: var(--accent-gold);
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 12px rgba(212, 163, 115, 0.25);
+    transition: all 0.3s ease;
+}
+
+/* 3. 確保畫面絕對不會被原生的鍵盤擠壓出右側白框 */
+body, .app-viewport {
+    overflow-x: hidden; 
+}
+
     </style>
 </head>
 <body>
@@ -256,30 +276,61 @@
     const categoryData = { '飲食': ['早餐','午餐','晚餐','宵夜','飲料','便利商店','水果'], '服飾美容': ['衣服','鞋包','保養品','理髮','醫美'], '交通': ['捷運公車','計程車','加油/充電','停車費','車保養'], '居住': ['房租/房貸','水電瓦斯','管理費','網路費','居家用品'], '育樂進修': ['電影展覽','數位訂閱','旅遊','書籍','學雜費','3C產品'], '其他生活': ['電話費','保險費','醫療','交際孝親','信用卡'], '收入': ['薪水','獎金','投資收益','政府回饋','其他收入'] };
     const colorMap = { '飲食': 'var(--cat-food)', '服飾美容': 'var(--cat-beauty)', '居住': 'var(--cat-house)', '交通': 'var(--cat-trans)', '育樂進修': 'var(--cat-ent)', '其他生活': 'var(--cat-other)' };
 
-    let currentInput = "0", activeBtn = null, currentSubTag = "", isIncomeMode = false, hasInvoice = false;
-    const kb = document.getElementById('keyboard'), display = document.getElementById('input-amt'), subContainer = document.getElementById('sub-tags-container');
+    let currentCustomEl = null; // 暫存目前點擊的自訂標籤元素
 
-    function updateDisplay() { display.innerText = currentInput === "0" ? "0" : Number(currentInput).toLocaleString(); }
+function renderSubTags(categoryName, isIncome) {
+    subContainer.innerHTML = ''; currentSubTag = "";
     
-    function renderSubTags(categoryName, isIncome) {
-        subContainer.innerHTML = ''; currentSubTag = "";
-        let tags = (categoryData[categoryName] || []).slice(); tags.push('✍️ 自訂');
-        tags.forEach(tag => {
-            const el = document.createElement('div'); el.className = `sub-tag ${isIncome ? 'sub-tag-income' : ''}`; el.innerText = tag;
+    // 複製清單
+    let tags = (categoryData[categoryName] || []).slice();
+    tags.push('ADD_CUSTOM'); // 使用特定常數代表新增按鈕
+
+    tags.forEach(tag => {
+        const el = document.createElement('div');
+        el.className = `sub-tag ${isIncome ? 'sub-tag-income' : ''}`;
+        
+        if (tag === 'ADD_CUSTOM') {
+            // 使用純 SVG 取代 emoji，極致極簡
+            el.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="margin-right:4px; vertical-align:-1px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>新增`;
+            el.onclick = function() {
+                // 清空並呼叫我們的高質感遮罩
+                document.getElementById('custom-tag-input').value = '';
+                showModal('custom-tag-modal');
+                currentCustomEl = this; // 記住這個按鈕，稍後填字用
+                
+                // 為了流暢度，延遲一下讓輸入框自動聚焦 (Focus)
+                setTimeout(() => document.getElementById('custom-tag-input').focus(), 100);
+            };
+        } else {
+            el.innerText = tag;
             el.onclick = function() {
                 Array.from(subContainer.children).forEach(t => t.classList.remove('selected'));
                 this.classList.add('selected');
-                if (tag === '✍️ 自訂') {
-                    let customText = prompt("請輸入自訂細項：");
-                    if (customText && customText.trim() !== "") { currentSubTag = customText.trim(); this.innerText = customText.trim(); } 
-                    else { this.classList.remove('selected'); }
-                } else { currentSubTag = tag; }
+                currentSubTag = tag;
                 this.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
             };
-            subContainer.appendChild(el);
-        });
-        setTimeout(() => subContainer.classList.add('show'), 50);
+        }
+        subContainer.appendChild(el);
+    });
+    setTimeout(() => subContainer.classList.add('show'), 50);
+}
+
+// 接收來自高質感遮罩的確認動作
+function confirmCustomTag() {
+    let val = document.getElementById('custom-tag-input').value.trim();
+    if (val !== "" && currentCustomEl) {
+        currentSubTag = val;
+        // 將「+ 新增」替換為使用者輸入的文字，並維持清淨排版
+        currentCustomEl.innerText = val;
+        
+        // 移除其他人的選取狀態，並將自己設為選取
+        Array.from(subContainer.children).forEach(t => t.classList.remove('selected'));
+        currentCustomEl.classList.add('selected');
+        currentCustomEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     }
+    closeModal('custom-tag-modal');
+}
+
 
     function openKeyboard(btn, category, isIncome = false) {
         if(activeBtn) activeBtn.classList.remove('active'); activeBtn = btn; activeBtn.classList.add('active');
@@ -421,6 +472,17 @@
     // 啟動 App
     window.onload = loadData;
 </script>
+<div class="modal-overlay" id="custom-tag-modal" onclick="closeModal('custom-tag-modal')">
+    <div class="glass-modal" onclick="event.stopPropagation()">
+        <h3 style="margin-top:0; color:var(--text-main); font-weight: 500; font-size: 1.1rem; letter-spacing: 1px;">新增專屬細項</h3>
+        <input type="text" id="custom-tag-input" class="modal-input" placeholder="例如：給媽媽的禮物" maxlength="8">
+        
+        <div style="display: flex; justify-content: center; gap: 10px; margin-top: 15px;">
+            <button class="modal-btn-alt" onclick="closeModal('custom-tag-modal')">取消</button>
+            <button class="modal-btn" onclick="confirmCustomTag()">確定</button>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>
