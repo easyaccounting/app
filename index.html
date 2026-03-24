@@ -2,8 +2,8 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>柔光記帳 - 智慧大圓滿</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>柔光記帳</title>
     <style>
         :root {
             --bg-gradient: linear-gradient(135deg, #F9F8F6, #EAE6DF);
@@ -13,48 +13,50 @@
             --text-main: #5C544E;
             --text-light: #9A928B;
             --accent-gold: #D4A373;
-            --accent-green: #8BA89C; /* 收入專用色 */
-            --accent-inc-bg: rgba(139, 168, 156, 0.1); /* 收入模式輕微背景色 */
+            --accent-green: #8BA89C; 
+            --accent-red: #D89A9E;
+            
+            --cat-food: #E2B4B7; --cat-trans: #A8C2CB; --cat-house: #D4A373;
+            --cat-ent: #8BA89C; --cat-beauty: #DDA7A5; --cat-other: #C4B7CB;
         }
 
-        body { margin: 0; padding: 0; background: var(--bg-gradient); color: var(--text-main); font-family: -apple-system, sans-serif; height: 100vh; display: flex; justify-content: center; overflow: hidden; -webkit-tap-highlight-color: transparent; user-select: none; }
-        .app-container { width: 100%; max-width: 400px; height: 100%; position: relative; display: flex; flex-direction: column; align-items: center; }
+        body { margin: 0; padding: 0; background: var(--bg-gradient); color: var(--text-main); font-family: -apple-system, sans-serif; height: 100dvh; display: flex; justify-content: center; overflow: hidden; -webkit-tap-highlight-color: transparent; user-select: none; }
+        .app-viewport { width: 100%; max-width: 400px; height: 100%; position: relative; overflow: hidden; }
+        .view-layer { position: absolute; top: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        #main-view { transform: translateX(0); } #report-view { transform: translateX(100%); }
 
-        /* 頂部載具 */
-        .carrier-pill { margin-top: 20px; background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow); padding: 8px 20px; border-radius: 30px; font-size: 0.85rem; color: var(--text-light); display: flex; align-items: center; gap: 8px; }
+        /* Header */
+        .header-bar { width: 90%; display: flex; justify-content: space-between; align-items: center; margin-top: max(20px, env(safe-area-inset-top)); margin-bottom: 10px; z-index: 10; }
+        .nav-btn { background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; color: var(--text-main); display: flex; align-items: center; gap: 8px; cursor: pointer; box-shadow: var(--glass-shadow); transition: all 0.2s; }
+        .nav-btn:active { transform: scale(0.95); }
+        .icon-btn { padding: 8px; border-radius: 50%; width: 36px; height: 36px; justify-content: center; }
 
-        /* 中部結餘 */
-        .balance-section { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; transition: transform 0.4s ease; }
-        .balance-label { font-size: 0.9rem; letter-spacing: 2px; color: var(--text-light); }
-        .balance-amount { font-size: 3.5rem; font-weight: 300; color: var(--accent-gold); text-shadow: 0 4px 15px rgba(212, 163, 115, 0.2); }
-
-        /* 下方網格 - 增加一列容納收入 */
-        .category-grid { width: 90%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding-bottom: 30px; transition: transform 0.4s ease; }
-        .cat-btn { background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow); border-radius: 20px; aspect-ratio: 1.1 / 1; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s; }
-        .cat-btn:active, .cat-btn.active { background: rgba(255, 255, 255, 0.8); transform: scale(0.95); border-color: var(--accent-gold); }
-        /* 收入按鈕專屬樣式 */
-        .cat-btn-income.active { border-color: var(--accent-green); }
+        /* Main View */
+        .balance-section { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; transition: transform 0.4s; }
+        .balance-label { font-size: 0.9rem; letter-spacing: 2px; color: var(--text-light); margin-bottom: 5px; }
+        .balance-amount { font-size: 3.5rem; font-weight: 300; color: var(--accent-gold); text-shadow: 0 4px 15px rgba(212, 163, 115, 0.2); transition: opacity 0.3s;}
         
+        .category-grid { width: 90%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding-bottom: 30px; transition: transform 0.4s; }
+        .cat-btn { background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow); border-radius: 20px; aspect-ratio: 1.1/1; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s; }
+        .cat-btn:active, .cat-btn.active { background: rgba(255, 255, 255, 0.8); transform: scale(0.95); border-color: var(--accent-gold); }
+        .cat-btn-income.active { border-color: var(--accent-green); }
         .cat-btn svg { width: 26px; height: 26px; stroke: var(--text-main); fill: none; stroke-width: 1.2; }
         .cat-btn.active svg { stroke: var(--accent-gold); }
         .cat-btn-income.active svg { stroke: var(--accent-green); }
         .cat-btn span { font-size: 0.8rem; color: var(--text-main); font-weight: 500; }
 
-        /* 滑出式鍵盤與細項 */
-        .keyboard-panel { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(249, 248, 246, 0.95); backdrop-filter: blur(20px); border-top: 1px solid var(--glass-border); border-radius: 30px 30px 0 0; padding: 15px 20px 30px 20px; box-sizing: border-box; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.4s ease; z-index: 100; }
+        /* Keyboard */
+        .keyboard-panel { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(249, 248, 246, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--glass-border); box-shadow: 0 -10px 40px rgba(180, 175, 170, 0.1); border-radius: 30px 30px 0 0; padding: 15px 20px max(30px, env(safe-area-inset-bottom)) 20px; box-sizing: border-box; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.4s; z-index: 100; }
         .keyboard-panel.open { transform: translateY(0); }
-        /* 收入模式時鍵盤背景微變色 */
         .keyboard-panel.income-mode { background: rgba(240, 248, 245, 0.95); }
 
-        /* 鍵盤上方工具列：日期與發票標記 */
-        .kb-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 0 5px; margin-bottom: 10px; opacity: 0; transition: opacity 0.3s ease; }
+        .kb-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 0 5px; margin-bottom: 10px; opacity: 0; transition: opacity 0.3s; }
         .kb-toolbar.show { opacity: 1; }
-        .date-display { font-size: 0.8rem; color: var(--text-light); display: flex; align-items: center; gap: 5px; cursor: pointer; }
+        .date-display { font-size: 0.8rem; color: var(--text-light); display: flex; align-items: center; gap: 5px; }
         .invoice-toggle { width: 32px; height: 32px; display: flex; justify-content: center; align-items: center; border-radius: 50%; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-light); cursor: pointer; transition: all 0.2s; }
         .invoice-toggle.active { background: var(--accent-gold); color: white; border-color: transparent; box-shadow: 0 2px 8px rgba(212, 163, 115, 0.3); }
 
-        /* 橫向滑動細項 */
-        .sub-tags-wrapper { width: 100%; overflow-x: auto; white-space: nowrap; padding: 0 0 15px 0; -ms-overflow-style: none; scrollbar-width: none; opacity: 0; transition: opacity 0.3s ease; }
+        .sub-tags-wrapper { width: 100%; overflow-x: auto; white-space: nowrap; padding: 0 0 15px 0; -ms-overflow-style: none; scrollbar-width: none; opacity: 0; transition: opacity 0.3s; }
         .sub-tags-wrapper::-webkit-scrollbar { display: none; }
         .sub-tags-wrapper.show { opacity: 1; }
         .sub-tag { display: inline-block; background: rgba(255, 255, 255, 0.5); border: 1px solid var(--glass-border); color: var(--text-light); padding: 7px 14px; border-radius: 20px; font-size: 0.8rem; margin-right: 8px; cursor: pointer; transition: all 0.2s; }
@@ -62,156 +64,216 @@
         .sub-tag-income.selected { border-color: var(--accent-green); }
 
         .input-display { text-align: right; font-size: 2.5rem; color: var(--text-main); height: 50px; display: flex; align-items: center; justify-content: flex-end; margin-bottom: 15px; border-bottom: 1px solid rgba(92, 84, 78, 0.1); }
-        
         .key-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
         .key { background: transparent; border: none; font-size: 1.5rem; color: var(--text-main); height: 55px; border-radius: 15px; display: flex; justify-content: center; align-items: center; cursor: pointer; font-weight: 300; }
         .key:active { background: rgba(0, 0, 0, 0.05); }
-        .key-enter { grid-row: span 2; background: var(--accent-gold); color: white; border-radius: 20px; font-size: 1.8rem; transition: background 0.3s ease; }
+        .key-enter { grid-row: span 2; background: var(--accent-gold); color: white; border-radius: 20px; font-size: 1.8rem; transition: background 0.3s; }
         .income-mode .key-enter { background: var(--accent-green); }
+
+        /* Report View */
+        .chart-card { width: 90%; background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-radius: 30px; box-shadow: var(--glass-shadow); padding: 30px 20px; display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; flex-shrink: 0; box-sizing: border-box; }
+        .chart-container { position: relative; width: 180px; height: 180px; }
+        svg.donut { width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible; }
+        .donut-segment { fill: transparent; stroke-width: 3.5; stroke-linecap: round; transition: stroke-dasharray 1s ease-out; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.08)); }
+        .chart-center-text { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .total-label { font-size: 0.8rem; color: var(--text-light); letter-spacing: 1px; margin-bottom: 4px; }
+        .total-amount { font-size: 1.8rem; font-weight: 300; color: var(--text-main); }
+        .budget-hint { font-size: 0.7rem; color: var(--accent-gold); margin-top: 4px; opacity: 0.8; }
+
+        .list-container { width: 90%; flex: 1; overflow-y: auto; padding-bottom: 40px; -ms-overflow-style: none; scrollbar-width: none; }
+        .list-container::-webkit-scrollbar { display: none; }
+        .list-header { font-size: 0.85rem; color: var(--text-light); letter-spacing: 1px; margin-bottom: 15px; padding-left: 5px; }
+        .trans-item { background: var(--glass-bg); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 20px; padding: 15px 20px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(180, 175, 170, 0.08); }
+        .trans-left { display: flex; align-items: center; gap: 15px; }
+        .cat-color-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .trans-info { display: flex; flex-direction: column; gap: 4px; }
+        .trans-title { font-size: 0.95rem; font-weight: 500; color: var(--text-main); display: flex; align-items: center; gap: 6px; }
+        .trans-time { font-size: 0.75rem; color: var(--text-light); }
+        .trans-amt { font-size: 1.1rem; font-weight: 400; }
+
+        /* Modals (Fixed) */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100dvh; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 999; opacity: 0; transition: opacity 0.3s; }
+        .modal-overlay.show { display: flex; opacity: 1; }
+        .glass-modal { background: rgba(249, 248, 246, 0.95); width: 85%; max-width: 320px; border-radius: 25px; padding: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.8); text-align: center; }
+        .modal-input { width: 100%; padding: 12px; margin: 10px 0 20px; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.6); font-size: 1rem; color: var(--text-main); box-sizing: border-box; text-align: center; }
+        .modal-btn { background: var(--accent-gold); color: white; border: none; padding: 10px 25px; border-radius: 20px; font-size: 1rem; cursor: pointer; margin: 5px; }
+        .modal-btn-alt { background: var(--glass-bg); color: var(--text-main); border: 1px solid var(--glass-border); padding: 10px 25px; border-radius: 20px; font-size: 1rem; cursor: pointer; margin: 5px; }
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    <div class="carrier-pill">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5v14M8 5v14M12 5v14M16 5v14M20 5v14"/></svg>
-        發票載具 /12ABCDE
-    </div>
-
-    <div class="balance-section" id="balance-sec">
-        <div class="balance-label">本月結餘</div>
-        <div class="balance-amount" id="main-balance">$15,000</div>
-    </div>
-
-    <div class="category-grid" id="cat-grid">
-        <div class="cat-btn" onclick="openKeyboard(this, '飲食')"><svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1z"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><path d="M6 1v3M10 1v3M14 1v3"/></svg><span>飲食</span></div>
-        <div class="cat-btn" onclick="openKeyboard(this, '服飾美容')"><svg viewBox="0 0 24 24"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg><span>服飾美容</span></div>
-        <div class="cat-btn" onclick="openKeyboard(this, '交通')"><svg viewBox="0 0 24 24"><rect x="1" y="3" width="22" height="13" rx="2"/><path d="M4 16v4M20 16v4M1 9h22M6 3v2M18 3v2"/></svg><span>交通</span></div>
-        <div class="cat-btn" onclick="openKeyboard(this, '居住')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg><span>居住</span></div>
-        <div class="cat-btn" onclick="openKeyboard(this, '育樂進修')"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="15" rx="2"/><path d="M17 22V5a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v17M12 7v15M7 11h10M7 15h10M7 19h10"/></svg><span>育樂進修</span></div>
-        <div class="cat-btn" onclick="openKeyboard(this, '其他生活')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg><span>其他生活</span></div>
-        <div class="cat-btn cat-btn-income" style="grid-column: span 3; aspect-ratio: auto; height: 50px; flex-direction: row; gap: 15px; border-color: rgba(139, 168, 156, 0.3);" onclick="openKeyboard(this, '收入', true)">
-            <svg viewBox="0 0 24 24" style="stroke: var(--accent-green);"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-            <span style="color: var(--accent-green); font-size: 0.9rem; letter-spacing: 2px;">記一筆收入</span>
-        </div>
-    </div>
-
-    <div class="keyboard-panel" id="keyboard">
-        <div class="kb-toolbar" id="kb-tools">
-            <div class="date-display">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                <span id="date-str">3月24日</span>
+<div class="app-viewport">
+    
+    <div id="main-view" class="view-layer">
+        <div class="header-bar">
+            <div style="display: flex; gap: 10px;">
+                <div class="nav-btn icon-btn" onclick="showModal('settings-modal')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                </div>
+                <div class="nav-btn" onclick="showCarrier()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5v14M8 5v14M12 5v14M16 5v14M20 5v14"/></svg>
+                    <span id="carrier-top-txt">/12ABCDE</span>
+                </div>
             </div>
-            <div class="invoice-toggle" id="invoice-btn" onclick="toggleInvoice()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1z"/><path d="M16 8h-8M16 12h-8M16 16h-8"/></svg>
+            <div class="nav-btn icon-btn" onclick="toggleView('report')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
             </div>
         </div>
 
-        <div class="sub-tags-wrapper" id="sub-tags-container"></div>
-        <div class="input-display" id="input-amt">0</div>
+        <div class="balance-section" id="balance-sec">
+            <div class="balance-label">目前結餘</div>
+            <div class="balance-amount" id="main-balance">$0</div>
+        </div>
+
+        <div class="category-grid" id="cat-grid">
+            <div class="cat-btn" onclick="openKeyboard(this, '飲食')"><svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1z"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><path d="M6 1v3M10 1v3M14 1v3"/></svg><span>飲食</span></div>
+            <div class="cat-btn" onclick="openKeyboard(this, '服飾美容')"><svg viewBox="0 0 24 24"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg><span>服飾美容</span></div>
+            <div class="cat-btn" onclick="openKeyboard(this, '交通')"><svg viewBox="0 0 24 24"><rect x="1" y="3" width="22" height="13" rx="2"/><path d="M4 16v4M20 16v4M1 9h22M6 3v2M18 3v2"/></svg><span>交通</span></div>
+            <div class="cat-btn" onclick="openKeyboard(this, '居住')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg><span>居住</span></div>
+            <div class="cat-btn" onclick="openKeyboard(this, '育樂進修')"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="15" rx="2"/><path d="M17 22V5a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v17M12 7v15M7 11h10M7 15h10M7 19h10"/></svg><span>育樂進修</span></div>
+            <div class="cat-btn" onclick="openKeyboard(this, '其他生活')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg><span>其他生活</span></div>
+            <div class="cat-btn cat-btn-income" style="grid-column: span 3; aspect-ratio: auto; height: 50px; flex-direction: row; gap: 15px; border-color: rgba(139, 168, 156, 0.3);" onclick="openKeyboard(this, '收入', true)">
+                <svg viewBox="0 0 24 24" style="stroke: var(--accent-green);"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span style="color: var(--accent-green); font-size: 0.9rem; letter-spacing: 2px;">記一筆收入</span>
+            </div>
+        </div>
+
+        <div class="keyboard-panel" id="keyboard">
+            <div class="kb-toolbar" id="kb-tools">
+                <div class="date-display"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span id="date-str">今天</span></div>
+                <div class="invoice-toggle" id="invoice-btn" onclick="toggleInvoice()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1z"/><path d="M16 8h-8M16 12h-8M16 16h-8"/></svg></div>
+            </div>
+            <div class="sub-tags-wrapper" id="sub-tags-container"></div>
+            <div class="input-display" id="input-amt">0</div>
+            <div class="key-grid">
+                <button class="key" onclick="inputNum(1)">1</button><button class="key" onclick="inputNum(2)">2</button><button class="key" onclick="inputNum(3)">3</button><button class="key" onclick="deleteNum()">⌫</button>
+                <button class="key" onclick="inputNum(4)">4</button><button class="key" onclick="inputNum(5)">5</button><button class="key" onclick="inputNum(6)">6</button><button class="key key-enter" onclick="submitEntry()">✓</button>
+                <button class="key" onclick="inputNum(7)">7</button><button class="key" onclick="inputNum(8)">8</button><button class="key" onclick="inputNum(9)">9</button>
+                <button class="key" onclick="closeKeyboard()">取消</button><button class="key" onclick="inputNum(0)">0</button><button class="key" onclick="inputNum('00')">00</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="report-view" class="view-layer">
+        <div class="header-bar">
+            <div class="nav-btn icon-btn" onclick="toggleView('main')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></div>
+            <div style="font-weight: 500; letter-spacing: 2px;">收支分析</div>
+            <div style="width: 36px;"></div>
+        </div>
+        <div class="chart-card">
+            <div class="chart-container">
+                <svg class="donut" viewBox="0 0 42 42" id="donut-chart"></svg>
+                <div class="chart-center-text">
+                    <div class="total-label">總支出</div>
+                    <div class="total-amount" id="total-disp">$0</div>
+                    <div class="budget-hint" id="budget-disp">預算 $0</div>
+                </div>
+            </div>
+        </div>
+        <div class="list-container">
+            <div class="list-header">近期明細</div>
+            <div id="trans-list"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="carrier-modal" onclick="closeModal('carrier-modal')">
+    <div class="glass-modal" onclick="event.stopPropagation()">
+        <h3 style="margin-top:0; color:var(--text-main); font-weight: 500; letter-spacing: 2px;">發票載具</h3>
+        <div id="barcode-svg-container" style="height: 80px; background: rgba(255,255,255,0.9); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; padding: 10px;"></div>
+        <div style="font-size: 1.8rem; letter-spacing: 3px; font-weight: 300; margin-bottom: 25px; color: var(--text-main);" id="modal-carrier-txt"></div>
+        <button class="modal-btn" onclick="closeModal('carrier-modal')">完成</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="settings-modal" onclick="closeModal('settings-modal')">
+    <div class="glass-modal" onclick="event.stopPropagation()">
+        <h3 style="margin-top:0; color:var(--text-main); font-weight: 500;">偏好設定</h3>
+        <div style="text-align: left; font-size: 0.85rem; color: var(--text-light); margin-left: 5px;">本月心靈預算</div>
+        <input type="number" id="setting-budget" class="modal-input" placeholder="例如：15000">
+        <div style="text-align: left; font-size: 0.85rem; color: var(--text-light); margin-left: 5px;">發票載具號碼</div>
+        <input type="text" id="setting-carrier" class="modal-input" placeholder="例如：/12ABCDE">
         
-        <div class="key-grid">
-            <button class="key" onclick="inputNum(1)">1</button>
-            <button class="key" onclick="inputNum(2)">2</button>
-            <button class="key" onclick="inputNum(3)">3</button>
-            <button class="key" onclick="deleteNum()">⌫</button>
-            <button class="key" onclick="inputNum(4)">4</button>
-            <button class="key" onclick="inputNum(5)">5</button>
-            <button class="key" onclick="inputNum(6)">6</button>
-            <button class="key key-enter" onclick="submitEntry()">✓</button>
-            <button class="key" onclick="inputNum(7)">7</button>
-            <button class="key" onclick="inputNum(8)">8</button>
-            <button class="key" onclick="inputNum(9)">9</button>
-            <button class="key" onclick="closeKeyboard()">取消</button>
-            <button class="key" onclick="inputNum(0)">0</button>
-            <button class="key" onclick="inputNum('00')">00</button>
+        <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; flex-wrap: wrap;">
+            <button class="modal-btn-alt" onclick="exportData('csv')" style="font-size: 0.85rem;">下載 CSV</button>
+            <button class="modal-btn-alt" onclick="exportData('json')" style="font-size: 0.85rem;">備份 JSON</button>
+        </div>
+        
+        <div style="display: flex; justify-content: center; gap: 10px;">
+            <button class="modal-btn-alt" onclick="closeModal('settings-modal')">取消</button>
+            <button class="modal-btn" onclick="saveSettings()">儲存</button>
         </div>
     </div>
 </div>
 
 <script>
-    // ================= 資料與狀態 =================
-    const categoryData = {
-        '飲食': ['早餐', '午餐', '晚餐', '宵夜', '飲料', '便利商店', '水果'],
-        '服飾美容': ['衣服', '鞋包', '保養品', '理髮', '醫美'],
-        '交通': ['捷運公車', '計程車', '加油/充電', '停車費', '車保養'],
-        '居住': ['房租/房貸', '水電瓦斯', '管理費', '網路費', '居家用品'],
-        '育樂進修': ['電影展覽', '數位訂閱', '旅遊', '書籍', '學雜費', '3C產品'],
-        '其他生活': ['電話費', '保險費', '醫療', '交際孝親', '信用卡'],
-        // ★ 收入細項清單 ★
-        '收入': ['薪水', '獎金', '投資收益', '政府回饋', '其他收入']
+    // ================= Code 39 條碼引擎 =================
+    const Code39 = {
+        chars: { '0':'000110100','1':'100100001','2':'001100001','3':'101100000','4':'000110001','5':'100110000','6':'001110000','7':'000100101','8':'100100100','9':'001100100','A':'100001001','B':'001001001','C':'101001000','D':'000011001','E':'100011000','F':'001011000','G':'000001101','H':'100001100','I':'001001100','J':'000011100','K':'100000011','L':'001000011','M':'101000010','N':'000010011','O':'100010010','P':'001010010','Q':'000000111','R':'100000110','S':'001000110','T':'000010110','U':'110000001','V':'011000001','W':'111000000','X':'010010001','Y':'110010000','Z':'011010000','-':'010000101','.':'110000100',' ':'011000100','*':'010010100','+':'010001010','/':'010100010','%':'000101010','$':'010101000' },
+        generateSVG: function(text) {
+            let barcodeText = '*' + text.toUpperCase() + '*'; let svgLines = ''; let xPosition = 0;
+            const narrow = 2; const wide = narrow * 3; const gap = narrow; const height = 60;
+            for (let i = 0; i < barcodeText.length; i++) {
+                let code = this.chars[barcodeText[i]]; if (!code) continue;
+                for (let j = 0; j < 9; j++) {
+                    let lineWidth = (code[j] === '1') ? wide : narrow;
+                    if (j % 2 === 0) svgLines += `<rect x="${xPosition}" y="0" width="${lineWidth}" height="${height}" fill="#2C2A29" />`;
+                    xPosition += lineWidth;
+                }
+                xPosition += gap;
+            }
+            return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${xPosition} ${height}" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">${svgLines}</svg>`;
+        }
     };
 
-    let currentInput = "0";
-    let activeBtn = null;
-    let currentSubTag = "";
-    let isIncomeMode = false;
-    let hasInvoice = false; // 紀錄是否有發票
-    let balance = 15000;
-
-    const kb = document.getElementById('keyboard');
-    const display = document.getElementById('input-amt');
-    const mainBal = document.getElementById('main-balance');
-    const tools = document.getElementById('kb-tools');
-    const invoiceBtn = document.getElementById('invoice-btn');
-    const subContainer = document.getElementById('sub-tags-container');
-
-    // ================= 核心邏輯 =================
+    // ================= 核心系統與 LocalStorage =================
+    const STORAGE_KEY = 'joy_accounting_app_data';
+    let appData = { budget: 15000, carrier: '/12ABCDE', transactions: [] };
     
+    function loadData() {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) appData = JSON.parse(stored);
+        
+        // 初始化今天日期
+        let today = new Date();
+        document.getElementById('date-str').innerText = `${today.getMonth()+1}月${today.getDate()}日`;
+        
+        updateSystemUI();
+    }
+
+    function saveData() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+        updateSystemUI();
+    }
+
+    function updateSystemUI() {
+        // 計算結餘
+        let bal = appData.transactions.reduce((acc, t) => t.type === 'income' ? acc + t.amt : acc - t.amt, 0);
+        document.getElementById('main-balance').innerText = "$" + bal.toLocaleString();
+        document.getElementById('carrier-top-txt').innerText = appData.carrier;
+    }
+
+    // ================= UI 互動與輸入 =================
+    const categoryData = { '飲食': ['早餐','午餐','晚餐','宵夜','飲料','便利商店','水果'], '服飾美容': ['衣服','鞋包','保養品','理髮','醫美'], '交通': ['捷運公車','計程車','加油/充電','停車費','車保養'], '居住': ['房租/房貸','水電瓦斯','管理費','網路費','居家用品'], '育樂進修': ['電影展覽','數位訂閱','旅遊','書籍','學雜費','3C產品'], '其他生活': ['電話費','保險費','醫療','交際孝親','信用卡'], '收入': ['薪水','獎金','投資收益','政府回饋','其他收入'] };
+    const colorMap = { '飲食': 'var(--cat-food)', '服飾美容': 'var(--cat-beauty)', '居住': 'var(--cat-house)', '交通': 'var(--cat-trans)', '育樂進修': 'var(--cat-ent)', '其他生活': 'var(--cat-other)' };
+
+    let currentInput = "0", activeBtn = null, currentSubTag = "", isIncomeMode = false, hasInvoice = false;
+    const kb = document.getElementById('keyboard'), display = document.getElementById('input-amt'), subContainer = document.getElementById('sub-tags-container');
+
     function updateDisplay() { display.innerText = currentInput === "0" ? "0" : Number(currentInput).toLocaleString(); }
-
-    // 開啟鍵盤，整合收入模式判斷
-    function openKeyboard(btn, category, isIncome = false) {
-        if(activeBtn) activeBtn.classList.remove('active');
-        activeBtn = btn;
-        activeBtn.classList.add('active');
-        
-        isIncomeMode = isIncome;
-        hasInvoice = false; // 重置發票狀態
-        invoiceBtn.classList.remove('active');
-        currentInput = "0";
-        updateDisplay();
-        
-        // 渲染細項，若是收入模式，加上特殊樣式
-        renderSubTags(category, isIncome);
-        
-        // UI 狀態切換
-        if (isIncome) {
-            kb.classList.add('income-mode');
-            invoiceBtn.style.display = 'none'; // 收入模式不需要發票標記
-        } else {
-            kb.classList.remove('income-mode');
-            invoiceBtn.style.display = 'flex';
-        }
-        
-        document.getElementById('balance-sec').style.transform = "translateY(-20px) scale(0.95)";
-        document.getElementById('cat-grid').style.transform = "translateY(-15px)";
-        kb.classList.add('open');
-        setTimeout(() => tools.classList.add('show'), 100);
-    }
-
-    function closeKeyboard() {
-        if(activeBtn) activeBtn.classList.remove('active');
-        activeBtn = null;
-        kb.classList.remove('open', 'income-mode');
-        tools.classList.remove('show');
-        subContainer.classList.remove('show');
-        document.getElementById('balance-sec').style.transform = "translateY(0) scale(1)";
-        document.getElementById('cat-grid').style.transform = "translateY(0)";
-    }
-
-    // 渲染免打字細項
+    
     function renderSubTags(categoryName, isIncome) {
         subContainer.innerHTML = ''; currentSubTag = "";
-        const tags = categoryData[categoryName] || [];
+        let tags = (categoryData[categoryName] || []).slice(); tags.push('✍️ 自訂');
         tags.forEach(tag => {
-            const el = document.createElement('div');
-            el.className = `sub-tag ${isIncome ? 'sub-tag-income' : ''}`;
-            el.innerText = tag;
+            const el = document.createElement('div'); el.className = `sub-tag ${isIncome ? 'sub-tag-income' : ''}`; el.innerText = tag;
             el.onclick = function() {
                 Array.from(subContainer.children).forEach(t => t.classList.remove('selected'));
                 this.classList.add('selected');
-                currentSubTag = tag;
+                if (tag === '✍️ 自訂') {
+                    let customText = prompt("請輸入自訂細項：");
+                    if (customText && customText.trim() !== "") { currentSubTag = customText.trim(); this.innerText = customText.trim(); } 
+                    else { this.classList.remove('selected'); }
+                } else { currentSubTag = tag; }
                 this.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
             };
             subContainer.appendChild(el);
@@ -219,52 +281,145 @@
         setTimeout(() => subContainer.classList.add('show'), 50);
     }
 
-    // 切換發票狀態
-    function toggleInvoice() {
-        hasInvoice = !hasInvoice;
-        if (hasInvoice) invoiceBtn.classList.add('active');
-        else invoiceBtn.classList.remove('active');
-    }
-
-    // 數字輸入邏輯
-    function inputNum(num) { 
-        if (currentInput === "0" && num !== "00") currentInput = num.toString();
-        else if(currentInput.length < 8) currentInput += num.toString();
-        updateDisplay();
-    }
-    function deleteNum() {
-        if (currentInput.length > 1) currentInput = currentInput.slice(0, -1);
-        else currentInput = "0";
-        updateDisplay();
-    }
-
-    // ★ 關鍵送出：整合支出/收入邏輯 ★
-    function submitEntry() {
-        let amt = Number(currentInput);
-        let subCategory = currentSubTag || '一般';
-        let date = document.getElementById('date-str').innerText;
+    function openKeyboard(btn, category, isIncome = false) {
+        if(activeBtn) activeBtn.classList.remove('active'); activeBtn = btn; activeBtn.classList.add('active');
+        isIncomeMode = isIncome; hasInvoice = false; document.getElementById('invoice-btn').classList.remove('active');
+        currentInput = "0"; updateDisplay(); renderSubTags(category, isIncome);
         
-        if(amt > 0) {
-            // 根據模式加或減結餘
-            if (isIncomeMode) {
-                balance += amt;
-                // 未來 LocalStorage：{ date: '...', type: 'income', cat: '薪水', amt: 1000 }
-                console.log(`[收入] ${date} ${subCategory} +$${amt}`);
-            } else {
-                balance -= amt;
-                // 未來 LocalStorage：{ date: '...', type: 'expense', cat: '飲食-早餐', amt: 60, invoice: true }
-                console.log(`[支出] ${date} ${subCategory} -$${amt} (發票: ${hasInvoice})`);
-            }
+        if (isIncome) { kb.classList.add('income-mode'); document.getElementById('invoice-btn').style.display = 'none'; } 
+        else { kb.classList.remove('income-mode'); document.getElementById('invoice-btn').style.display = 'flex'; }
+        
+        document.getElementById('balance-sec').style.transform = "translateY(-20px) scale(0.95)";
+        document.getElementById('cat-grid').style.transform = "translateY(-15px)";
+        kb.classList.add('open'); setTimeout(() => document.getElementById('kb-tools').classList.add('show'), 100);
+    }
 
-            // 更新結餘顯示 (簡單動畫)
-            mainBal.style.opacity = 0;
-            setTimeout(() => {
-                mainBal.innerText = "$" + balance.toLocaleString();
-                mainBal.style.opacity = 1;
-            }, 200);
+    function closeKeyboard() {
+        if(activeBtn) activeBtn.classList.remove('active'); activeBtn = null;
+        kb.classList.remove('open', 'income-mode'); document.getElementById('kb-tools').classList.remove('show'); subContainer.classList.remove('show');
+        document.getElementById('balance-sec').style.transform = "translateY(0) scale(1)"; document.getElementById('cat-grid').style.transform = "translateY(0)";
+    }
+
+    function toggleInvoice() { hasInvoice = !hasInvoice; document.getElementById('invoice-btn').classList.toggle('active', hasInvoice); }
+    function inputNum(num) { if (currentInput === "0" && num !== "00") currentInput = num.toString(); else if(currentInput.length < 8) currentInput += num.toString(); updateDisplay(); }
+    function deleteNum() { if (currentInput.length > 1) currentInput = currentInput.slice(0, -1); else currentInput = "0"; updateDisplay(); }
+
+    function submitEntry() {
+        let amt = Number(currentInput); let cat = activeBtn ? activeBtn.querySelector('span').innerText : '未分類';
+        let sub = currentSubTag || '一般'; let date = document.getElementById('date-str').innerText;
+        if(amt > 0) {
+            appData.transactions.unshift({
+                id: Date.now(), type: isIncomeMode ? 'income' : 'expense',
+                date: date, cat: cat, sub: sub, amt: amt, invoice: hasInvoice,
+                color: isIncomeMode ? 'var(--accent-green)' : (colorMap[cat] || 'var(--cat-other)')
+            });
+            saveData();
+            let balObj = document.getElementById('main-balance'); balObj.style.opacity = 0;
+            setTimeout(() => { balObj.style.opacity = 1; }, 200);
         }
         closeKeyboard();
     }
+
+    // ================= 報表與視圖切換 =================
+    function toggleView(target) {
+        const main = document.getElementById('main-view'), report = document.getElementById('report-view');
+        if (target === 'report') {
+            closeKeyboard(); main.style.transform = 'translateX(-100%)'; report.style.transform = 'translateX(0)'; initReport();
+        } else { main.style.transform = 'translateX(0)'; report.style.transform = 'translateX(100%)'; }
+    }
+
+    function initReport() {
+        const listDiv = document.getElementById('trans-list'), donut = document.getElementById('donut-chart');
+        let expenseTotal = 0; let catTotals = {}; listDiv.innerHTML = '';
+
+        if(appData.transactions.length === 0) { listDiv.innerHTML = '<div style="text-align:center; color:var(--text-light); margin-top:20px; font-size:0.85rem;">目前尚無紀錄。</div>'; }
+
+        appData.transactions.forEach(t => {
+            if(t.type === 'expense') {
+                expenseTotal += t.amt;
+                if(!catTotals[t.cat]) catTotals[t.cat] = { amt: 0, color: t.color };
+                catTotals[t.cat].amt += t.amt;
+            }
+            let invoiceHtml = (t.invoice && t.type === 'expense') ? `<svg style="width:12px; height:12px; stroke:var(--accent-gold); fill:none;" viewBox="0 0 24 24"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1z"/><path d="M16 8h-8M16 12h-8M16 16h-8"/></svg>` : '';
+            let amtStr = t.type === 'income' ? `+$${t.amt}` : `-$${t.amt}`;
+            let amtColor = t.type === 'income' ? 'var(--accent-green)' : 'var(--text-main)';
+
+            const item = document.createElement('div'); item.className = 'trans-item';
+            item.innerHTML = `<div class="trans-left"><div class="cat-color-dot" style="background: ${t.color}"></div><div class="trans-info"><div class="trans-title">${t.cat} - ${t.sub} ${invoiceHtml}</div><div class="trans-time">${t.date}</div></div></div><div class="trans-amt" style="color:${amtColor}">${amtStr}</div>`;
+            listDiv.appendChild(item);
+        });
+
+        const totalDisp = document.getElementById('total-disp'), budgetDisp = document.getElementById('budget-disp');
+        totalDisp.innerText = '$' + expenseTotal.toLocaleString();
+        totalDisp.style.color = 'var(--text-main)'; budgetDisp.style.color = 'var(--accent-gold)';
+
+        if (expenseTotal > appData.budget) {
+            totalDisp.style.color = 'var(--accent-red)'; budgetDisp.innerText = '已超預算'; budgetDisp.style.color = 'var(--accent-red)';
+        } else if (expenseTotal > appData.budget * 0.8) { budgetDisp.innerText = `剩餘 $${(appData.budget - expenseTotal).toLocaleString()}`;
+        } else { budgetDisp.innerText = `預算 $${appData.budget.toLocaleString()}`; }
+
+        let cumulativePercent = 0; donut.innerHTML = '';
+        if(expenseTotal > 0) {
+            Object.keys(catTotals).forEach(cat => {
+                let percent = (catTotals[cat].amt / expenseTotal) * 100;
+                let visiblePercent = percent > 2 ? percent - 1.5 : percent;
+                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circle.setAttribute("cx", "21"); circle.setAttribute("cy", "21"); circle.setAttribute("r", "15.9155");
+                circle.setAttribute("class", "donut-segment"); circle.setAttribute("stroke", catTotals[cat].color);
+                circle.style.strokeDasharray = `0 100`; circle.style.strokeDashoffset = `-${cumulativePercent}`;
+                donut.appendChild(circle);
+                setTimeout(() => { circle.style.strokeDasharray = `${visiblePercent} ${100 - visiblePercent}`; }, 50);
+                cumulativePercent += percent;
+            });
+        }
+    }
+
+    // ================= 遮罩模組與匯出 =================
+    function showModal(id) {
+        if(id === 'settings-modal') {
+            document.getElementById('setting-budget').value = appData.budget;
+            document.getElementById('setting-carrier').value = appData.carrier;
+        }
+        document.getElementById(id).classList.add('show'); 
+    }
+    function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+    
+    function showCarrier() {
+        document.getElementById('barcode-svg-container').innerHTML = Code39.generateSVG(appData.carrier);
+        document.getElementById('modal-carrier-txt').innerText = appData.carrier;
+        showModal('carrier-modal');
+    }
+
+    function saveSettings() {
+        appData.budget = Number(document.getElementById('setting-budget').value) || 0;
+        appData.carrier = document.getElementById('setting-carrier').value || '/12ABCDE';
+        saveData(); closeModal('settings-modal'); alert("設定已更新！");
+    }
+
+    // 純前端資料匯出 (CSV/JSON)
+    function exportData(type) {
+        let content, filename, mimeType;
+        if (type === 'json') {
+            content = JSON.stringify(appData, null, 2);
+            filename = `JoyAccounting_Backup_${new Date().getTime()}.json`;
+            mimeType = 'application/json';
+        } else {
+            // CSV 需要加上 BOM 讓 Excel 讀取中文不亂碼
+            content = "\uFEFF類型,日期,分類,細項,金額,有發票\n";
+            appData.transactions.forEach(t => {
+                content += `${t.type === 'income'?'收入':'支出'},${t.date},${t.cat},${t.sub},${t.amt},${t.invoice?'是':'否'}\n`;
+            });
+            filename = `JoyAccounting_Export_${new Date().getTime()}.csv`;
+            mimeType = 'text/csv;charset=utf-8;';
+        }
+        const blob = new Blob([content], { type: mimeType });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob); link.download = filename;
+        document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    }
+
+    // 啟動 App
+    window.onload = loadData;
 </script>
 
 </body>
