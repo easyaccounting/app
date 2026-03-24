@@ -17,23 +17,50 @@
         }
 
         html, body { 
-            margin: 0; padding: 0; width: 100%; height: 100%; 
-            background: #000; color: var(--text-main); 
-            font-family: -apple-system, sans-serif; 
-            overflow: hidden; touch-action: none; 
-            -webkit-user-select: none; user-select: none; 
-            -webkit-tap-highlight-color: transparent; 
+            margin: 0; padding: 0; width: 100%; height: 100%; background: #000; color: var(--text-main); 
+            font-family: -apple-system, sans-serif; overflow: hidden; touch-action: none; 
+            -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; 
         }
 
         .app-viewport { 
-            width: 100%; max-width: 400px; height: 100dvh; 
-            margin: 0 auto; background: var(--bg-gradient); 
-            position: relative; overflow: hidden; 
-            box-shadow: 0 0 20px rgba(0,0,0,0.5); 
+            width: 100%; max-width: 400px; height: 100dvh; margin: 0 auto; background: var(--bg-gradient); 
+            position: relative; overflow: hidden; box-shadow: 0 0 20px rgba(0,0,0,0.5); 
         }
 
         .view-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
-        #main-view { transform: translateX(0); } #report-view { transform: translateX(100%); }
+        #main-view { transform: translateX(0); } 
+        #report-view { transform: translateX(100%); }
+
+        /* ================= 側邊選單 (新增) ================= */
+        .side-menu-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.3); backdrop-filter: blur(4px); 
+            z-index: 900; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .side-menu-overlay.open { opacity: 1; pointer-events: auto; }
+        
+        .side-menu {
+            position: absolute; top: 0; left: 0; width: 75%; max-width: 280px; height: 100%;
+            background: rgba(249, 248, 246, 0.95); backdrop-filter: blur(20px);
+            border-right: 1px solid var(--glass-border); box-shadow: 10px 0 30px rgba(0,0,0,0.1);
+            transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            z-index: 901; display: flex; flex-direction: column; padding-top: max(40px, env(safe-area-inset-top));
+        }
+        .side-menu.open { transform: translateX(0); }
+        
+        .menu-profile { padding: 0 25px 30px; border-bottom: 1px solid rgba(92,84,78,0.1); margin-bottom: 10px; }
+        .menu-title { font-size: 1.5rem; font-weight: 300; color: var(--text-main); letter-spacing: 2px; }
+        .menu-subtitle { font-size: 0.8rem; color: var(--accent-gold); letter-spacing: 1px; margin-top: 5px; }
+        
+        .menu-list { flex: 1; overflow-y: auto; padding: 10px 15px; }
+        .menu-item {
+            padding: 15px 20px; margin-bottom: 8px; border-radius: 15px;
+            display: flex; align-items: center; gap: 15px; font-size: 1rem; color: var(--text-main);
+            cursor: pointer; transition: background 0.2s;
+        }
+        .menu-item:active { background: rgba(0,0,0,0.05); }
+        .menu-item svg { stroke: var(--text-light); fill: none; stroke-width: 1.5; width: 20px; height: 20px; }
+        /* ================================================ */
 
         /* Header */
         .header-bar { width: 90%; display: flex; justify-content: space-between; align-items: center; margin-top: max(20px, env(safe-area-inset-top)); margin-bottom: 10px; z-index: 10; }
@@ -66,14 +93,12 @@
         .invoice-toggle { width: 32px; height: 32px; display: flex; justify-content: center; align-items: center; border-radius: 50%; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-light); cursor: pointer; transition: all 0.2s; }
         .invoice-toggle.active { background: var(--accent-gold); color: white; border-color: transparent; box-shadow: 0 2px 8px rgba(212, 163, 115, 0.3); }
 
-        /* 細項自動折行 */
         .sub-tags-wrapper { width: 100%; display: flex; flex-wrap: wrap; gap: 8px; padding: 0 0 15px 0; opacity: 0; transition: opacity 0.3s; }
         .sub-tags-wrapper.show { opacity: 1; }
         .sub-tag { background: rgba(255, 255, 255, 0.5); border: 1px solid var(--glass-border); color: var(--text-light); padding: 7px 14px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; }
         .sub-tag.selected { background: rgba(255, 255, 255, 0.9); color: var(--text-main); border-color: var(--accent-gold); font-weight: 500; transform: scale(0.96); }
         .sub-tag-income.selected { border-color: var(--accent-green); }
 
-        /* 顯示區與備註按鈕 */
         .input-display-area { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; border-bottom: 1px solid rgba(92, 84, 78, 0.1); padding-bottom: 5px; }
         .memo-btn { font-size: 0.85rem; color: var(--text-light); cursor: pointer; padding: 5px; max-width: 45%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .input-display { flex: 1; text-align: right; font-size: 2.2rem; color: var(--text-main); height: 45px; line-height: 45px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -84,7 +109,7 @@
         .key-enter { grid-row: span 2; background: var(--accent-gold); color: white; border-radius: 20px; font-size: 1.8rem; transition: background 0.3s; }
         .income-mode .key-enter { background: var(--accent-green); }
 
-        /* Report View & Time Tabs */
+        /* Report View */
         .time-tabs { display: flex; width: 90%; background: rgba(255,255,255,0.3); border: 1px solid var(--glass-border); border-radius: 20px; margin-bottom: 15px; padding: 4px; box-sizing: border-box; }
         .time-tab { flex: 1; text-align: center; padding: 6px 0; font-size: 0.85rem; color: var(--text-light); border-radius: 16px; cursor: pointer; transition: all 0.3s; }
         .time-tab.active { background: var(--glass-bg); color: var(--text-main); font-weight: 500; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
@@ -125,11 +150,34 @@
 <body>
 
 <div class="app-viewport">
+    
+    <div class="side-menu-overlay" id="side-menu-overlay" onclick="toggleMenu()"></div>
+    <div class="side-menu" id="side-menu">
+        <div class="menu-profile">
+            <div class="menu-title">淨息流</div>
+            <div class="menu-subtitle">萬法唯心造，記帳亦修行</div>
+        </div>
+        <div class="menu-list">
+            <div class="menu-item" onclick="toggleMenu()">
+                <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> 財務記帳
+            </div>
+            <div class="menu-item" onclick="openHealthModule()">
+                <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> 健康日誌 <span style="font-size: 0.7rem; color: var(--accent-gold);">(血壓/用藥)</span>
+            </div>
+            <div class="menu-item" onclick="window.location.href='https://namoamitabhapureland.github.io/bodhicitta/index.html'">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg> 彌陀淨土系統
+            </div>
+            <div class="menu-item" onclick="toggleMenu(); showModal('settings-modal');" style="margin-top: 20px; border-top: 1px solid rgba(92,84,78,0.1); padding-top: 25px; border-radius: 0;">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> 偏好設定
+            </div>
+        </div>
+    </div>
+
     <div id="main-view" class="view-layer">
         <div class="header-bar">
             <div style="display: flex; gap: 10px;">
-                <div class="nav-btn icon-btn" onclick="showModal('settings-modal')">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <div class="nav-btn icon-btn" onclick="toggleMenu()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                 </div>
                 <div class="nav-btn" onclick="showCarrier()">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5v14M8 5v14M12 5v14M16 5v14M20 5v14"/></svg>
@@ -173,7 +221,6 @@
             <div class="key-grid">
                 <button class="key" onclick="inputNum(1)">1</button><button class="key" onclick="inputNum(2)">2</button><button class="key" onclick="inputNum(3)">3</button>
                 <button class="key" onclick="clearNum()" style="color: var(--accent-red); font-weight: 400;">AC</button>
-                
                 <button class="key" onclick="inputNum(4)">4</button><button class="key" onclick="inputNum(5)">5</button><button class="key" onclick="inputNum(6)">6</button><button class="key key-enter" onclick="submitEntry()">✓</button>
                 <button class="key" onclick="inputNum(7)">7</button><button class="key" onclick="inputNum(8)">8</button><button class="key" onclick="inputNum(9)">9</button>
                 <button class="key" onclick="closeKeyboard()">取消</button><button class="key" onclick="inputNum(0)">0</button><button class="key" onclick="inputNum('00')">00</button>
@@ -300,12 +347,29 @@
         document.getElementById('carrier-top-txt').innerText = appData.carrier;
     }
 
+    /* ================= 側邊選單邏輯 ================= */
+    function toggleMenu() {
+        const menu = document.getElementById('side-menu');
+        const overlay = document.getElementById('side-menu-overlay');
+        if (menu.classList.contains('open')) {
+            menu.classList.remove('open'); overlay.classList.remove('open');
+        } else {
+            closeKeyboard(); // 開啟選單時確保鍵盤收起
+            menu.classList.add('open'); overlay.classList.add('open');
+        }
+    }
+    
+    function openHealthModule() {
+        toggleMenu();
+        alert('「健康日誌」模組正在靜心開發中，即將支援血壓、血糖與用藥紀錄，敬請期待。');
+    }
+    /* ================================================ */
+
     const categoryData = { '飲食': ['早餐','午餐','晚餐','飲料','便利商店'], '服飾美容': ['衣服','鞋包','保養品','理髮','醫美'], '交通': ['捷運公車','計程車','加油/充電','停車費','車保養'], '居住': ['房租/房貸','水電瓦斯','管理費','網路費','居家用品'], '育樂進修': ['電影展覽','數位訂閱','旅遊','書籍','3C產品'], '其他生活': ['電話費','保險費','醫療','交際孝親','信用卡'], '收入': ['薪水','獎金','投資收益','政府回饋','其他收入'] };
     const colorMap = { '飲食': 'var(--cat-food)', '服飾美容': 'var(--cat-beauty)', '居住': 'var(--cat-house)', '交通': 'var(--cat-trans)', '育樂進修': 'var(--cat-ent)', '其他生活': 'var(--cat-other)' };
 
     let currentInput = "0", activeBtn = null, currentSubTag = "", isIncomeMode = false, hasInvoice = false;
-    let currentCustomEl = null; 
-    let currentMemo = ""; // 暫存備註
+    let currentCustomEl = null, currentMemo = ""; 
     
     const kb = document.getElementById('keyboard'), display = document.getElementById('input-amt'), subContainer = document.getElementById('sub-tags-container');
 
@@ -346,11 +410,7 @@
         closeModal('custom-tag-modal');
     }
 
-    // ★ 備註處理邏輯
-    function showMemoModal() {
-        document.getElementById('memo-input').value = currentMemo;
-        showModal('memo-modal');
-    }
+    function showMemoModal() { document.getElementById('memo-input').value = currentMemo; showModal('memo-modal'); }
     function confirmMemo() {
         currentMemo = document.getElementById('memo-input').value.trim();
         let btn = document.getElementById('memo-display-btn');
@@ -363,7 +423,6 @@
         if(activeBtn) activeBtn.classList.remove('active'); activeBtn = btn; activeBtn.classList.add('active');
         isIncomeMode = isIncome; hasInvoice = false; document.getElementById('invoice-btn').classList.remove('active');
         
-        // 重置輸入與備註
         currentInput = "0"; currentMemo = "";
         document.getElementById('memo-display-btn').innerText = "✍️ 備註...";
         document.getElementById('memo-display-btn').style.color = "var(--text-light)";
@@ -392,7 +451,6 @@
         updateDisplay(); 
     }
     
-    // ★ 改為 AC 歸零
     function clearNum() { currentInput = "0"; updateDisplay(); }
 
     function submitEntry() {
@@ -400,7 +458,7 @@
         let sub = currentSubTag || '一般'; let date = document.getElementById('date-str').innerText;
         if(amt > 0) {
             appData.transactions.unshift({
-                id: Date.now(), timestamp: Date.now(), // ★ 加入絕對時間戳記供過濾
+                id: Date.now(), timestamp: Date.now(),
                 type: isIncomeMode ? 'income' : 'expense',
                 date: date, cat: cat, sub: sub, amt: amt, 
                 memo: currentMemo, invoice: hasInvoice,
@@ -414,14 +472,11 @@
         closeKeyboard();
     }
 
-    // ================= 報表與時間過濾 =================
     let currentTimeFilter = 'month';
-    
     function setTimeFilter(filter, el) {
         currentTimeFilter = filter;
         document.querySelectorAll('.time-tab').forEach(t => t.classList.remove('active'));
-        el.classList.add('active');
-        initReport();
+        el.classList.add('active'); initReport();
     }
 
     function toggleView(target) {
@@ -434,21 +489,14 @@
     function initReport() {
         const listDiv = document.getElementById('trans-list'), donut = document.getElementById('donut-chart');
         let expenseTotal = 0; let catTotals = {}; listDiv.innerHTML = '';
-
         let now = new Date();
         
-        // ★ 時間過濾邏輯
         let filteredTxs = appData.transactions.filter(t => {
-            if (!t.timestamp) return true; // 兼容舊資料
+            if (!t.timestamp) return true; 
             let tDate = new Date(t.timestamp);
-            if (currentTimeFilter === 'month') {
-                return tDate.getMonth() === now.getMonth() && tDate.getFullYear() === now.getFullYear();
-            } else if (currentTimeFilter === 'halfYear') {
-                let sixMonthsAgo = new Date(); sixMonthsAgo.setMonth(now.getMonth() - 6);
-                return tDate >= sixMonthsAgo;
-            } else if (currentTimeFilter === 'year') {
-                return tDate.getFullYear() === now.getFullYear();
-            }
+            if (currentTimeFilter === 'month') { return tDate.getMonth() === now.getMonth() && tDate.getFullYear() === now.getFullYear(); } 
+            else if (currentTimeFilter === 'halfYear') { let sixMonthsAgo = new Date(); sixMonthsAgo.setMonth(now.getMonth() - 6); return tDate >= sixMonthsAgo; } 
+            else if (currentTimeFilter === 'year') { return tDate.getFullYear() === now.getFullYear(); }
             return true;
         });
 
@@ -474,18 +522,11 @@
         totalDisp.innerText = '$' + expenseTotal.toLocaleString();
         totalDisp.style.color = 'var(--text-main)'; budgetDisp.style.color = 'var(--accent-gold)';
 
-        // 預算邏輯只在「本月」生效
         if(currentTimeFilter === 'month' && appData.budget > 0) {
-            if (expenseTotal > appData.budget) {
-                totalDisp.style.color = 'var(--accent-red)'; budgetDisp.innerText = '已超預算'; budgetDisp.style.color = 'var(--accent-red)';
-            } else if (expenseTotal > appData.budget * 0.8) { 
-                budgetDisp.innerText = `剩餘 $${(appData.budget - expenseTotal).toLocaleString()}`;
-            } else { 
-                budgetDisp.innerText = `預算 $${appData.budget.toLocaleString()}`; 
-            }
-        } else {
-            budgetDisp.innerText = ''; // 半年或全年不顯示單月預算
-        }
+            if (expenseTotal > appData.budget) { totalDisp.style.color = 'var(--accent-red)'; budgetDisp.innerText = '已超預算'; budgetDisp.style.color = 'var(--accent-red)'; } 
+            else if (expenseTotal > appData.budget * 0.8) { budgetDisp.innerText = `剩餘 $${(appData.budget - expenseTotal).toLocaleString()}`; } 
+            else { budgetDisp.innerText = `預算 $${appData.budget.toLocaleString()}`; }
+        } else { budgetDisp.innerText = ''; }
 
         let cumulativePercent = 0; donut.innerHTML = '';
         if(expenseTotal > 0) {
