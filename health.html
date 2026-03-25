@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>淨息流 ． 健康觀照</title>
+    <style>
+        :root {
+            /* 淨土色系：玉綠、沈靜金、淨石灰 */
+            --bg-deep: #F2F5F4; 
+            --bg-gradient: linear-gradient(135deg, #F9FAF9, #E6EBE9);
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.9);
+            --text-main: #58504A;
+            --text-light: #968E86;
+            --accent-gold: #CBA37A;
+            --accent-jade: #82968C;
+            --accent-red: #D29498;
+            --shadow-soft: 0 10px 40px rgba(160, 155, 150, 0.12);
+        }
+
+        * { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+
+        html, body {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background: var(--bg-gradient); color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow-x: hidden; overflow-y: auto;
+            -webkit-user-select: none; user-select: none;
+        }
+
+        /* 頂部導航 - 懸浮於虛空 */
+        .top-nav {
+            position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+            padding: max(20px, env(safe-area-inset-top)) 20px 15px;
+            display: flex; justify-content: center; align-items: center;
+            background: linear-gradient(to bottom, rgba(249,250,249,0.95), rgba(249,250,249,0));
+        }
+
+        .nav-content {
+            width: 100%; max-width: 720px; display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .back-btn {
+            display: flex; align-items: center; gap: 8px; cursor: pointer;
+            background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border);
+            padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; color: var(--text-main);
+            box-shadow: var(--shadow-soft); transition: all 0.3s;
+        }
+        .back-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.9); }
+        .back-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+        .page-title { font-size: 1.1rem; font-weight: 500; letter-spacing: 2px; color: var(--accent-jade); }
+
+        /* 中道佈局 - 限制最大寬度，平板自動置中 */
+        .main-container {
+            width: 100%; max-width: 720px; margin: 0 auto;
+            padding: calc(80px + env(safe-area-inset-top)) 20px 100px;
+            display: flex; flex-direction: column; gap: 20px;
+        }
+
+        /* 觀照卡片基礎 */
+        .health-card {
+            background: var(--glass-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 22px;
+            box-shadow: var(--shadow-soft); transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+            position: relative; overflow: hidden;
+        }
+
+        /* 琉璃金光呼吸效果 (取代紅點) */
+        @keyframes breatheGold {
+            0%, 100% { box-shadow: 0 4px 15px rgba(203, 163, 122, 0.1); border-color: rgba(255,255,255,0.9); }
+            50% { box-shadow: 0 4px 30px rgba(203, 163, 122, 0.4); border-color: rgba(203, 163, 122, 0.5); }
+        }
+        .needs-action { animation: breatheGold 3.5s infinite ease-in-out; }
+
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .card-title { display: flex; align-items: center; gap: 10px; font-size: 1.05rem; font-weight: 500; letter-spacing: 1px; color: var(--text-main); }
+        .card-icon { width: 22px; height: 22px; stroke: var(--accent-jade); fill: none; stroke-width: 1.8; }
+        
+        /* 吃藥模組特製 */
+        .pill-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .pill-btn {
+            display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer;
+            padding: 12px 5px; border-radius: 16px; border: 1px solid rgba(130,150,140,0.2);
+            background: rgba(255,255,255,0.4); transition: all 0.3s;
+        }
+        .pill-btn:active { transform: scale(0.92); }
+        .pill-dot { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--text-light); transition: all 0.3s; }
+        .pill-btn.done { background: rgba(130,150,140,0.1); border-color: rgba(130,150,140,0.4); }
+        .pill-btn.done .pill-dot { background: var(--accent-jade); border-color: var(--accent-jade); }
+        .pill-btn.done .pill-label { color: var(--accent-jade); }
+        .pill-label { font-size: 0.8rem; color: var(--text-light); letter-spacing: 1px; }
+
+        /* 數值展示區塊 */
+        .value-display { display: flex; align-items: flex-end; gap: 8px; cursor: pointer; }
+        .main-value { font-size: 2.2rem; font-weight: 300; color: var(--text-main); line-height: 1; }
+        .sub-value { font-size: 1rem; color: var(--text-light); margin-bottom: 4px; }
+        .trend-icon { width: 16px; height: 16px; stroke: var(--accent-gold); stroke-width: 2; margin-bottom: 6px; }
+        
+        .action-hint { font-size: 0.75rem; color: var(--accent-gold); letter-spacing: 1px; margin-top: 10px; display: flex; align-items: center; gap: 4px; }
+        .action-hint svg { width: 12px; height: 12px; }
+
+        /* 底部法卷抽屜 (輸入與圖表) */
+        .bottom-drawer {
+            position: fixed; bottom: 0; left: 0; width: 100vw; background: rgba(252, 251, 249, 0.95);
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border-top: 1px solid var(--glass-border); border-radius: 35px 35px 0 0;
+            box-shadow: 0 -15px 50px rgba(160, 155, 150, 0.1);
+            transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+            z-index: 2000; padding: 0 0 calc(20px + env(safe-area-inset-bottom)) 0;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .bottom-drawer.open { transform: translateY(0); }
+        
+        .drawer-content { width: 100%; max-width: 720px; padding: 20px; }
+        .drawer-handle { width: 40px; height: 4px; background: rgba(150,142,134,0.3); border-radius: 2px; margin: 0 auto 20px; cursor: pointer; }
+        
+        .drawer-title { font-size: 1.1rem; color: var(--accent-jade); text-align: center; letter-spacing: 2px; margin-bottom: 20px; font-weight: 500; }
+
+        /* 模擬圖表區塊 (純向量預留) */
+        .chart-placeholder {
+            width: 100%; height: 120px; border: 1px dashed rgba(130,150,140,0.3);
+            border-radius: 16px; display: flex; justify-content: center; align-items: center;
+            color: var(--text-light); font-size: 0.85rem; letter-spacing: 1px; margin-bottom: 20px;
+            background: rgba(255,255,255,0.4);
+        }
+
+        /* 簡單數字鍵盤預留 */
+        .btn-large {
+            width: 100%; background: var(--accent-jade); color: white; border: none;
+            padding: 16px; border-radius: 20px; font-size: 1.1rem; letter-spacing: 2px;
+            cursor: pointer; box-shadow: 0 4px 15px rgba(130, 150, 140, 0.2); transition: all 0.2s;
+        }
+        .btn-large:active { transform: scale(0.97); }
+
+    </style>
+</head>
+<body>
+
+    <div class="top-nav">
+        <div class="nav-content">
+            <div class="back-btn" onclick="history.back()">
+                <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                回記帳
+            </div>
+            <div class="page-title">健康日誌</div>
+            <div style="width: 80px;"></div> </div>
+    </div>
+
+    <div class="main-container">
+
+        <div class="health-card needs-action" id="card-med">
+            <div class="card-header">
+                <div class="card-title">
+                    <svg class="card-icon" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"></rect><line x1="12" y1="8" x2="12" y2="16"></line></svg>
+                    今日服藥
+                </div>
+                <div style="font-size: 0.8rem; color: var(--text-light);">規律觀照</div>
+            </div>
+            <div class="pill-grid">
+                <div class="pill-btn done" onclick="togglePill(this)">
+                    <div class="pill-dot"></div><div class="pill-label">早晨</div>
+                </div>
+                <div class="pill-btn" onclick="togglePill(this)">
+                    <div class="pill-dot"></div><div class="pill-label">中午</div>
+                </div>
+                <div class="pill-btn" onclick="togglePill(this)">
+                    <div class="pill-dot"></div><div class="pill-label">晚間</div>
+                </div>
+                <div class="pill-btn" onclick="togglePill(this)">
+                    <div class="pill-dot"></div><div class="pill-label">睡前</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="health-card" onclick="openDrawer('血壓觀測')">
+            <div class="card-header">
+                <div class="card-title">
+                    <svg class="card-icon" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+                    血壓脈搏
+                </div>
+                <div style="font-size: 0.8rem; color: var(--text-light);">晨間紀錄</div>
+            </div>
+            <div class="value-display">
+                <div class="main-value">118</div>
+                <div class="sub-value">/ 75</div>
+                <svg class="trend-icon" fill="none" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>
+            </div>
+            <div class="action-hint"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg> 點擊進入詳情與紀錄</div>
+        </div>
+
+        <div class="health-card" onclick="openDrawer('血糖觀測')">
+            <div class="card-header">
+                <div class="card-title">
+                    <svg class="card-icon" viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+                    血糖趨勢
+                </div>
+                <div style="font-size: 0.8rem; color: var(--text-light); background: rgba(203,163,122,0.15); padding: 2px 8px; border-radius: 10px; color: var(--accent-gold);">飯後兩小時</div>
+            </div>
+            <div class="value-display">
+                <div class="main-value">105</div>
+                <div class="sub-value">mg/dL</div>
+            </div>
+             <div class="action-hint"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg> 點擊進入詳情與紀錄</div>
+        </div>
+
+        <div class="health-card" onclick="openDrawer('體重紀錄')">
+            <div class="card-header">
+                <div class="card-title">
+                    <svg class="card-icon" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+                    形體觀照
+                </div>
+                <div style="font-size: 0.8rem; color: var(--text-light);">較上週 -0.5kg</div>
+            </div>
+            <div class="value-display">
+                <div class="main-value">62.5</div>
+                <div class="sub-value">kg</div>
+            </div>
+            <svg style="width:100%; height:30px; margin-top:10px; stroke:var(--accent-jade); fill:none; stroke-width:2; stroke-linecap:round;" viewBox="0 0 100 30" preserveAspectRatio="none">
+                <path d="M0 25 Q 20 20, 40 22 T 80 10 T 100 15"></path>
+            </svg>
+        </div>
+
+    </div>
+
+    <div id="action-drawer" class="bottom-drawer">
+        <div class="drawer-content">
+            <div class="drawer-handle" onclick="closeDrawer()"></div>
+            <div class="drawer-title" id="drawer-title">紀錄與趨勢</div>
+            
+            <div class="chart-placeholder">
+                <svg width="24" height="24" stroke="currentColor" fill="none" style="margin-right:8px;"><path d="M3 3v18h18"/><path d="M18 9l-5 5-4-4-5 5"/></svg>
+                貝茲曲線圖表開發預留區
+            </div>
+
+            <button class="btn-large" onclick="closeDrawer()">新增今日紀錄</button>
+        </div>
+    </div>
+
+    <script>
+        // 點擊藥丸的動畫與邏輯
+        function togglePill(el) {
+            el.classList.toggle('done');
+            checkMedicationStatus();
+        }
+
+        // 檢查是否所有藥都吃了，若完成則取消卡片的琉璃金光呼吸
+        function checkMedicationStatus() {
+            const card = document.getElementById('card-med');
+            const pills = card.querySelectorAll('.pill-btn');
+            let allDone = true;
+            
+            // 這裡可以加入時間邏輯，判斷「當前時間應吃」是否已吃。
+            // 暫時簡化為：只要有任何一個亮起（或達成特定條件），即可動態改變光芒。
+            pills.forEach(p => {
+                // 此處留給後續與時間掛鉤的邏輯
+            });
+
+            // 示範：手動點擊後，若感覺圓滿，可移除呼吸光芒
+            // card.classList.remove('needs-action'); 
+        }
+
+        // 開關底部抽屜
+        function openDrawer(title) {
+            document.getElementById('drawer-title').innerText = title;
+            document.getElementById('action-drawer').classList.add('open');
+        }
+
+        function closeDrawer() {
+            document.getElementById('action-drawer').classList.remove('open');
+        }
+    </script>
+</body>
+</html>
