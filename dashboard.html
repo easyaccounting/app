@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>淨息流 ． 生命軌跡</title>
+    <title>淨息流 ． 大數據統計</title>
     <style>
         :root {
             --bg-gradient: linear-gradient(135deg, #F9FAF9, #E6EBE9);
@@ -11,9 +11,9 @@
             --text-main: #58504A; --text-light: #968E86;
             --accent-gold: #CBA37A; --accent-jade: #82968C; --accent-red: #D29498;
             --shadow-soft: 0 10px 40px rgba(160, 155, 150, 0.12);
-            /* 記帳分類色票 */
+            /* 修正分類色票，避免與收入的綠色混淆 */
             --cat-food: #D9AEAD; --cat-beauty: #D3A9A7; --cat-house: #CBA37A;
-            --cat-trans: #B5AFA6; --cat-ent: #9BAA9D; --cat-other: #C2BAC6;
+            --cat-trans: #B5AFA6; --cat-ent: #A5B3B6; /* 調整為冷石灰，避開綠色 */ --cat-other: #C2BAC6;
         }
 
         * { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
@@ -57,18 +57,32 @@
 
         /* --- 主要內容區 --- */
         .main-container { width: 100%; max-width: 720px; margin: 0 auto; padding: 0 20px 100px; display: none; flex-direction: column; gap: 15px; }
-        .main-container.active { display: flex; } /* 顯示當前模組 */
+        .main-container.active { display: flex; } 
 
         .stat-card { background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-radius: 24px; padding: 20px; box-shadow: var(--shadow-soft); cursor: pointer; transition: transform 0.2s; display: flex; flex-direction: column; }
         .stat-card:active { transform: scale(0.97); background: rgba(255,255,255,0.9); }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .card-title { font-size: 1rem; font-weight: 500; letter-spacing: 1px; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
         .card-title svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
+        
+        /* 一般卡片數值 */
         .card-body { display: flex; align-items: center; justify-content: space-between; gap: 15px; }
         .card-data-text { flex: 1; }
         .data-main { font-size: 1.8rem; font-weight: 300; color: var(--text-main); line-height: 1.2; }
         .data-sub { font-size: 0.8rem; color: var(--text-light); }
         .mini-chart { width: 120px; height: 60px; display: flex; justify-content: center; align-items: center; position: relative; }
+
+        /* 記帳結餘卡片專用 */
+        .balance-box { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+        .bal-row { display: flex; justify-content: space-between; align-items: flex-end; }
+        .bal-income { font-size: 0.9rem; color: var(--accent-jade); }
+        .bal-expense { font-size: 0.9rem; color: var(--text-main); }
+        
+        /* 預算進度條組件 */
+        .budget-bar-wrap { width: 100%; background: rgba(150,142,134,0.15); height: 8px; border-radius: 4px; overflow: hidden; margin-top: 5px; position: relative; }
+        .budget-progress { height: 100%; width: 0%; background: var(--accent-gold); transition: width 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.3s; }
+        .budget-progress.over { background: var(--accent-red); }
+        .budget-labels { display: flex; justify-content: space-between; font-size: 0.75rem; margin-top: 6px; transition: color 0.3s; }
 
         /* --- 全螢幕展開層 (禪定深觀) --- */
         .expand-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; background: var(--bg-gradient); z-index: 2000; transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; flex-direction: column; overflow-y: auto; }
@@ -77,25 +91,21 @@
         .expand-title { font-size: 1.15rem; font-weight: 500; letter-spacing: 2px; color: var(--text-main); }
         .expand-content { flex: 1; width: 100%; max-width: 720px; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
         
-        /* 圖表舞台 */
         .large-chart-stage { width: 100%; height: 280px; background: var(--glass-bg); border-radius: 24px; border: 1px solid var(--glass-border); box-shadow: var(--shadow-soft); position: relative; padding: 20px 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .large-chart-stage svg { width: 100%; height: 100%; overflow: visible; position: absolute; top: 0; left: 0; }
         
-        /* 曲線樣式 (健康) */
         .curve-sys { fill: none; stroke: var(--text-main); stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); transition: d 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
         .curve-dia { fill: none; stroke: var(--accent-jade); stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 4px 6px rgba(130, 150, 140, 0.2)); transition: d 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
         .curve-single { fill: none; stroke: var(--accent-jade); stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 6px 10px rgba(130, 150, 140, 0.25)); transition: d 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
         
-        /* 圓餅圖樣式 (記帳) */
         svg.donut { width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible; position: relative; }
-        .donut-segment { fill: transparent; stroke-width: 4; stroke-linecap: round; transition: stroke-dasharray 1s ease-out; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.08)); cursor: pointer; }
+        .donut-segment { fill: transparent; stroke-width: 4; stroke-linecap: round; transition: stroke-dasharray 1s ease-out; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.08)); }
         
         .chart-labels { position: absolute; bottom: 10px; left: 0; width: 100%; display: flex; justify-content: space-between; padding: 0 15px; font-size: 0.7rem; color: var(--text-light); pointer-events: none; }
         .chart-legend { display: flex; gap: 15px; justify-content: center; margin-bottom: 10px; position: relative; z-index: 2; width: 100%; flex-wrap: wrap; }
         .legend-item { font-size: 0.8rem; color: var(--text-light); display: flex; align-items: center; gap: 6px; }
         .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
 
-        /* 歷史明細列表 (共用) */
         .history-list { display: flex; flex-direction: column; gap: 10px; padding-bottom: 40px; }
         .history-item { background: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.6); border-radius: 16px; padding: 15px; display: flex; flex-direction: column; gap: 8px; }
         .history-top { display: flex; justify-content: space-between; align-items: center; }
@@ -104,8 +114,6 @@
         .history-val { font-size: 1.2rem; font-weight: 500; color: var(--text-main); }
         .history-memo { font-size: 0.8rem; color: var(--text-light); background: rgba(255,255,255,0.3); padding: 8px 12px; border-radius: 8px; border-left: 2px solid var(--accent-gold); display: inline-block; }
         .history-alert { font-size: 0.8rem; color: var(--accent-red); background: rgba(210, 148, 152, 0.1); padding: 8px 12px; border-radius: 8px; display: inline-block; font-weight: 500; }
-        
-        /* 記帳專用明細左側小圓點 */
         .cat-color-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
 
         .giant-donut-wrap { width: 200px; height: 200px; position: relative; display: flex; justify-content: center; align-items: center; margin: 0 auto; }
@@ -129,7 +137,7 @@
             <div class="menu-item mod-dashed" onclick="alert('「孕母與育兒」模組靜心開發中')"><svg viewBox="0 0 24 24" stroke-dasharray="4"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>孕母與育兒</div>
             <div class="menu-item mod-dashed" onclick="alert('「毛孩觀照」模組靜心開發中')"><svg viewBox="0 0 24 24" stroke-dasharray="4"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm4 0h-2v-2h2v2zm-2-4q-2 0-3-1.5T9 8h2q0 1 1 1.5t2 0V12z"/></svg>毛孩手冊</div>
             
-            <div class="menu-item active" onclick="toggleMenu()"><div class="menu-icon-wrap"><svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div>大數據統計</div>
+            <div class="menu-item active" onclick="toggleMenu()"><div class="menu-icon-wrap"><svg viewBox="0 0 24 24" stroke="currentColor"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div>大數據統計</div>
             
             <div class="menu-item" onclick="window.location.href='https://namoamitabhapureland.github.io/bodhicitta/index.html'"><div class="menu-icon-wrap"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg></div>彌陀淨土系統</div>
         </div>
@@ -158,15 +166,41 @@
 
     <div class="main-container active" id="view-finance">
         
-        <div class="stat-card" onclick="openDetail('收支圓餅圖', 'finance')">
+        <div class="stat-card" onclick="openDetail('收支明細與預算', 'finance-list')">
             <div class="card-header">
-                <div class="card-title" style="color: var(--accent-gold);"><svg viewBox="0 0 24 24" stroke="currentColor"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg> 總支出分析</div>
-                <div style="font-size: 0.8rem; color: var(--text-light);" id="fin-budget-status">預算狀態</div>
+                <div class="card-title" style="color: var(--accent-gold);"><svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> 本期結餘</div>
+                <div style="font-size: 0.8rem; color: var(--text-light);">含心靈預算</div>
+            </div>
+            
+            <div class="balance-box">
+                <div class="data-main" id="fin-net-balance" style="font-size: 2.8rem; color: var(--text-main);">$0</div>
+                <div class="bal-row">
+                    <div class="bal-income">總收入 <span id="fin-total-inc" style="font-weight:bold;">+$0</span></div>
+                    <div class="bal-expense">總支出 <span id="fin-total-exp" style="font-weight:bold;">-$0</span></div>
+                </div>
+                
+                <div id="budget-section" style="display: none; margin-top: 10px; border-top: 1px dashed rgba(150,142,134,0.3); padding-top: 15px;">
+                    <div class="budget-labels">
+                        <span id="budget-status-text" style="color: var(--text-light);">心靈預算使用率</span>
+                        <span id="budget-percent-num" style="font-weight: bold; color: var(--accent-gold);">0%</span>
+                    </div>
+                    <div class="budget-bar-wrap">
+                        <div class="budget-progress" id="budget-bar"></div>
+                    </div>
+                    <div class="budget-labels" style="justify-content: flex-end; font-size: 0.7rem;" id="budget-hint">剩餘預算 $0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card" onclick="openDetail('支出結構分析', 'finance-chart')">
+            <div class="card-header">
+                <div class="card-title" style="color: var(--text-main);"><svg viewBox="0 0 24 24" stroke="currentColor"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg> 支出分析</div>
+                <div style="font-size: 0.8rem; color: var(--text-light);">純支出圓餅圖</div>
             </div>
             <div class="card-body">
                 <div class="card-data-text">
-                    <div class="data-main" id="fin-total-expense">$0</div>
-                    <div class="data-sub">點擊查看分類明細</div>
+                    <div class="data-main" id="fin-expense-only">$0</div>
+                    <div class="data-sub">點擊查看比例與明細</div>
                 </div>
                 <div class="mini-chart">
                     <svg viewBox="0 0 42 42" id="mini-donut-chart" style="width:100%; height:100%; transform: rotate(-90deg); overflow: visible;"></svg>
@@ -177,7 +211,6 @@
     </div>
 
     <div class="main-container" id="view-health">
-        
         <div class="stat-card" onclick="openDetail('服藥規律度', 'med')">
             <div class="card-header">
                 <div class="card-title" style="color: var(--accent-jade);"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"></rect><line x1="12" y1="8" x2="12" y2="16"></line></svg> 規律觀照</div>
@@ -185,15 +218,9 @@
             </div>
             <div class="card-body">
                 <div class="card-data-text"><div class="data-main" id="med-percent">--<span style="font-size: 1rem;">%</span></div><div class="data-sub">歷史達成率</div></div>
-                <div class="mini-chart">
-                    <svg viewBox="0 0 36 36" style="width: 60px; height: 60px; transform: rotate(-90deg);">
-                        <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(130,150,140,0.2)" stroke-width="4"></circle>
-                        <circle id="mini-med-ring" cx="18" cy="18" r="15.9" fill="none" stroke="var(--accent-jade)" stroke-width="4" stroke-dasharray="0, 100" stroke-linecap="round" style="transition: stroke-dasharray 1s ease-out;"></circle>
-                    </svg>
-                </div>
+                <div class="mini-chart"><svg viewBox="0 0 36 36" style="width: 60px; height: 60px; transform: rotate(-90deg);"><circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(130,150,140,0.2)" stroke-width="4"></circle><circle id="mini-med-ring" cx="18" cy="18" r="15.9" fill="none" stroke="var(--accent-jade)" stroke-width="4" stroke-dasharray="0, 100" stroke-linecap="round" style="transition: stroke-dasharray 1s ease-out;"></circle></svg></div>
             </div>
         </div>
-
         <div class="stat-card" onclick="openDetail('血壓脈搏趨勢', 'bp')">
             <div class="card-header">
                 <div class="card-title" style="color: var(--accent-jade);"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg> 血壓觀測</div>
@@ -201,15 +228,9 @@
             </div>
             <div class="card-body">
                 <div class="card-data-text"><div class="data-main" id="bp-avg">--<span style="font-size:1.2rem; color:var(--text-light)">/--</span></div><div class="data-sub">mmHg</div></div>
-                <div class="mini-chart">
-                    <svg viewBox="0 0 100 40" style="width: 100%; height: 100%; stroke-linecap: round; fill: none; stroke-width: 2.5;">
-                        <path d="M0,15 Q25,8 50,15 T100,10" stroke="var(--text-main)" style="opacity: 0.7;"></path>
-                        <path d="M0,32 Q25,25 50,30 T100,28" stroke="var(--accent-jade)"></path>
-                    </svg>
-                </div>
+                <div class="mini-chart"><svg viewBox="0 0 100 40" style="width: 100%; height: 100%; stroke-linecap: round; fill: none; stroke-width: 2.5;"><path d="M0,15 Q25,8 50,15 T100,10" stroke="var(--text-main)" style="opacity: 0.7;"></path><path d="M0,32 Q25,25 50,30 T100,28" stroke="var(--accent-jade)"></path></svg></div>
             </div>
         </div>
-        
         <div class="stat-card" onclick="openDetail('血糖起伏分析', 'bs')">
             <div class="card-header">
                 <div class="card-title" style="color: var(--accent-jade);"><svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg> 血糖觀測</div>
@@ -217,15 +238,9 @@
             </div>
             <div class="card-body">
                 <div class="card-data-text"><div class="data-main" id="bs-avg">--</div><div class="data-sub">mg/dL (平均)</div></div>
-                <div class="mini-chart">
-                    <svg viewBox="0 0 100 40" style="width: 100%; height: 100%; fill: none;">
-                        <line x1="0" y1="20" x2="100" y2="20" stroke="var(--accent-gold)" stroke-width="1" stroke-dasharray="2,2"></line>
-                        <path d="M0,25 Q20,35 40,15 T80,22 T100,18" stroke="var(--accent-jade)" stroke-width="2.5" stroke-linecap="round"></path>
-                    </svg>
-                </div>
+                <div class="mini-chart"><svg viewBox="0 0 100 40" style="width: 100%; height: 100%; fill: none;"><line x1="0" y1="20" x2="100" y2="20" stroke="var(--accent-gold)" stroke-width="1" stroke-dasharray="2,2"></line><path d="M0,25 Q20,35 40,15 T80,22 T100,18" stroke="var(--accent-jade)" stroke-width="2.5" stroke-linecap="round"></path></svg></div>
             </div>
         </div>
-
     </div>
 
     <div class="expand-overlay" id="detail-view">
@@ -234,10 +249,9 @@
             <div class="expand-title" id="detail-title">詳細軌跡</div>
             <div style="width: 42px;"></div>
         </div>
-        
         <div class="expand-content">
-            <div class="large-chart-stage" id="chart-stage"></div>
-            <div style="font-size: 0.95rem; color: var(--text-main); font-weight: 500; margin-top: 5px; letter-spacing: 1px;">歷史明細</div>
+            <div class="large-chart-stage" id="chart-stage" style="display:none;"></div>
+            <div style="font-size: 0.95rem; color: var(--text-main); font-weight: 500; margin-top: 5px; letter-spacing: 1px;" id="list-title">歷史明細</div>
             <div class="history-list" id="history-list-container"></div>
         </div>
     </div>
@@ -245,11 +259,9 @@
     <script>
         function toggleMenu() { document.getElementById('side-menu').classList.toggle('open'); document.getElementById('side-menu-overlay').classList.toggle('open'); }
 
-        // 模組切換邏輯 (財務 vs 健康)
         let currentModule = 'finance';
         function switchModule(mod) {
             currentModule = mod;
-            // UI 切換
             document.getElementById('tab-finance').className = 'mod-tab';
             document.getElementById('tab-health').className = 'mod-tab';
             if(mod === 'finance') document.getElementById('tab-finance').classList.add('active', 'mod-fin');
@@ -259,50 +271,54 @@
             document.getElementById('view-health').classList.remove('active');
             document.getElementById('view-' + mod).classList.add('active');
             
-            // 重新載入對應模組的總覽卡片
             if(mod === 'finance') renderFinanceSummary();
             if(mod === 'health') calculateHealthSummaries();
         }
 
-        // 時間濾鏡邏輯
         let currentTimeFilter = 'month';
         function switchTime(el, filter) {
             document.querySelectorAll('.time-tab').forEach(t => t.classList.remove('active'));
             el.classList.add('active');
             currentTimeFilter = filter;
-            
-            // 時間改變，重新渲染當前模組的卡片
             if(currentModule === 'finance') renderFinanceSummary();
             if(currentModule === 'health') calculateHealthSummaries();
         }
 
-        // ================= 資料庫存取 (DB) =================
+        // ================= 資料庫系統 (含模擬生成) =================
         let financeDB = { budget: 15000, transactions: [] };
         let healthDB = { med: [], bp: [], bs: [], wt: [] };
         const colorMap = { '飲食': 'var(--cat-food)', '服飾美容': 'var(--cat-beauty)', '居住': 'var(--cat-house)', '交通': 'var(--cat-trans)', '育樂進修': 'var(--cat-ent)', '其他生活': 'var(--cat-other)' };
 
         window.onload = () => {
             initDB();
-            switchModule('finance'); // 預設進來顯示財務
+            switchModule('finance'); 
         };
 
         function initDB() {
-            // 讀取財務 DB
             let storedFin = localStorage.getItem('joy_accounting_app_data');
             if (storedFin) financeDB = JSON.parse(storedFin);
+            else {
+                // 自動產生模擬的記帳資料，讓預算與圖表有感
+                let now = Date.now();
+                financeDB.transactions = [
+                    { id: 1, timestamp: now, type: 'expense', date: '今天', cat: '飲食', sub: '午餐', amt: 150 },
+                    { id: 2, timestamp: now, type: 'expense', date: '今天', cat: '服飾美容', sub: '保養品', amt: 1200 },
+                    { id: 3, timestamp: now - 86400000, type: 'income', date: '昨天', cat: '收入', sub: '獎金', amt: 5000 },
+                    { id: 4, timestamp: now - 86400000, type: 'expense', date: '昨天', cat: '交通', sub: '捷運', amt: 30 },
+                    { id: 5, timestamp: now - 172800000, type: 'expense', date: '前天', cat: '育樂進修', sub: '買書', amt: 350 }
+                ];
+            }
             
-            // 讀取健康 DB
             let storedHealth = localStorage.getItem('joy_health_history');
             if (storedHealth) healthDB = JSON.parse(storedHealth);
             else {
-                // 若無健康資料，給予展示資料
                 healthDB.med = [ { date: '10/25', time: '早晨', status: '已服', memo: '' }, { date: '10/24', time: '中午', status: '未服', memo: '忘記' } ];
                 healthDB.bp = [ { date: '10/21', sys: 122, dia: 80, tag: '晚間' }, { date: '10/25', sys: 116, dia: 74, tag: '早晨' } ];
                 healthDB.bs = [ { date: '10/21', val: 95, tag: '空腹', hba1c: null, memo: '' }, { date: '10/24', val: 140, tag: '飯後2H', hba1c: null, memo: '甜點' } ];
             }
         }
 
-        // ================= 模組一：財務收支引擎 =================
+        // ================= 模組一：財務引擎 =================
         function getFilteredTransactions() {
             let now = new Date();
             return financeDB.transactions.filter(t => {
@@ -311,34 +327,64 @@
                 if (currentTimeFilter === 'month') return tDate.getMonth() === now.getMonth() && tDate.getFullYear() === now.getFullYear();
                 if (currentTimeFilter === 'halfYear') { let sixMonthsAgo = new Date(); sixMonthsAgo.setMonth(now.getMonth() - 6); return tDate >= sixMonthsAgo; }
                 if (currentTimeFilter === 'year') return tDate.getFullYear() === now.getFullYear();
-                return true; // week 暫時當全視
+                return true; 
             });
         }
 
         function renderFinanceSummary() {
             let filteredTxs = getFilteredTransactions();
-            let expenseTotal = 0; let catTotals = {};
+            let expenseTotal = 0; let incomeTotal = 0; let catTotals = {};
             
             filteredTxs.forEach(t => {
                 if(t.type === 'expense') {
                     expenseTotal += t.amt;
                     if(!catTotals[t.cat]) catTotals[t.cat] = { amt: 0, color: t.color || colorMap[t.cat] || 'var(--cat-other)' };
                     catTotals[t.cat].amt += t.amt;
+                } else if(t.type === 'income') {
+                    incomeTotal += t.amt;
                 }
             });
 
-            document.getElementById('fin-total-expense').innerText = '$' + expenseTotal.toLocaleString();
-            
-            let budgetHint = document.getElementById('fin-budget-status');
-            if (currentTimeFilter === 'month' && financeDB.budget > 0) {
-                if(expenseTotal > financeDB.budget) { budgetHint.innerText = '已超預算'; budgetHint.style.color = 'var(--accent-red)'; }
-                else { budgetHint.innerText = `剩餘預算 $${(financeDB.budget - expenseTotal).toLocaleString()}`; budgetHint.style.color = 'var(--text-light)'; }
-            } else { budgetHint.innerText = '期間總覽'; budgetHint.style.color = 'var(--text-light)'; }
+            // 雙卡片更新
+            let netBalance = incomeTotal - expenseTotal;
+            document.getElementById('fin-net-balance').innerText = (netBalance >= 0 ? '$' : '-$') + Math.abs(netBalance).toLocaleString();
+            document.getElementById('fin-net-balance').style.color = netBalance >= 0 ? 'var(--text-main)' : 'var(--accent-red)';
+            document.getElementById('fin-total-inc').innerText = '+$' + incomeTotal.toLocaleString();
+            document.getElementById('fin-total-exp').innerText = '-$' + expenseTotal.toLocaleString();
+            document.getElementById('fin-expense-only').innerText = '$' + expenseTotal.toLocaleString();
 
-            // 畫迷你圓餅圖
+            // 預算進度條邏輯
+            let budgetBox = document.getElementById('budget-section');
+            if (currentTimeFilter === 'month' && financeDB.budget > 0) {
+                budgetBox.style.display = 'block';
+                let percent = (expenseTotal / financeDB.budget) * 100;
+                let bar = document.getElementById('budget-bar');
+                let txt = document.getElementById('budget-percent-num');
+                let hint = document.getElementById('budget-hint');
+                
+                bar.style.width = `${Math.min(percent, 100)}%`;
+                txt.innerText = `${percent.toFixed(0)}%`;
+                
+                if (percent > 100) {
+                    bar.classList.add('over');
+                    txt.style.color = 'var(--accent-red)';
+                    document.getElementById('budget-status-text').style.color = 'var(--accent-red)';
+                    hint.innerText = '已超出心靈預算！請觀照物欲。';
+                    hint.style.color = 'var(--accent-red)';
+                } else {
+                    bar.classList.remove('over');
+                    txt.style.color = 'var(--accent-gold)';
+                    document.getElementById('budget-status-text').style.color = 'var(--text-light)';
+                    hint.innerText = `預算剩餘 $${(financeDB.budget - expenseTotal).toLocaleString()}`;
+                    hint.style.color = 'var(--text-light)';
+                }
+            } else {
+                budgetBox.style.display = 'none';
+            }
+
+            // 迷你圓餅圖 (純支出)
             const donut = document.getElementById('mini-donut-chart');
-            donut.innerHTML = '';
-            let cumulativePercent = 0;
+            donut.innerHTML = ''; let cumulativePercent = 0;
             if(expenseTotal > 0) {
                 Object.keys(catTotals).forEach(cat => {
                     let percent = (catTotals[cat].amt / expenseTotal) * 100;
@@ -354,22 +400,21 @@
             }
         }
 
-        // ================= 模組二：健康觀照引擎 =================
+        // ================= 模組二：健康引擎 =================
         function calculateHealthSummaries() {
-            // 吃藥百分比
             if (healthDB.med.length > 0) {
                 let doneCount = healthDB.med.filter(m => m.status === '已服').length;
                 let percent = Math.round((doneCount / healthDB.med.length) * 100);
                 document.getElementById('med-percent').innerHTML = `${percent}<span style="font-size: 1rem;">%</span>`;
-                document.getElementById('med-status-tag').innerText = percent >= 80 ? '狀態良好' : '需多留意';
+                let tag = document.getElementById('med-status-tag');
+                tag.innerText = percent >= 80 ? '狀態良好' : '需多留意';
+                tag.style.color = percent >= 80 ? 'var(--accent-jade)' : 'var(--accent-gold)';
                 document.getElementById('mini-med-ring').style.strokeDasharray = `${percent}, 100`;
             }
-            // 血壓平均
             if (healthDB.bp.length > 0) {
                 let sysSum = 0, diaSum = 0; healthDB.bp.forEach(b => { sysSum += b.sys; diaSum += b.dia; });
                 document.getElementById('bp-avg').innerHTML = `${Math.round(sysSum / healthDB.bp.length)}<span style="font-size:1.2rem; color:var(--text-light)">/${Math.round(diaSum / healthDB.bp.length)}</span>`;
             }
-            // 血糖平均
             if (healthDB.bs.length > 0) {
                 let bsSum = 0; healthDB.bs.forEach(b => { bsSum += b.val; });
                 document.getElementById('bs-avg').innerText = Math.round(bsSum / healthDB.bs.length);
@@ -379,14 +424,18 @@
         // ================= 禪定深觀 (全螢幕展開) =================
         function openDetail(title, type) {
             document.getElementById('detail-title').innerText = title;
-            document.getElementById('detail-title').style.color = type === 'finance' ? 'var(--accent-gold)' : 'var(--accent-jade)';
+            document.getElementById('detail-title').style.color = type.includes('finance') ? 'var(--accent-gold)' : 'var(--accent-jade)';
             document.getElementById('detail-view').classList.add('open');
             document.body.style.overflow = 'hidden'; 
             
             const stage = document.getElementById('chart-stage');
             stage.innerHTML = ''; 
+            stage.style.display = 'flex'; // 預設顯示圖表舞台
+            document.getElementById('list-title').innerText = type === 'finance-list' ? '收支明細' : '歷史明細';
+
             setTimeout(() => {
-                if (type === 'finance') renderFinanceDetailEngine(stage);
+                if (type === 'finance-list') { stage.style.display = 'none'; renderFinanceListEngine(); }
+                if (type === 'finance-chart') renderFinanceChartEngine(stage);
                 if (type === 'med') renderMedicationEngine(stage);
                 if (type === 'bp') renderBPEngine(stage);
                 if (type === 'bs') renderBSEngine(stage);
@@ -395,8 +444,22 @@
 
         function closeDetail() { document.getElementById('detail-view').classList.remove('open'); document.body.style.overflow = 'auto'; }
 
-        // --- 財務明細引擎 ---
-        function renderFinanceDetailEngine(stage) {
+        // --- 財務明細引擎 (列表模式) ---
+        function renderFinanceListEngine() {
+            let filteredTxs = getFilteredTransactions();
+            const list = document.getElementById('history-list-container'); list.innerHTML = '';
+            if(filteredTxs.length === 0) { list.innerHTML = '<div style="text-align:center; color:var(--text-light); padding:20px;">這段期間尚無紀錄</div>'; return; }
+            filteredTxs.forEach(t => {
+                let amtStr = t.type === 'income' ? `+$${t.amt}` : `-$${t.amt}`;
+                let amtColor = t.type === 'income' ? 'var(--accent-jade)' : 'var(--text-main)';
+                let memoHtml = t.memo ? `<div class="history-memo" style="margin-left:24px; margin-top:5px;">${t.memo}</div>` : '';
+                let color = t.color || colorMap[t.cat] || 'var(--cat-other)';
+                list.innerHTML += `<div class="history-item"><div class="history-top" style="justify-content: flex-start; gap: 12px;"><div class="cat-color-dot" style="background: ${color}"></div><div style="flex:1;"><div style="font-size: 0.95rem; font-weight: 500; color: var(--text-main); display:flex; align-items:center; gap:6px;">${t.cat} - ${t.sub}</div><div style="font-size: 0.75rem; color: var(--text-light);">${t.date}</div></div><div class="history-val" style="color:${amtColor}">${amtStr}</div></div>${memoHtml}</div>`;
+            });
+        }
+
+        // --- 財務圖表引擎 (圓餅圖模式) ---
+        function renderFinanceChartEngine(stage) {
             let filteredTxs = getFilteredTransactions();
             let expenseTotal = 0; let catTotals = {};
             filteredTxs.forEach(t => {
@@ -407,29 +470,15 @@
                 }
             });
 
-            // 組合 Legend 標籤
             let legendHtml = '';
-            Object.keys(catTotals).forEach(cat => {
-                legendHtml += `<div class="legend-item"><div class="legend-dot" style="background: ${catTotals[cat].color};"></div>${cat}</div>`;
-            });
+            Object.keys(catTotals).forEach(cat => { legendHtml += `<div class="legend-item"><div class="legend-dot" style="background: ${catTotals[cat].color};"></div>${cat}</div>`; });
 
-            stage.innerHTML = `
-                <div class="giant-donut-wrap">
-                    <svg class="donut" viewBox="0 0 42 42" id="large-donut-chart"></svg>
-                    <div class="giant-donut-text">
-                        <div class="num">$${expenseTotal.toLocaleString()}</div><div class="lbl">期間總支出</div>
-                    </div>
-                </div>
-                <div class="chart-legend" style="margin-top: 15px;">${legendHtml}</div>
-            `;
+            stage.innerHTML = `<div class="giant-donut-wrap"><svg class="donut" viewBox="0 0 42 42" id="large-donut-chart"></svg><div class="giant-donut-text"><div class="num">$${expenseTotal.toLocaleString()}</div><div class="lbl">期間純支出</div></div></div><div class="chart-legend" style="margin-top: 15px;">${legendHtml}</div>`;
             
-            // 畫大圓餅圖
-            const donut = document.getElementById('large-donut-chart');
-            let cumulativePercent = 0;
+            const donut = document.getElementById('large-donut-chart'); let cumulativePercent = 0;
             if(expenseTotal > 0) {
                 Object.keys(catTotals).forEach(cat => {
-                    let percent = (catTotals[cat].amt / expenseTotal) * 100;
-                    let visiblePercent = percent > 2 ? percent - 1.5 : percent;
+                    let percent = (catTotals[cat].amt / expenseTotal) * 100; let visiblePercent = percent > 2 ? percent - 1.5 : percent;
                     const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
                     circle.setAttribute("cx", "21"); circle.setAttribute("cy", "21"); circle.setAttribute("r", "15.9155");
                     circle.setAttribute("class", "donut-segment"); circle.setAttribute("stroke", catTotals[cat].color);
@@ -439,39 +488,12 @@
                     cumulativePercent += percent;
                 });
             }
-
-            // 渲染交易明細列表
-            const list = document.getElementById('history-list-container');
-            list.innerHTML = '';
-            if(filteredTxs.length === 0) { list.innerHTML = '<div style="text-align:center; color:var(--text-light); padding:20px;">這段期間尚無紀錄</div>'; return; }
-
-            filteredTxs.forEach(t => {
-                let invoiceHtml = t.invoice && t.type === 'expense' ? `<svg style="width:12px; height:12px; stroke:var(--accent-gold); fill:none;" viewBox="0 0 24 24"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1z"/></svg>` : '';
-                let amtStr = t.type === 'income' ? `+$${t.amt}` : `-$${t.amt}`;
-                let amtColor = t.type === 'income' ? 'var(--accent-jade)' : 'var(--text-main)';
-                let memoHtml = t.memo ? `<div class="history-memo" style="margin-left:24px; margin-top:5px;">${t.memo}</div>` : '';
-                let color = t.color || colorMap[t.cat] || 'var(--cat-other)';
-
-                list.innerHTML += `
-                    <div class="history-item">
-                        <div class="history-top" style="justify-content: flex-start; gap: 12px;">
-                            <div class="cat-color-dot" style="background: ${color}"></div>
-                            <div style="flex:1;">
-                                <div style="font-size: 0.95rem; font-weight: 500; color: var(--text-main); display:flex; align-items:center; gap:6px;">${t.cat} - ${t.sub} ${invoiceHtml}</div>
-                                <div style="font-size: 0.75rem; color: var(--text-light);">${t.date}</div>
-                            </div>
-                            <div class="history-val" style="color:${amtColor}">${amtStr}</div>
-                        </div>
-                        ${memoHtml}
-                    </div>
-                `;
-            });
+            renderFinanceListEngine(); // 底部一樣列出明細
         }
 
-        // --- 以下為健康模組繪圖引擎 (保留原本 99 分的貝茲曲線邏輯) ---
+        // --- 健康引擎 (省略重複代碼，保持與前一版本一致的 99 分渲染) ---
         function renderMedicationEngine(stage) {
-            let percent = 0;
-            if (healthDB.med.length > 0) { let doneCount = healthDB.med.filter(m => m.status === '已服').length; percent = Math.round((doneCount / healthDB.med.length) * 100); }
+            let percent = 0; if (healthDB.med.length > 0) { let doneCount = healthDB.med.filter(m => m.status === '已服').length; percent = Math.round((doneCount / healthDB.med.length) * 100); }
             stage.innerHTML = `<div class="giant-donut-wrap"><svg viewBox="0 0 36 36" style="width:100%; height:100%; transform: rotate(-90deg);"><circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(130,150,140,0.15)" stroke-width="2.5"></circle><circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--accent-jade)" stroke-width="2.5" stroke-dasharray="${percent}, 100" stroke-linecap="round" style="transition: stroke-dasharray 1.5s ease-out;"></circle></svg><div class="giant-donut-text"><div class="num">${percent}%</div><div class="lbl">歷史圓滿度</div></div></div>`;
             const list = document.getElementById('history-list-container'); list.innerHTML = '';
             healthDB.med.forEach(d => {
@@ -484,11 +506,7 @@
             stage.innerHTML = `<div class="chart-legend"><div class="legend-item"><div class="legend-dot" style="background: var(--text-main);"></div>收縮壓</div><div class="legend-item"><div class="legend-dot" style="background: var(--accent-jade);"></div>舒張壓</div></div><svg preserveAspectRatio="none"><path class="curve-sys" id="path-sys" d=""></path><path class="curve-dia" id="path-dia" d=""></path></svg><div class="chart-labels" id="bp-labels"></div>`;
             let pointsSys = [], pointsDia = []; const w = stage.clientWidth, h = stage.clientHeight, padX = 20, padY = 50, useW = w - padX*2, useH = h - padY*2, range = 160 - 50; 
             if(healthDB.bp.length > 0) {
-                healthDB.bp.forEach((d, i) => {
-                    let x = padX + (i / (Math.max(1, healthDB.bp.length - 1))) * useW;
-                    pointsSys.push({ x: x, y: padY + useH - ((d.sys - 50) / range) * useH }); pointsDia.push({ x: x, y: padY + useH - ((d.dia - 50) / range) * useH });
-                    if (i===0 || i===healthDB.bp.length-1 || i%2===0) { document.getElementById('bp-labels').innerHTML += `<div style="position:absolute; left:${x}px; transform:translateX(-50%);">${d.date}</div>`; }
-                });
+                healthDB.bp.forEach((d, i) => { let x = padX + (i / (Math.max(1, healthDB.bp.length - 1))) * useW; pointsSys.push({ x: x, y: padY + useH - ((d.sys - 50) / range) * useH }); pointsDia.push({ x: x, y: padY + useH - ((d.dia - 50) / range) * useH }); if (i===0 || i===healthDB.bp.length-1 || i%2===0) { document.getElementById('bp-labels').innerHTML += `<div style="position:absolute; left:${x}px; transform:translateX(-50%);">${d.date}</div>`; } });
                 setTimeout(() => { document.getElementById('path-sys').setAttribute('d', generateBezierPath(pointsSys, 0.25)); document.getElementById('path-dia').setAttribute('d', generateBezierPath(pointsDia, 0.25)); }, 50);
             }
             const list = document.getElementById('history-list-container'); list.innerHTML = '';
@@ -500,10 +518,7 @@
             let points = []; const w = stage.clientWidth, h = stage.clientHeight, padX = 20, padY = 50, useW = w - padX*2, useH = h - padY*2, maxVal = 160, minVal = 70, range = maxVal - minVal;
             let baseY = padY + useH - ((100 - minVal) / range) * useH; document.getElementById('bs-baseline').setAttribute('y1', baseY); document.getElementById('bs-baseline').setAttribute('y2', baseY);
             if(healthDB.bs.length > 0) {
-                healthDB.bs.forEach((d, i) => {
-                    let x = padX + (i / (Math.max(1, healthDB.bs.length - 1))) * useW; points.push({ x: x, y: padY + useH - ((d.val - minVal) / range) * useH });
-                    if (i===0 || i===healthDB.bs.length-1 || i%2===0) { document.getElementById('bs-labels').innerHTML += `<div style="position:absolute; left:${x}px; transform:translateX(-50%);">${d.date}</div>`; }
-                });
+                healthDB.bs.forEach((d, i) => { let x = padX + (i / (Math.max(1, healthDB.bs.length - 1))) * useW; points.push({ x: x, y: padY + useH - ((d.val - minVal) / range) * useH }); if (i===0 || i===healthDB.bs.length-1 || i%2===0) { document.getElementById('bs-labels').innerHTML += `<div style="position:absolute; left:${x}px; transform:translateX(-50%);">${d.date}</div>`; } });
                 setTimeout(() => { document.getElementById('path-bs').setAttribute('d', generateBezierPath(points, 0.25)); }, 50);
             }
             const list = document.getElementById('history-list-container'); list.innerHTML = '';
