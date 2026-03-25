@@ -411,24 +411,8 @@
         </div>
     </div>
 
-    <script>
-        // ================= 1. 全局設定與四大模組保全 (一鍵 CSV/JSON) =================
-        function loadGlobalSettings() {
-            let accDB = JSON.parse(localStorage.getItem('joy_accounting_app_data')) || { budget: 15000, carrier: "", transactions: [] };
-            document.getElementById('setting-budget').value = accDB.budget || "";
-            document.getElementById('setting-carrier').value = accDB.carrier || "";
-        }
-
-        function saveGlobalSettings() {
-            let accDB = JSON.parse(localStorage.getItem('joy_accounting_app_data')) || { budget: 15000, carrier: "", transactions: [] };
-            accDB.budget = Number(document.getElementById('setting-budget').value) || 0;
-            accDB.carrier = document.getElementById('setting-carrier').value.trim().toUpperCase() || "";
-            localStorage.setItem('joy_accounting_app_data', JSON.stringify(accDB));
-            document.getElementById('global-settings-modal').classList.remove('show');
-            alert("全局設定已儲存！");
-            if(currentModule === 'finance') renderFinanceSummary();
-        }
-
+        <script>
+        // ================= 1. 全局下載與保全引擎 (超級 CSV / JSON) =================
         function exportEcosystemData(type) {
             let ecoData = {
                 accounting: JSON.parse(localStorage.getItem('joy_accounting_app_data')) || {},
@@ -445,7 +429,7 @@
                 link.href = URL.createObjectURL(blob); link.download = filename; 
                 document.body.appendChild(link); link.click(); document.body.removeChild(link);
             } else {
-                // 超級 CSV 引擎：融合四大模組
+                // 超級 CSV 引擎：融合四大模組，統一欄位規格
                 let csvContent = "\uFEFF模組,紀錄類型,日期,時間,分類/項目,數值/狀態,備註\n";
                 
                 // 財務
@@ -478,6 +462,7 @@
                 link.href = URL.createObjectURL(blob); link.download = filename; 
                 document.body.appendChild(link); link.click(); document.body.removeChild(link);
             }
+            document.getElementById('backup-modal').classList.remove('show');
         }
 
         // ================= 2. UI 與模組切換引擎 =================
@@ -519,15 +504,14 @@
 
         // ================= 3. 萬法歸一：資料庫 (DB) 引擎 =================
         let financeDB = { budget: 15000, transactions: [] };
-        let healthDB = { med: [], bp: [], bs: [], wt: [], bmi: [], periods: [] }; // 新增 healthDB.periods
+        let healthDB = { med: [], bp: [], bs: [], wt: [], bmi: [], periods: [] };
         let momDB = { edd: "", dob: "", fetalCount: 0, vax: {}, periods: [], bp: [], gdm: [], wt: [] };
-        let petDB = { wt: [], actions: [], medical: [] }; // 毛孩 DB
+        let petDB = { wt: [], actions: [], medical: [] }; 
         
         const colorMap = { '飲食': 'var(--cat-food)', '服飾美容': 'var(--cat-beauty)', '居住': 'var(--cat-house)', '交通': 'var(--cat-trans)', '育樂進修': 'var(--cat-ent)', '其他生活': 'var(--cat-other)' };
 
         window.onload = () => {
             initDB();
-            loadGlobalSettings();
             switchModule('finance'); 
         };
 
@@ -538,17 +522,20 @@
             let storedHealth = localStorage.getItem('joy_health_history');
             if (storedHealth) {
                 healthDB = JSON.parse(storedHealth);
-                if(!healthDB.periods) healthDB.periods = []; // 確保舊資料庫有此陣列
+                if(!healthDB.periods) healthDB.periods = []; 
             }
             
             let storedMom = localStorage.getItem('joy_mom_data');
             if (storedMom) momDB = JSON.parse(storedMom);
 
             let storedPet = localStorage.getItem('joy_pet_data');
-            if (storedPet) petDB = JSON.parse(storedPet);
+            if (storedPet) {
+                petDB = JSON.parse(storedPet);
+                if(!petDB.actions) petDB.actions = [];
+            }
         }
 
-        function getFilteredTransactions() { return financeDB.transactions; } // 目前預設載入全量，未來可套用 timeFilter
+        function getFilteredTransactions() { return financeDB.transactions; }
 
         // ================= 4. 各模組摘要計算引擎 =================
         function renderFinanceSummary() {
@@ -624,6 +611,9 @@
             if (petDB.medical) {
                 document.getElementById('pet-med-count').innerText = petDB.medical.length;
             }
+            if (petDB.actions && document.getElementById('pet-action-count')) {
+                document.getElementById('pet-action-count').innerText = petDB.actions.length;
+            }
         }
 
         // ================= 5. 禪定深觀 (展開層) 與圖表引擎 =================
@@ -648,7 +638,7 @@
                 if (type === 'bp') renderBPEngine(stage);
                 if (type === 'bs') renderBSEngine(stage);
                 if (type === 'bmi') renderBMIEngine(stage);
-                if (type === 'health-period') renderHealthPeriodEngine(stage); // 新增：健康一般經期
+                if (type === 'health-period') renderHealthPeriodEngine(stage); 
                 
                 if (type === 'period') renderPeriodEngine(stage);
                 if (type === 'preg') { stage.style.display = 'none'; renderPregListEngine(); }
@@ -659,6 +649,7 @@
 
                 if (type === 'pet-wt') renderPetWtEngine(stage);
                 if (type === 'pet-med') { stage.style.display = 'none'; renderPetMedListEngine(); }
+                if (type === 'pet-actions') { stage.style.display = 'none'; renderPetActionsListEngine(); }
             }, 50);
         }
         function closeDetail() { document.getElementById('detail-view').classList.remove('open'); document.body.style.overflow = 'auto'; }
@@ -795,7 +786,7 @@
             list.innerHTML = `<div style="text-align:center; padding:20px; font-size:1.1rem; color:var(--accent-rose);">預產期：${momDB.edd || '尚未設定'}</div><div style="text-align:center; color:var(--text-light);">累計胎動：${momDB.fetalCount || 0} 次</div>`;
         }
 
-        // --- 毛孩圖表 (新增日期 Labels) ---
+        // --- 毛孩圖表 (新增日期 Labels 與日常照護紀錄) ---
         function renderPetWtEngine(stage) {
             stage.innerHTML = `<div class="chart-legend" style="justify-content: center; padding: 0 10px;"><div class="legend-item"><div class="legend-dot" style="background: var(--accent-amber);"></div>毛孩體重變化</div></div><svg preserveAspectRatio="none"><path class="curve-single" id="path-pet-wt" d="" style="stroke:var(--accent-amber);"></path></svg><div class="chart-labels" id="pet-wt-labels"></div>`;
             let points = []; const w = stage.clientWidth, h = stage.clientHeight, padX = 20, padY = 50, useW = w - padX*2, useH = h - padY*2;
@@ -825,6 +816,17 @@
                 list.innerHTML = '<div style="text-align:center; color:var(--text-light); padding:20px;">尚無紀錄</div>';
             }
         }
+        function renderPetActionsListEngine() {
+            const list = document.getElementById('history-list-container'); list.innerHTML = '';
+            if(petDB.actions && petDB.actions.length > 0) {
+                [...petDB.actions].reverse().forEach(d => {
+                    let memoHtml = d.memo ? `<div class="history-memo" style="border-left-color: var(--accent-amber);">${d.memo}</div>` : '';
+                    list.innerHTML += `<div class="history-item"><div class="history-top"><div class="history-date"><span>${d.date} ${d.time}</span><span class="history-tag" style="color:var(--text-main);">${d.type}</span></div><div class="history-val" style="font-size:0.9rem; color:var(--accent-jade);">✔ 已完成</div></div>${memoHtml}</div>`;
+                });
+            } else {
+                list.innerHTML = '<div style="text-align:center; color:var(--text-light); padding:20px;">尚無紀錄</div>';
+            }
+        }
 
         // ================= 核心 SVG 貝茲曲線演算法 =================
         function generateBezierPath(points, tension) {
@@ -842,3 +844,4 @@
     </script>
 </body>
 </html>
+
