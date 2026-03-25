@@ -481,20 +481,33 @@
             }
         }
 
-        // ================= 3. 大數據歷史推送 (Push to Dashboard) =================
+               // ================= 3. 大數據歷史推送 (加入自動修復與同日覆蓋引擎) =================
         function pushToHistoryDB(type, payload) {
             let historyDB = JSON.parse(localStorage.getItem(HISTORY_KEY));
             if (!historyDB) historyDB = { med: [], bp: [], bs: [], wt: [], bmi: [] };
             
-            if(type === 'med') historyDB.med.push(payload);
-            if(type === 'bp') historyDB.bp.push(payload);
-            if(type === 'bs') historyDB.bs.push(payload);
-            if(type === 'wt') historyDB.wt.push(payload);
-            if(type === 'bmi') historyDB.bmi.push(payload);
+            // 💡 防呆修復：如果舊的資料庫沒有這個陣列，系統自動幫它建一個，防止崩潰！
+            if (!historyDB[type]) historyDB[type] = [];
+
+            // 💡 覆蓋機制 (Upsert)：體重與 BMI 每天只留一筆最新的
+            if (type === 'wt' || type === 'bmi') {
+                let existingIndex = historyDB[type].findIndex(item => item.date === payload.date);
+                if (existingIndex !== -1) {
+                    // 找到同一天的紀錄，直接覆蓋舊值
+                    historyDB[type][existingIndex] = payload;
+                } else {
+                    // 沒找到，新增一筆
+                    historyDB[type].push(payload);
+                }
+            } else {
+                // 血壓、血糖、吃藥，允許一天有多筆紀錄
+                historyDB[type].push(payload);
+            }
 
             localStorage.setItem(HISTORY_KEY, JSON.stringify(historyDB));
         }
 
+       
         // ================= 4. UI 互動與抽屜引擎 =================
         let currentMode = ""; let currentTag = ""; let currentMedSlot = "";
         let inputData = { sys: "0", dia: "0", single: "0" }; let activeInput = "single";
@@ -615,56 +628,66 @@
 
         // ================= 雙寫入引擎 (Dual-Write) =================
         function submitData() {
-            let memoStr = document.getElementById('input-memo').value.trim();
-            // 如果是在日曆選的日期，就用 recordDateStr，否則取今天
-            let dDate = recordDateStr === "" ? getMDString(new Date()) : recordDateStr;
-            
-            if (currentMode === '吃藥') {
-                // 1. 寫入今日卡片
-                if (dDate === getMDString(new Date())) {
-                    todayData.med[currentMedSlot] = currentMedStatus;
-                    saveTodayData();
-                    restoreUIFromData();
-                }
-                // 2. 推送至大數據
-                pushToHistoryDB('med', { date: dDate, time: currentMedSlot, status: (currentMedStatus==='done'?'已服':'未服'), memo: memoStr });
-            } 
-            else if (currentMode === '血壓') {
-                let sys = parseInt(inputData.sys); let dia = parseInt(inputData.dia);
-                if(sys > 0 || dia > 0) {
+            try {
+                let memoStr = document.getElementById('input-memo').value.trim();
+                // 如果是在日曆選的日期，就用 recordDateStr，否則取今天
+                let dDate = recordDateStr === "" ? getMDString(new Date()) : recordDateStr;
+                
+                if (currentMode === '吃藥') {
+                    // 1. 寫入今日卡片
                     if (dDate === getMDString(new Date())) {
-                        todayData.bp = { sys: sys, dia: dia, tag: currentTag };
-                        saveTodayData(); restoreUIFromData();
+                        todayData.med[currentMedSlot] = currentMedStatus;
+                        saveTodayData();
+                        restoreUIFromData();
                     }
-                    pushToHistoryDB('bp', { date: dDate, sys: sys, dia: dia, tag: currentTag, memo: memoStr });
-                }
-            } 
-            else if (currentMode === '血糖') {
-                let val = parseInt(inputData.single); let hba1cVal = document.getElementById('input-hba1c').value;
-                if(val > 0) {
-                    if (dDate === getMDString(new Date())) {
-                        todayData.bs = { val: val, tag: currentTag };
-                        saveTodayData(); restoreUIFromData();
+                    // 2. 推送至大數據
+                    pushToHistoryDB('med', { date: dDate, time: currentMedSlot, status: (currentMedStatus==='done'?'已服':'未服'), memo: memoStr });
+                } 
+                else if (currentMode === '血壓') {
+                    let sys = parseInt(inputData.sys); let dia = parseInt(inputData.dia);
+                    if(sys > 0 || dia > 0) {
+                        if (dDate === getMDString(new Date())) {
+                            todayData.bp = { sys: sys, dia: dia, tag: currentTag };
+                            saveTodayData(); restoreUIFromData();
+                        }
+                        pushToHistoryDB('bp', { date: dDate, sys: sys, dia: dia, tag: currentTag, memo: memoStr });
                     }
-                    pushToHistoryDB('bs', { date: dDate, val: val, tag: currentTag, hba1c: hba1cVal?parseFloat(hba1cVal):null, memo: memoStr });
-                }
-            } 
-            else if (currentMode === '體重') {
-                let val = parseFloat(inputData.single);
-                if(val > 0) {
-                    if (dDate === getMDString(new Date())) {
-                        todayData.wt = { val: val };
-                        saveTodayData(); restoreUIFromData();
+                } 
+                else if (currentMode === '血糖') {
+                    let val = parseInt(inputData.single); let hba1cVal = document.getElementById('input-hba1c').value;
+                    if(val > 0) {
+                        if (dDate === getMDString(new Date())) {
+                            todayData.bs = { val: val, tag: currentTag };
+                            saveTodayData(); restoreUIFromData();
+                        }
+                        pushToHistoryDB('bs', { date: dDate, val: val, tag: currentTag, hba1c: hba1cVal?parseFloat(hba1cVal):null, memo: memoStr });
                     }
-                    pushToHistoryDB('wt', { date: dDate, val: val, memo: memoStr });
-                    
-                    // 自動計算 BMI 並寫入大數據
-                    let m = userHeightCm / 100; let bmi = parseFloat((val / (m * m)).toFixed(1));
-                    pushToHistoryDB('bmi', { date: dDate, val: bmi });
+                } 
+                else if (currentMode === '體重') {
+                    let val = parseFloat(inputData.single);
+                    if(val > 0) {
+                        if (dDate === getMDString(new Date())) {
+                            todayData.wt = { val: val };
+                            saveTodayData(); restoreUIFromData();
+                        }
+                        pushToHistoryDB('wt', { date: dDate, val: val, memo: memoStr });
+                        
+                        // 自動計算 BMI 並寫入大數據
+                        let m = userHeightCm / 100; let bmi = parseFloat((val / (m * m)).toFixed(1));
+                        pushToHistoryDB('bmi', { date: dDate, val: bmi });
+                    }
                 }
+                
+                // 正常執行完畢，收起抽屜
+                closeDrawer();
+                
+            } catch (error) {
+                console.error("資料寫入異常：", error);
+                alert("寫入時發生異常，已啟動防護機制。");
+                closeDrawer();
             }
-            closeDrawer();
         }
+
 
         // --- 日期與時間設定彈窗 ---
         function openHeightModal() { document.getElementById('height-input-box').value = userHeightCm; document.getElementById('height-modal').classList.add('show'); }
