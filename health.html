@@ -3,9 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>淨息流 ． 健康觀照</title>
     <style>
         :root {
+            /* 淨土極簡禪色系 */
+            --bg-deep: #F2F5F4; 
             --bg-gradient: linear-gradient(135deg, #F9FAF9, #E6EBE9);
             --glass-bg: rgba(255, 255, 255, 0.65);
             --glass-border: rgba(255, 255, 255, 0.9);
@@ -13,81 +17,101 @@
             --text-light: #968E86;
             --accent-gold: #CBA37A;
             --accent-jade: #82968C;
+            --accent-red: #D29498;
             --shadow-soft: 0 10px 40px rgba(160, 155, 150, 0.12);
         }
 
         * { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
-        html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg-gradient); color: var(--text-main); font-family: -apple-system, sans-serif; overflow-x: hidden; }
 
-        /* --- 側邊選單 (與記帳共用邏輯) --- */
+        html, body {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background: var(--bg-gradient); color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow-x: hidden; overflow-y: auto; -webkit-user-select: none; user-select: none;
+        }
+
+        /* --- 側邊導航選單 --- */
         .side-menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.25); backdrop-filter: blur(5px); z-index: 900; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .side-menu-overlay.open { opacity: 1; pointer-events: auto; }
         .side-menu { position: fixed; top: 0; left: 0; width: 80%; max-width: 320px; height: 100%; background: rgba(252, 251, 249, 0.95); backdrop-filter: blur(20px); border-right: 1px solid var(--glass-border); box-shadow: 10px 0 40px rgba(0,0,0,0.08); transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); z-index: 901; display: flex; flex-direction: column; padding-top: max(40px, env(safe-area-inset-top)); }
         .side-menu.open { transform: translateX(0); }
         .menu-profile { padding: 0 25px 25px; border-bottom: 1px solid rgba(92,84,78,0.06); margin-bottom: 15px; }
-        .menu-title { font-size: 1.6rem; font-weight: 300; letter-spacing: 3px; }
+        .menu-title { font-size: 1.6rem; font-weight: 300; letter-spacing: 3px; color: var(--text-main); }
         .menu-subtitle { font-size: 0.75rem; color: var(--accent-gold); letter-spacing: 1px; margin-top: 8px; }
-        .menu-list { flex: 1; overflow-y: auto; padding: 0 20px; display: flex; flex-direction: column; gap: 12px; }
-        .menu-item { padding: 16px 20px; border-radius: 20px; border: 1px solid var(--glass-border); display: flex; align-items: center; gap: 15px; font-size: 0.95rem; font-weight: 500; cursor: pointer; background: var(--glass-bg); }
+        
+        .menu-list { flex: 1; overflow-y: auto; padding: 0 20px 40px; display: flex; flex-direction: column; gap: 12px; }
+        .menu-item { padding: 16px 20px; border-radius: 20px; border: 1px solid var(--glass-border); display: flex; align-items: center; gap: 15px; font-size: 0.95rem; font-weight: 500; cursor: pointer; background: var(--glass-bg); color: var(--text-main); transition: all 0.2s; }
+        .menu-item:active { transform: scale(0.97); }
         .menu-item.active { background: linear-gradient(135deg, var(--glass-bg), rgba(130, 150, 140, 0.12)); border-color: var(--accent-jade); }
+        
         .menu-icon-wrap { width: 32px; height: 32px; border-radius: 50%; background: #fff; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
         .menu-item svg { stroke: var(--text-main); fill: none; stroke-width: 1.8; width: 16px; height: 16px; }
         .menu-item.active svg { stroke: var(--accent-jade); }
         
         /* 虛線預留模組 */
-        .mod-dashed { background: transparent; border: 1.5px dashed rgba(150, 142, 134, 0.25); color: var(--text-light); justify-content: center; font-weight: 400; font-size: 0.85rem; letter-spacing: 1px; margin-top: 5px; }
+        .mod-dashed { background: transparent; border: 1.5px dashed rgba(150, 142, 134, 0.3); color: var(--text-light); justify-content: center; font-weight: 400; font-size: 0.85rem; letter-spacing: 1px; margin-top: 5px; box-shadow: none; }
 
         /* --- 頂部導航 --- */
-        .top-nav { position: fixed; top: 0; left: 0; width: 100%; z-index: 800; padding: max(20px, env(safe-area-inset-top)) 20px 15px; display: flex; justify-content: center; background: linear-gradient(to bottom, rgba(249,250,249,0.95), rgba(249,250,249,0)); }
+        .top-nav { position: fixed; top: 0; left: 0; width: 100%; z-index: 800; padding: max(15px, env(safe-area-inset-top)) 20px 15px; display: flex; justify-content: center; background: linear-gradient(to bottom, rgba(249,250,249,0.95), rgba(249,250,249,0)); }
         .nav-content { width: 100%; max-width: 720px; display: flex; justify-content: space-between; align-items: center; }
-        .nav-btn { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); color: var(--text-main); box-shadow: var(--shadow-soft); cursor: pointer; }
-        .page-title { font-size: 1.1rem; font-weight: 500; letter-spacing: 2px; color: var(--accent-jade); }
+        .nav-btn { display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%; background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); color: var(--text-main); box-shadow: var(--shadow-soft); cursor: pointer; transition: all 0.2s; }
+        .nav-btn:active { transform: scale(0.92); background: rgba(255,255,255,0.9); }
+        .nav-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
+        .page-title { font-size: 1.15rem; font-weight: 500; letter-spacing: 3px; color: var(--accent-jade); }
 
         /* --- 主要內容區 --- */
-        .main-container { width: 100%; max-width: 720px; margin: 0 auto; padding: calc(80px + env(safe-area-inset-top)) 20px 100px; display: flex; flex-direction: column; gap: 20px; }
-        .health-card { background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-radius: 24px; padding: 22px; box-shadow: var(--shadow-soft); cursor: pointer; }
+        .main-container { width: 100%; max-width: 720px; margin: 0 auto; padding: calc(85px + env(safe-area-inset-top)) 20px 100px; display: flex; flex-direction: column; gap: 20px; }
+        
+        /* 觀照卡片 */
+        .health-card { background: var(--glass-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-radius: 24px; padding: 22px; box-shadow: var(--shadow-soft); transition: transform 0.2s; position: relative; overflow: hidden; }
+        .health-card.clickable:active { transform: scale(0.98); background: rgba(255,255,255,0.8); }
+
+        /* 呼吸金光 */
+        @keyframes breatheGold { 0%, 100% { box-shadow: 0 4px 15px rgba(203, 163, 122, 0.1); border-color: rgba(255,255,255,0.9); } 50% { box-shadow: 0 4px 30px rgba(203, 163, 122, 0.4); border-color: rgba(203, 163, 122, 0.5); } }
+        .needs-action { animation: breatheGold 3.5s infinite ease-in-out; }
+
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .card-title { display: flex; align-items: center; gap: 10px; font-size: 1.05rem; font-weight: 500; letter-spacing: 1px; }
         .card-icon { width: 22px; height: 22px; stroke: var(--accent-jade); fill: none; stroke-width: 1.8; }
         
+        .pill-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .pill-btn { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; padding: 12px 5px; border-radius: 16px; border: 1px solid rgba(130,150,140,0.2); background: rgba(255,255,255,0.4); transition: all 0.3s; }
+        .pill-btn:active { transform: scale(0.92); }
+        .pill-dot { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--text-light); transition: all 0.3s; }
+        .pill-btn.done { background: rgba(130,150,140,0.1); border-color: rgba(130,150,140,0.4); }
+        .pill-btn.done .pill-dot { background: var(--accent-jade); border-color: var(--accent-jade); }
+        .pill-btn.done .pill-label { color: var(--accent-jade); }
+        .pill-label { font-size: 0.8rem; color: var(--text-light); letter-spacing: 1px; }
+
         .value-display { display: flex; align-items: flex-end; gap: 8px; }
         .main-value { font-size: 2.2rem; font-weight: 300; line-height: 1; }
         .sub-value { font-size: 1rem; color: var(--text-light); margin-bottom: 4px; }
-        
-        /* 雙數據展示 (供身高體重使用) */
+        .trend-icon { width: 16px; height: 16px; stroke: var(--accent-gold); stroke-width: 2; margin-bottom: 6px; }
         .dual-value-box { display: flex; gap: 30px; margin-top: 10px; }
 
-        /* --- 底部法卷抽屜 (整合輸入與圖表) --- */
-        .bottom-drawer { position: fixed; bottom: 0; left: 0; width: 100vw; height: 80vh; background: rgba(252, 251, 249, 0.95); backdrop-filter: blur(25px); border-top: 1px solid var(--glass-border); border-radius: 35px 35px 0 0; box-shadow: 0 -15px 50px rgba(160, 155, 150, 0.1); transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); z-index: 2000; display: flex; flex-direction: column; align-items: center; }
+        .action-hint { font-size: 0.75rem; color: var(--accent-gold); letter-spacing: 1px; margin-top: 10px; display: flex; align-items: center; gap: 4px; }
+        .action-hint svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+        /* --- 極簡輸入抽屜 --- */
+        .bottom-drawer { position: fixed; bottom: 0; left: 0; width: 100vw; background: rgba(252, 251, 249, 0.95); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-top: 1px solid var(--glass-border); border-radius: 35px 35px 0 0; box-shadow: 0 -15px 50px rgba(160, 155, 150, 0.1); transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); z-index: 2000; display: flex; flex-direction: column; align-items: center; padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
         .bottom-drawer.open { transform: translateY(0); }
-        .drawer-handle { width: 40px; height: 4px; background: rgba(150,142,134,0.3); border-radius: 2px; margin: 15px auto; cursor: pointer; }
-        .drawer-content { width: 100%; max-width: 720px; padding: 0 20px; display: flex; flex-direction: column; height: 100%; }
-        .drawer-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .drawer-title { font-size: 1.15rem; color: var(--accent-jade); letter-spacing: 2px; font-weight: 500; }
         
-        /* 模式切換標籤 (新增紀錄 vs 趨勢分析) */
-        .mode-tabs { display: flex; background: rgba(255,255,255,0.4); border: 1px solid var(--glass-border); border-radius: 20px; padding: 4px; margin-bottom: 20px; }
-        .mode-tab { flex: 1; text-align: center; padding: 8px 0; font-size: 0.9rem; color: var(--text-light); border-radius: 16px; cursor: pointer; transition: all 0.3s; }
-        .mode-tab.active { background: var(--glass-bg); color: var(--text-main); font-weight: 500; box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
+        .drawer-content { width: 100%; max-width: 720px; padding: 0 25px; display: flex; flex-direction: column; }
+        .drawer-handle { width: 40px; height: 4px; background: rgba(150,142,134,0.3); border-radius: 2px; margin: 15px auto 5px; cursor: pointer; }
+        
+        .drawer-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .drawer-title { font-size: 1.15rem; color: var(--text-main); letter-spacing: 2px; font-weight: 500; }
+        
+        .input-display-area { font-size: 3.2rem; font-weight: 300; text-align: center; color: var(--accent-jade); border-bottom: 1px solid rgba(130, 150, 140, 0.2); padding-bottom: 10px; margin-bottom: 20px; min-height: 60px; line-height: 1; display: flex; justify-content: center; align-items: flex-end; gap: 8px;}
+        .input-unit { font-size: 1rem; color: var(--text-light); font-weight: 400; margin-bottom: 8px; }
 
-        /* 時間維度切換 (日 月 半年 一年) */
-        .time-tabs { display: flex; gap: 10px; margin-bottom: 15px; justify-content: center; }
-        .time-tab { padding: 6px 16px; font-size: 0.8rem; color: var(--text-light); border: 1px solid transparent; border-radius: 20px; cursor: pointer; transition: all 0.2s; }
-        .time-tab.active { border-color: var(--accent-gold); color: var(--accent-gold); background: rgba(203, 163, 122, 0.08); }
+        .key-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .key { background: rgba(255,255,255,0.5); border: 1px solid var(--glass-border); border-radius: 20px; height: 60px; font-size: 1.6rem; color: var(--text-main); font-weight: 300; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: all 0.15s; }
+        .key:active { transform: scale(0.92); background: rgba(255,255,255,0.95); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .key-ac { color: var(--accent-red); font-weight: 400; font-size: 1.2rem; letter-spacing: 1px; }
+        .key-submit { grid-column: span 3; background: var(--accent-gold); color: white; border: none; font-weight: 400; letter-spacing: 4px; box-shadow: 0 6px 20px rgba(203, 163, 122, 0.25); }
+        .key-submit:active { background: #b89166; }
 
-        /* 視圖區域 */
-        .view-area { flex: 1; display: none; flex-direction: column; }
-        .view-area.active { display: flex; }
-
-        /* 數字鍵盤區 */
-        .input-display { font-size: 2.8rem; font-weight: 300; text-align: center; margin: 20px 0; color: var(--accent-jade); border-bottom: 1px solid rgba(130, 150, 140, 0.2); padding-bottom: 10px; }
-        .key-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
-        .key { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; height: 60px; font-size: 1.5rem; color: var(--text-main); font-weight: 300; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: var(--shadow-soft); transition: all 0.1s; }
-        .key:active { transform: scale(0.95); background: rgba(255,255,255,0.9); }
-        .key-submit { background: var(--accent-jade); color: white; }
-
-        /* 圖表區 */
-        .chart-box { flex: 1; background: rgba(255,255,255,0.4); border: 1px dashed rgba(130,150,140,0.3); border-radius: 20px; display: flex; justify-content: center; align-items: center; color: var(--text-light); font-size: 0.85rem; letter-spacing: 1px; min-height: 250px; }
     </style>
 </head>
 <body>
@@ -99,21 +123,31 @@
             <div class="menu-subtitle">萬法唯心造，身心皆觀照</div>
         </div>
         <div class="menu-list">
-            <div class="menu-item" onclick="window.location.href='index.html'">
+            <div class="menu-item" onclick="alert('導向財務記帳')">
                 <div class="menu-icon-wrap"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>
                 財務記帳
             </div>
             <div class="menu-item active" onclick="toggleMenu()">
                 <div class="menu-icon-wrap"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
-                健康日誌
+                健康觀照 (輸入)
+            </div>
+            
+            <div class="menu-item" style="border-color: rgba(203, 163, 122, 0.4);" onclick="alert('導向獨立的【生命軌跡】統計頁面')">
+                <div class="menu-icon-wrap"><svg viewBox="0 0 24 24" stroke="var(--accent-gold)"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div>
+                生命軌跡 (總覽)
+            </div>
+
+            <div class="menu-item mod-dashed" onclick="alert('「孕母與育兒」模組靜心開發中')">
+                <svg viewBox="0 0 24 24" stroke-dasharray="4"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                孕母與育兒 (預留)
+            </div>
+            <div class="menu-item mod-dashed" onclick="alert('「毛孩觀照」模組靜心開發中')">
+                <svg viewBox="0 0 24 24" stroke-dasharray="4"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm4 0h-2v-2h2v2zm-2-4q-2 0-3-1.5T9 8h2q0 1 1 1.5t2 0V12z"/></svg>
+                毛孩手冊 (預留)
             </div>
             <div class="menu-item" onclick="window.location.href='https://namoamitabhapureland.github.io/bodhicitta/index.html'">
                 <div class="menu-icon-wrap"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg></div>
                 彌陀淨土系統
-            </div>
-            <div class="menu-item mod-dashed" onclick="alert('「孕母與育兒觀照」模組靜心開發中，敬請期待')">
-                <svg viewBox="0 0 24 24" stroke-dasharray="4"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                孕母與育兒觀照
             </div>
         </div>
     </div>
@@ -121,14 +155,63 @@
     <div class="top-nav">
         <div class="nav-content">
             <div class="nav-btn" onclick="toggleMenu()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                <svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
             </div>
             <div class="page-title">健康日誌</div>
-            <div style="width: 40px;"></div> </div>
+            <div class="nav-btn" onclick="alert('導向獨立的【生命軌跡】統計頁面')">
+                <svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+            </div>
+        </div>
     </div>
 
     <div class="main-container">
-        <div class="health-card" onclick="openDrawer('形體觀照')">
+        <div class="health-card needs-action" id="card-med">
+            <div class="card-header">
+                <div class="card-title">
+                    <svg class="card-icon" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"></rect><line x1="12" y1="8" x2="12" y2="16"></line></svg>
+                    今日服藥
+                </div>
+                <div style="font-size: 0.8rem; color: var(--text-light);">規律觀照</div>
+            </div>
+            <div class="pill-grid">
+                <div class="pill-btn done" onclick="togglePill(this)"><div class="pill-dot"></div><div class="pill-label">早晨</div></div>
+                <div class="pill-btn" onclick="togglePill(this)"><div class="pill-dot"></div><div class="pill-label">中午</div></div>
+                <div class="pill-btn" onclick="togglePill(this)"><div class="pill-dot"></div><div class="pill-label">晚間</div></div>
+                <div class="pill-btn" onclick="togglePill(this)"><div class="pill-dot"></div><div class="pill-label">睡前</div></div>
+            </div>
+        </div>
+
+        <div class="health-card clickable" onclick="openInputDrawer('血壓觀測', 'mmHg')">
+            <div class="card-header">
+                <div class="card-title">
+                    <svg class="card-icon" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+                    血壓脈搏
+                </div>
+                <div style="font-size: 0.8rem; color: var(--text-light);">晨間紀錄</div>
+            </div>
+            <div class="value-display">
+                <div class="main-value" id="val-bp">118</div>
+                <div class="sub-value">/ 75</div>
+            </div>
+            <div class="action-hint"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg> 點擊輸入今日數據</div>
+        </div>
+
+        <div class="health-card clickable" onclick="openInputDrawer('血糖觀測', 'mg/dL')">
+            <div class="card-header">
+                <div class="card-title">
+                    <svg class="card-icon" viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+                    血糖紀錄
+                </div>
+                <div style="font-size: 0.8rem; background: rgba(203,163,122,0.15); padding: 2px 8px; border-radius: 10px; color: var(--accent-gold);">飯後兩小時</div>
+            </div>
+            <div class="value-display">
+                <div class="main-value" id="val-bs">105</div>
+                <div class="sub-value">mg/dL</div>
+            </div>
+            <div class="action-hint"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg> 點擊輸入今日數據</div>
+        </div>
+
+        <div class="health-card clickable" onclick="openInputDrawer('體重紀錄', 'kg')">
             <div class="card-header">
                 <div class="card-title">
                     <svg class="card-icon" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
@@ -139,7 +222,7 @@
             <div class="dual-value-box">
                 <div>
                     <div style="font-size:0.8rem; color:var(--text-light);">體重</div>
-                    <div class="value-display"><div class="main-value">62.5</div><div class="sub-value">kg</div></div>
+                    <div class="value-display"><div class="main-value" id="val-weight">62.5</div><div class="sub-value">kg</div></div>
                 </div>
                 <div>
                     <div style="font-size:0.8rem; color:var(--text-light);">身高</div>
@@ -158,60 +241,80 @@
                 <svg onclick="closeDrawer()" style="width:24px; height:24px; stroke:var(--text-light); cursor:pointer;" viewBox="0 0 24 24" fill="none" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </div>
 
-            <div class="mode-tabs">
-                <div class="mode-tab active" onclick="switchMode('input', this)">新增紀錄</div>
-                <div class="mode-tab" onclick="switchMode('chart', this)">趨勢分析</div>
+            <div class="input-display-area">
+                <span id="kb-input">0</span>
+                <span class="input-unit" id="kb-unit"></span>
             </div>
-
-            <div id="view-input" class="view-area active">
-                <div class="input-display">62.5</div>
-                <div class="key-grid">
-                    <div class="key">1</div><div class="key">2</div><div class="key">3</div>
-                    <div class="key">4</div><div class="key">5</div><div class="key">6</div>
-                    <div class="key">7</div><div class="key">8</div><div class="key">9</div>
-                    <div class="key" style="color:var(--accent-red);">AC</div><div class="key">0</div><div class="key">.</div>
-                    <div class="key key-submit" style="grid-column: span 3;">儲存紀錄</div>
-                </div>
+            
+            <div class="key-grid">
+                <div class="key" onclick="inputChar('1')">1</div>
+                <div class="key" onclick="inputChar('2')">2</div>
+                <div class="key" onclick="inputChar('3')">3</div>
+                <div class="key" onclick="inputChar('4')">4</div>
+                <div class="key" onclick="inputChar('5')">5</div>
+                <div class="key" onclick="inputChar('6')">6</div>
+                <div class="key" onclick="inputChar('7')">7</div>
+                <div class="key" onclick="inputChar('8')">8</div>
+                <div class="key" onclick="inputChar('9')">9</div>
+                <div class="key key-ac" onclick="clearInput()">AC</div>
+                <div class="key" onclick="inputChar('0')">0</div>
+                <div class="key" onclick="inputChar('.')">.</div>
+                <div class="key key-submit" onclick="submitData()">寫入觀照</div>
             </div>
-
-            <div id="view-chart" class="view-area">
-                <div class="time-tabs">
-                    <div class="time-tab">日</div>
-                    <div class="time-tab active">月</div>
-                    <div class="time-tab">半年</div>
-                    <div class="time-tab">一年</div>
-                </div>
-                <div class="chart-box">
-                    <svg width="24" height="24" stroke="currentColor" fill="none" style="margin-right:8px;"><path d="M3 3v18h18"/><path d="M18 9l-5 5-4-4-5 5"/></svg>
-                    此處將繪製純 SVG 貝茲曲線
-                </div>
-            </div>
-
         </div>
     </div>
 
     <script>
+        // --- UI 互動 ---
         function toggleMenu() {
-            const menu = document.getElementById('side-menu');
-            const overlay = document.getElementById('side-menu-overlay');
-            menu.classList.toggle('open'); overlay.classList.toggle('open');
+            document.getElementById('side-menu').classList.toggle('open');
+            document.getElementById('side-menu-overlay').classList.toggle('open');
         }
 
-        function openDrawer(title) {
+        function togglePill(el) {
+            el.classList.toggle('done');
+            // 簡易展示：若全部完成，關閉呼吸金光
+            const card = document.getElementById('card-med');
+            const undone = card.querySelectorAll('.pill-btn:not(.done)');
+            if(undone.length === 0) card.classList.remove('needs-action');
+            else card.classList.add('needs-action');
+        }
+
+        // --- 輸入抽屜與鍵盤邏輯 ---
+        let currentInput = "0";
+        let currentTarget = ""; // 紀錄現在是在改血壓、血糖還是體重
+
+        function openInputDrawer(title, unit) {
             document.getElementById('drawer-title').innerText = title;
+            document.getElementById('kb-unit').innerText = unit;
+            currentTarget = title;
+            clearInput();
             document.getElementById('action-drawer').classList.add('open');
         }
 
-        function closeDrawer() {
-            document.getElementById('action-drawer').classList.remove('open');
+        function closeDrawer() { document.getElementById('action-drawer').classList.remove('open'); }
+
+        function inputChar(char) {
+            if (currentInput === "0" && char !== ".") { currentInput = char; } 
+            else if (char === "." && currentInput.includes(".")) { return; } 
+            else if (currentInput.length < 5) { currentInput += char; }
+            document.getElementById('kb-input').innerText = currentInput;
         }
 
-        function switchMode(mode, el) {
-            document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
-            el.classList.add('active');
-            document.getElementById('view-input').classList.remove('active');
-            document.getElementById('view-chart').classList.remove('active');
-            document.getElementById('view-' + mode).classList.add('active');
+        function clearInput() {
+            currentInput = "0";
+            document.getElementById('kb-input').innerText = currentInput;
+        }
+
+        function submitData() {
+            let val = parseFloat(currentInput);
+            if (!isNaN(val) && val > 0) {
+                // 簡易展示寫入卡片
+                if(currentTarget === '血壓觀測') document.getElementById('val-bp').innerText = val;
+                if(currentTarget === '血糖觀測') document.getElementById('val-bs').innerText = val;
+                if(currentTarget === '體重紀錄') document.getElementById('val-weight').innerText = val;
+            }
+            closeDrawer();
         }
     </script>
 </body>
