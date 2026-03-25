@@ -3,28 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    
     <title>柔光記帳</title>
     <style>
         :root {
-            /* 基礎色彩系統 */
-            --bg-gradient: linear-gradient(135deg, #F9F8F6, #EAE6DF);
+            var(--bg-gradient): linear-gradient(135deg, #F9F8F6, #EAE6DF);
             --glass-bg: rgba(255, 255, 255, 0.55);
             --glass-border: rgba(255, 255, 255, 0.8);
             --glass-shadow: 0 8px 32px rgba(180, 175, 170, 0.15);
             --text-main: #5C544E; --text-light: #9A928B;
-            --accent-gold: #D4A373; 
-            --accent-green: #849A8E; /* 優化：更高級的莫蘭迪薄荷玉色 */
-            --accent-red: #D89A9E;
-            
-            /* 分類專屬色彩 */
+            --accent-gold: #D4A373; --accent-green: #849A8E; --accent-red: #D89A9E;
             --cat-food: #E2B4B7; --cat-trans: #A8C2CB; --cat-house: #D4A373;
             --cat-ent: #8BA89C; --cat-beauty: #DDA7A5; --cat-other: #C4B7CB;
-            
-            /* 選單模組色彩 */
-            --menu-acc-fin: rgba(212, 163, 115, 0.15); /* 記帳色塊 */
-            --menu-acc-health: rgba(132, 154, 142, 0.15); /* 健康色塊 */
-            --menu-acc-pure: rgba(168, 194, 203, 0.15); /* 淨土色塊 */
+            --menu-acc-fin: rgba(212, 163, 115, 0.15); 
+            --menu-acc-health: rgba(132, 154, 142, 0.15); 
+            --menu-acc-pure: rgba(168, 194, 203, 0.15);
         }
+
+        /* ★ 徹底超渡雙擊放大的物理設定 */
+        * { touch-action: manipulation; }
 
         html, body { 
             margin: 0; padding: 0; width: 100%; height: 100%; background: #000; color: var(--text-main); 
@@ -41,7 +43,7 @@
         #main-view { transform: translateX(0); } 
         #report-view { transform: translateX(100%); }
 
-        /* ================= 側邊選單 (美學進化版) ================= */
+        /* 側邊選單 */
         .side-menu-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); backdrop-filter: blur(4px); z-index: 900; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .side-menu-overlay.open { opacity: 1; pointer-events: auto; }
         
@@ -59,8 +61,6 @@
         .menu-subtitle { font-size: 0.75rem; color: var(--accent-gold); letter-spacing: 1px; margin-top: 8px; opacity: 0.9; }
         
         .menu-list { flex: 1; overflow-y: auto; padding: 0 20px 40px; display: flex; flex-direction: column; gap: 12px; }
-        
-        /* 模組按鈕色塊化 */
         .menu-item {
             padding: 16px 20px; border-radius: 20px; border: 1px solid var(--glass-border);
             display: flex; align-items: center; gap: 15px; font-size: 0.95rem; color: var(--text-main);
@@ -68,29 +68,19 @@
             background: var(--glass-bg);
         }
         .menu-item:active { transform: scale(0.97); }
-        
-        /* 賦予不同模組微光底色 */
         .menu-item.mod-fin { background: linear-gradient(135deg, var(--glass-bg), var(--menu-acc-fin)); }
         .menu-item.mod-health { background: linear-gradient(135deg, var(--glass-bg), var(--menu-acc-health)); }
         .menu-item.mod-pure { background: linear-gradient(135deg, var(--glass-bg), var(--menu-acc-pure)); }
         
-        /* 圖示獨立圓框 */
         .menu-icon-wrap { width: 32px; height: 32px; border-radius: 50%; background: #fff; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         .menu-item svg { stroke: var(--text-main); fill: none; stroke-width: 1.8; width: 16px; height: 16px; }
         .mod-fin svg { stroke: var(--accent-gold); } .mod-health svg { stroke: var(--accent-green); } .mod-pure svg { stroke: #A8C2CB; }
 
-        /* 虛線預留按鈕 */
-        .menu-item.mod-dashed {
-            background: transparent; border: 1.5px dashed rgba(154, 146, 139, 0.3);
-            color: var(--text-light); justify-content: center; font-weight: 400; font-size: 0.85rem;
-            letter-spacing: 1px; box-shadow: none; margin-top: 5px;
-        }
+        .menu-item.mod-dashed { background: transparent; border: 1.5px dashed rgba(154, 146, 139, 0.3); color: var(--text-light); justify-content: center; font-weight: 400; font-size: 0.85rem; letter-spacing: 1px; box-shadow: none; margin-top: 5px; }
         .mod-dashed svg { stroke: var(--text-light); width: 14px; height: 14px; }
 
-        /* 底部功能小按鈕 */
         .menu-bottom-links { display: flex; justify-content: space-around; padding-top: 15px; border-top: 1px solid rgba(92,84,78,0.08); }
         .menu-sub-link { font-size: 0.75rem; color: var(--text-light); cursor: pointer; padding: 5px 10px; }
-        /* ======================================================== */
 
         /* Header */
         .header-bar { width: 90%; display: flex; justify-content: space-between; align-items: center; margin-top: max(20px, env(safe-area-inset-top)); margin-bottom: 10px; z-index: 10; }
@@ -115,8 +105,6 @@
         /* Keyboard */
         .keyboard-panel { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(249, 248, 246, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--glass-border); box-shadow: 0 -10px 40px rgba(180, 175, 170, 0.1); border-radius: 30px 30px 0 0; padding: 15px 20px calc(20px + env(safe-area-inset-bottom)) 20px; box-sizing: border-box; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.4s; z-index: 100; }
         .keyboard-panel.open { transform: translateY(0); }
-        
-        /* 優化：收入模式的背景色更具高級感，不再刺眼 */
         .keyboard-panel.income-mode { background: rgba(238, 243, 240, 0.95); }
 
         .kb-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 0 5px; margin-bottom: 10px; opacity: 0; transition: opacity 0.3s; }
@@ -131,17 +119,10 @@
         .sub-tag.selected { background: rgba(255, 255, 255, 0.9); color: var(--text-main); border-color: var(--accent-gold); font-weight: 500; transform: scale(0.96); }
         .sub-tag-income.selected { border-color: var(--accent-green); }
 
-        /* 優化：備註按鈕設計，加入精緻 SVG，移除 emoji */
         .input-display-area { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; border-bottom: 1px solid rgba(92, 84, 78, 0.1); padding-bottom: 5px; }
-        .memo-btn { 
-            font-size: 0.85rem; color: var(--text-light); cursor: pointer; padding: 6px 10px; 
-            max-width: 45%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.4); 
-            border-radius: 12px; border: 1px solid var(--glass-border); transition: all 0.2s;
-        }
+        .memo-btn { font-size: 0.85rem; color: var(--text-light); cursor: pointer; padding: 6px 10px; max-width: 45%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.4); border-radius: 12px; border: 1px solid var(--glass-border); transition: all 0.2s; }
         .memo-btn:active { background: rgba(255,255,255,0.8); transform: scale(0.97); }
         .memo-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
-        
         .input-display { flex: 1; text-align: right; font-size: 2.2rem; color: var(--text-main); height: 45px; line-height: 45px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
         .key-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
@@ -187,7 +168,6 @@
         .modal-btn { background: var(--accent-gold); color: white; border: none; padding: 10px 25px; border-radius: 20px; font-size: 1rem; cursor: pointer; margin: 5px; }
         .modal-btn-alt { background: var(--glass-bg); color: var(--text-main); border: 1px solid var(--glass-border); padding: 10px 25px; border-radius: 20px; font-size: 1rem; cursor: pointer; margin: 5px; }
         
-        /* 說明文字專區 */
         .manual-text { font-size: 0.85rem; color: var(--text-light); text-align: left; line-height: 1.6; margin-bottom: 20px; }
     </style>
 </head>
@@ -377,12 +357,12 @@
 
 <div class="modal-overlay" id="manual-modal" onclick="closeModal('manual-modal')">
     <div class="glass-modal" onclick="event.stopPropagation()">
-        <h3 style="margin-top:0; color:var(--text-main); font-weight: 500; letter-spacing: 1px;">使用指南</h3>
+        <h3 style="margin-top:0; color:var(--text-main); font-weight: 500; letter-spacing: 1px; margin-bottom: 20px;">使用指南</h3>
         <div class="manual-text">
-            <b>1. 絕對隱私：</b><br>所有資料皆存於您的手機本機（LocalStorage），無伺服器連線，絕對安全。<br><br>
-            <b>2. 零摩擦記帳：</b><br>點擊分類 ➔ 選擇/新增細項 ➔ 輸入金額 ➔ 打勾完成。無須切換頁面。<br><br>
-            <b>3. 發票記帳：</b><br>我們不讀取您的相機或連線財政部。點擊鍵盤上方「🧾」即可優雅標記該筆帳目有發票。<br><br>
-            <b>4. 資料自主：</b><br>於設定中可隨時免費匯出 CSV (供 Excel 統計) 或 JSON 備份檔。
+            <b>1. 絕對隱私：</b><br>所有資料皆存於您的手機本機空間，無伺服器連線，極致清淨安全。<br><br>
+            <b>2. 零摩擦輸入：</b><br>點擊分類 ➔ 點選細項 ➔ 輸入金額 ➔ 打勾完成。3秒無痕紀錄。<br><br>
+            <b>3. 發票記帳：</b><br>點擊鍵盤上方「🧾」即可優雅標記該筆帳目有發票。我們不讀相機，保護隱私。<br><br>
+            <b>4. 資料自主：</b><br>於偏好設定中，可隨時免費匯出 CSV 或 JSON 備份檔，資料永遠屬於您。
         </div>
         <button class="modal-btn" onclick="closeModal('manual-modal')">我瞭解了</button>
     </div>
@@ -426,7 +406,6 @@
         document.getElementById('carrier-top-txt').innerText = appData.carrier;
     }
 
-    /* 側邊選單邏輯 */
     function toggleMenu() {
         const menu = document.getElementById('side-menu');
         const overlay = document.getElementById('side-menu-overlay');
