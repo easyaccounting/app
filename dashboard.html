@@ -10,7 +10,7 @@
             --glass-bg: rgba(255, 255, 255, 0.65); --glass-border: rgba(255, 255, 255, 0.9);
             --text-main: #58504A; --text-light: #968E86;
             --accent-gold: #CBA37A; --accent-jade: #82968C; --accent-red: #D29498; 
-            --accent-rose: #CFA4A4; /* 新增母嬰專屬色 */
+            --accent-rose: #CFA4A4; --accent-rose-light: rgba(207, 164, 164, 0.15);
             --shadow-soft: 0 10px 40px rgba(160, 155, 150, 0.12);
             --cat-food: #D9AEAD; --cat-beauty: #D3A9A7; --cat-house: #CBA37A;
             --cat-trans: #B5AFA6; --cat-ent: #A5B3B6; --cat-other: #C2BAC6;
@@ -41,26 +41,25 @@
         .nav-btn { display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-main); box-shadow: var(--shadow-soft); cursor: pointer; transition: all 0.2s; }
         .nav-btn:active { transform: scale(0.92); }
         .nav-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
-        .page-title { font-size: 1.15rem; font-weight: 500; letter-spacing: 3px; color: var(--accent-gold); }
+        .page-title { font-size: 1.15rem; font-weight: 500; letter-spacing: 3px; color: var(--accent-gold); transition: color 0.3s; }
 
-        .module-tabs { width: 100%; max-width: 720px; display: flex; overflow-x: auto; gap: 10px; padding-bottom: 5px; scrollbar-width: none; -ms-overflow-style: none; }
-        .module-tabs::-webkit-scrollbar { display: none; }
-        .mod-tab { flex-shrink: 0; padding: 8px 18px; border-radius: 20px; font-size: 0.9rem; font-weight: 500; color: var(--text-light); border: 1px solid transparent; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 6px; }
+        .module-tabs { width: 100%; max-width: 720px; display: flex; justify-content: center; gap: 10px; padding-bottom: 5px; }
+        .mod-tab { padding: 8px 18px; border-radius: 20px; font-size: 0.9rem; font-weight: 500; color: var(--text-light); border: 1px solid transparent; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 6px; }
         .mod-tab svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
         
-        /* 模組專屬色光 Active 狀態 */
         .mod-tab.active.mod-fin { background: var(--glass-bg); color: var(--accent-gold); border-color: var(--accent-gold); box-shadow: 0 2px 10px rgba(203,163,122,0.1); }
         .mod-tab.active.mod-health { background: var(--glass-bg); color: var(--accent-jade); border-color: var(--accent-jade); box-shadow: 0 2px 10px rgba(130,150,140,0.1); }
-        .mod-tab.active.mod-mom { background: var(--glass-bg); color: var(--accent-rose); border-color: var(--accent-rose); box-shadow: 0 2px 10px rgba(207,164,164,0.1); }
+        .mod-tab.active.mod-mom { background: var(--glass-bg); color: var(--accent-rose); border-color: var(--accent-rose); box-shadow: 0 2px 10px var(--accent-rose-light); }
 
         .time-filter-wrap { width: 100%; max-width: 720px; margin: calc(130px + env(safe-area-inset-top)) auto 15px; padding: 0 20px; display: flex; justify-content: center; }
         .time-tabs { display: flex; background: rgba(255,255,255,0.4); border: 1px solid var(--glass-border); border-radius: 20px; padding: 4px; width: 100%; max-width: 400px; }
         .time-tab { flex: 1; text-align: center; padding: 6px 0; font-size: 0.85rem; color: var(--text-light); border-radius: 16px; cursor: pointer; transition: all 0.3s; }
         .time-tab.active { background: var(--glass-bg); color: var(--text-main); font-weight: 500; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
 
-        /* --- 主要內容區 --- */
+        /* --- 主要內容區 (卡片) --- */
         .main-container { width: 100%; max-width: 720px; margin: 0 auto; padding: 0 20px 100px; display: none; flex-direction: column; gap: 15px; }
-        .main-container.active { display: flex; } 
+        .main-container.active { display: flex; animation: fadeIn 0.3s ease; } 
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .stat-card { background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-radius: 24px; padding: 20px; box-shadow: var(--shadow-soft); cursor: pointer; transition: transform 0.2s; display: flex; flex-direction: column; }
         .stat-card:active { transform: scale(0.97); background: rgba(255,255,255,0.9); }
@@ -70,29 +69,46 @@
         
         .card-body { display: flex; align-items: center; justify-content: space-between; gap: 15px; }
         .card-data-text { flex: 1; }
-        .data-main { font-size: 1.8rem; font-weight: 300; color: var(--text-main); line-height: 1.2; }
-        .data-sub { font-size: 0.8rem; color: var(--text-light); }
+        .data-main { font-size: 1.8rem; font-weight: 300; color: var(--text-main); line-height: 1.2; transition: color 0.3s;}
+        .data-sub { font-size: 0.8rem; color: var(--text-light); margin-top: 4px; }
         .mini-chart { width: 120px; height: 60px; display: flex; justify-content: center; align-items: center; position: relative; }
 
-        /* 預算進度條組件 */
+        /* 記帳結餘卡片專用 */
+        .balance-box { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+        .bal-row { display: flex; justify-content: space-between; align-items: flex-end; }
+        .bal-income { font-size: 0.9rem; color: var(--accent-jade); }
+        .bal-expense { font-size: 0.9rem; color: var(--text-main); }
+        
         .budget-bar-wrap { width: 100%; background: rgba(150,142,134,0.15); height: 8px; border-radius: 4px; overflow: hidden; margin-top: 5px; position: relative; }
-        .budget-progress { height: 100%; width: 0%; background: var(--accent-gold); transition: width 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.3s; }
+        .budget-progress { height: 100%; width: 0%; background: var(--accent-gold); transition: width 0.8s ease, background 0.3s; }
         .budget-progress.over { background: var(--accent-red); }
         .budget-labels { display: flex; justify-content: space-between; font-size: 0.75rem; margin-top: 6px; transition: color 0.3s; }
 
-        /* --- 全螢幕展開層 --- */
+        /* 圓環與文字通用 */
+        .giant-donut-wrap { width: 200px; height: 200px; position: relative; display: flex; justify-content: center; align-items: center; margin: 0 auto; }
+        .giant-donut-text { position: absolute; display: flex; flex-direction: column; align-items: center; pointer-events: none; }
+        .giant-donut-text .num { font-size: 2.2rem; font-weight: 300; color: var(--text-main); line-height: 1.2; }
+        .giant-donut-text .lbl { font-size: 0.8rem; color: var(--text-light); letter-spacing: 1px; margin-top: 5px; text-align: center; }
+
+        /* 月經週期條狀圖專屬 */
+        .period-bar-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .period-bar-bg { flex: 1; height: 8px; background: var(--accent-rose-light); border-radius: 4px; overflow: hidden; position: relative; }
+        .period-bar-fill { height: 100%; background: var(--accent-rose); border-radius: 4px; transition: width 1s ease-out; }
+        .period-day-lbl { font-size: 0.75rem; color: var(--text-light); width: 35px; text-align: right; }
+
+        /* --- 全螢幕展開層 (禪定深觀) --- */
         .expand-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; background: var(--bg-gradient); z-index: 2000; transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; flex-direction: column; overflow-y: auto; }
         .expand-overlay.open { transform: translateY(0); }
         .expand-header { padding: max(20px, env(safe-area-inset-top)) 20px 15px; display: flex; justify-content: space-between; align-items: center; background: rgba(249,250,249,0.95); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 10; border-bottom: 1px solid var(--glass-border); }
-        .expand-title { font-size: 1.15rem; font-weight: 500; letter-spacing: 2px; color: var(--text-main); }
+        .expand-title { font-size: 1.15rem; font-weight: 500; letter-spacing: 2px; color: var(--text-main); transition: color 0.3s; }
         .expand-content { flex: 1; width: 100%; max-width: 720px; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
         
         .large-chart-stage { width: 100%; height: 280px; background: var(--glass-bg); border-radius: 24px; border: 1px solid var(--glass-border); box-shadow: var(--shadow-soft); position: relative; padding: 20px 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .large-chart-stage svg { width: 100%; height: 100%; overflow: visible; position: absolute; top: 0; left: 0; }
         
-        .curve-sys { fill: none; stroke: var(--text-main); stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); transition: d 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
-        .curve-dia { fill: none; stroke: var(--accent-jade); stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 4px 6px rgba(130, 150, 140, 0.2)); transition: d 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
-        .curve-single { fill: none; stroke: var(--accent-jade); stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 6px 10px rgba(130, 150, 140, 0.25)); transition: d 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .curve-sys { fill: none; stroke: var(--text-main); stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); transition: d 0.8s ease; }
+        .curve-dia { fill: none; stroke: var(--accent-jade); stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 4px 6px rgba(130, 150, 140, 0.2)); transition: d 0.8s ease; }
+        .curve-single { fill: none; stroke: currentColor; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.1)); transition: d 0.8s ease; }
         
         svg.donut { width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible; position: relative; }
         .donut-segment { fill: transparent; stroke-width: 4; stroke-linecap: round; transition: stroke-dasharray 1s ease-out; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.08)); }
@@ -104,25 +120,13 @@
 
         .history-list { display: flex; flex-direction: column; gap: 10px; padding-bottom: 40px; }
         .history-item { background: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.6); border-radius: 16px; padding: 15px; display: flex; flex-direction: column; gap: 8px; }
-        .history-top { display: flex; justify-content: space-between; align-items: center; }
+        .history-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
         .history-date { font-size: 0.85rem; color: var(--text-light); display: flex; align-items: center; gap: 8px; }
         .history-tag { font-size: 0.75rem; padding: 2px 8px; border-radius: 8px; background: rgba(255,255,255,0.8); border: 1px solid var(--glass-border); color: var(--text-main); }
         .history-val { font-size: 1.2rem; font-weight: 500; color: var(--text-main); }
-        
-        .history-memo { font-size: 0.8rem; color: var(--text-light); background: rgba(255,255,255,0.3); padding: 8px 12px; border-radius: 8px; border-left: 2px solid var(--accent-gold); display: inline-block; }
-        .history-alert { font-size: 0.8rem; color: var(--accent-red); background: rgba(210, 148, 152, 0.1); padding: 8px 12px; border-radius: 8px; display: inline-block; font-weight: 500; }
+        .history-memo { font-size: 0.8rem; color: var(--text-light); background: rgba(255,255,255,0.3); padding: 8px 12px; border-radius: 8px; border-left: 2px solid var(--accent-gold); display: inline-block; margin-left: 20px; }
+        .history-alert { font-size: 0.8rem; color: var(--accent-red); background: rgba(210, 148, 152, 0.1); padding: 8px 12px; border-radius: 8px; display: inline-block; font-weight: 500; margin-left: 20px; }
         .cat-color-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
-
-        .giant-donut-wrap { width: 200px; height: 200px; position: relative; display: flex; justify-content: center; align-items: center; margin: 0 auto; }
-        .giant-donut-text { position: absolute; display: flex; flex-direction: column; align-items: center; pointer-events: none; }
-        .giant-donut-text .num { font-size: 2.2rem; font-weight: 300; color: var(--text-main); line-height: 1.2; }
-        .giant-donut-text .lbl { font-size: 0.8rem; color: var(--text-light); letter-spacing: 1px; margin-top: 5px; }
-
-        /* 月經週期 SVG 長條圖專屬 */
-        .period-bar-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-        .period-bar-bg { flex: 1; height: 8px; background: rgba(207, 164, 164, 0.15); border-radius: 4px; overflow: hidden; position: relative; }
-        .period-bar-fill { height: 100%; background: var(--accent-rose); border-radius: 4px; }
-        .period-day-lbl { font-size: 0.75rem; color: var(--text-light); width: 35px; }
     </style>
 </head>
 <body>
@@ -138,9 +142,8 @@
             <div class="menu-item" onclick="window.location.href='accounting.html'"><div class="menu-icon-wrap"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>財務記帳</div>
             <div class="menu-item" onclick="window.location.href='health.html'"><div class="menu-icon-wrap"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>健康日誌</div>
             <div class="menu-item" onclick="window.location.href='mom.html'"><div class="menu-icon-wrap"><svg viewBox="0 0 24 24"><path d="M12 22c0-5.5-4.5-10-10-10 5.5 0 10-4.5 10-10 0 5.5 4.5 10 10 10-5.5 0-10 4.5-10 10z"/></svg></div>孕母與育兒</div>
-            <div class="menu-item mod-dashed" onclick="alert('「毛孩觀照」模組靜心開發中')"><svg viewBox="0 0 24 24" stroke-dasharray="4"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm4 0h-2v-2h2v2zm-2-4q-2 0-3-1.5T9 8h2q0 1 1 1.5t2 0V12z"/></svg>毛孩手冊</div>
-            
             <div class="menu-item active" onclick="toggleMenu()"><div class="menu-icon-wrap"><svg viewBox="0 0 24 24" stroke="currentColor"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div>大數據統計</div>
+            <div class="menu-item mod-dashed" onclick="alert('「毛孩觀照」模組靜心開發中')"><svg viewBox="0 0 24 24" stroke-dasharray="4"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm4 0h-2v-2h2v2zm-2-4q-2 0-3-1.5T9 8h2q0 1 1 1.5t2 0V12z"/></svg>毛孩手冊</div>
             <div class="menu-item" onclick="window.location.href='https://namoamitabhapureland.github.io/bodhicitta/index.html'"><div class="menu-icon-wrap"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg></div>彌陀淨土系統</div>
         </div>
     </div>
@@ -148,7 +151,7 @@
     <div class="top-nav">
         <div class="nav-content">
             <div class="nav-btn" onclick="toggleMenu()"><svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></div>
-            <div class="page-title">大數據統計</div>
+            <div class="page-title" id="main-page-title">大數據統計</div>
             <div style="width: 42px;"></div>
         </div>
         <div class="module-tabs">
@@ -236,7 +239,7 @@
         <div class="stat-card" onclick="openDetail('BMI 形體軌跡', 'bmi')">
             <div class="card-header">
                 <div class="card-title" style="color: var(--accent-jade);"><svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg> 形體觀照</div>
-                <div style="font-size: 0.8rem; color: var(--text-light);" id="bmi-status-tag">標準</div>
+                <div style="font-size: 0.8rem; color: var(--text-light);" id="bmi-status-tag">計算中</div>
             </div>
             <div class="card-body">
                 <div class="card-data-text"><div class="data-main" id="bmi-avg">--</div><div class="data-sub">平均 BMI</div></div>
@@ -253,23 +256,52 @@
                 <div style="font-size: 0.8rem; color: var(--text-light);">平均週期</div>
             </div>
             <div class="card-body">
-                <div class="card-data-text"><div class="data-main" id="period-avg">28<span style="font-size:1.2rem; color:var(--text-light)">天</span></div><div class="data-sub">預計下次: <span id="period-next">11/20</span></div></div>
-                <div class="mini-chart">
-                    <svg viewBox="0 0 100 40" style="width: 100%; height: 100%; fill: none; stroke-linecap: round;">
-                        <path d="M10,20 Q30,5 50,20 T90,20" stroke="var(--accent-rose)" stroke-width="2.5"></path>
-                    </svg>
-                </div>
+                <div class="card-data-text"><div class="data-main" id="period-avg">--<span style="font-size:1.2rem; color:var(--text-light)">天</span></div><div class="data-sub">預計下次: <span id="period-next">--/--</span></div></div>
+                <div class="mini-chart"><svg viewBox="0 0 100 40" style="width: 100%; height: 100%; fill: none; stroke-linecap: round;"><path d="M10,20 Q30,5 50,20 T90,20" stroke="var(--accent-rose)" stroke-width="2.5"></path></svg></div>
             </div>
         </div>
 
-        <div class="stat-card" onclick="openDetail('胎動與孕期總覽', 'preg')">
+        <div class="stat-card" onclick="openDetail('孕期進度與胎動', 'preg')">
             <div class="card-header">
                 <div class="card-title" style="color: var(--accent-rose);"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> 孕期總覽</div>
-                <div style="font-size: 0.8rem; color: var(--text-light);">預產期: <span id="mom-edd">--</span></div>
+                <div style="font-size: 0.8rem; color: var(--text-light);">EDD: <span id="mom-edd">--</span></div>
             </div>
             <div class="card-body">
-                <div class="card-data-text"><div class="data-main" id="mom-fetal-total">--</div><div class="data-sub">本月累計胎動次數</div></div>
-                <div class="mini-chart"><svg viewBox="0 0 36 36" style="width: 60px; height: 60px; transform: rotate(-90deg);"><circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--accent-rose-light)" stroke-width="4"></circle><circle id="mini-preg-ring" cx="18" cy="18" r="15.9" fill="none" stroke="var(--accent-rose)" stroke-width="4" stroke-dasharray="0, 100" stroke-linecap="round" style="transition: stroke-dasharray 1s ease-out;"></circle></svg></div>
+                <div class="card-data-text"><div class="data-main" id="mom-fetal-total">--</div><div class="data-sub">累計胎動次數</div></div>
+                <div class="mini-chart"><svg viewBox="0 0 36 36" style="width: 60px; height: 60px; transform: rotate(-90deg);"><circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--accent-rose-light)" stroke-width="4"></circle><circle id="mini-preg-ring" cx="18" cy="18" r="15.9" fill="none" stroke="var(--accent-rose)" stroke-width="4" stroke-dasharray="0, 100" stroke-linecap="round"></circle></svg></div>
+            </div>
+        </div>
+
+        <div class="stat-card" onclick="openDetail('產檢血壓分析', 'mom-bp')">
+            <div class="card-header">
+                <div class="card-title" style="color: var(--accent-rose);"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg> 產檢血壓</div>
+                <div style="font-size: 0.8rem; color: var(--text-light);">預防子癲前症</div>
+            </div>
+            <div class="card-body">
+                <div class="card-data-text"><div class="data-main" id="mom-bp-avg">--<span style="font-size:1.2rem; color:var(--text-light)">/--</span></div><div class="data-sub">mmHg</div></div>
+                <div class="mini-chart"><svg viewBox="0 0 100 40" style="width: 100%; height: 100%; stroke-linecap: round; fill: none; stroke-width: 2.5;"><path d="M0,15 Q25,8 50,15 T100,10" stroke="var(--text-main)" style="opacity: 0.7;"></path><path d="M0,32 Q25,25 50,30 T100,28" stroke="var(--accent-rose)"></path></svg></div>
+            </div>
+        </div>
+
+        <div class="stat-card" onclick="openDetail('妊娠血糖軌跡', 'mom-bs')">
+            <div class="card-header">
+                <div class="card-title" style="color: var(--accent-rose);"><svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg> 妊娠血糖</div>
+                <div style="font-size: 0.8rem; color: var(--accent-red);">嚴格監控</div>
+            </div>
+            <div class="card-body">
+                <div class="card-data-text"><div class="data-main" id="mom-bs-avg">--</div><div class="data-sub">mg/dL (平均)</div></div>
+                <div class="mini-chart"><svg viewBox="0 0 100 40" style="width: 100%; height: 100%; fill: none;"><line x1="0" y1="20" x2="100" y2="20" stroke="var(--accent-red)" stroke-width="1" stroke-dasharray="2,2"></line><path d="M0,25 Q20,35 40,15 T80,22 T100,18" stroke="var(--accent-rose)" stroke-width="2.5" stroke-linecap="round"></path></svg></div>
+            </div>
+        </div>
+
+        <div class="stat-card" onclick="openDetail('孕期體重變化', 'mom-wt')">
+            <div class="card-header">
+                <div class="card-title" style="color: var(--accent-rose);"><svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg> 孕期體重</div>
+                <div style="font-size: 0.8rem; color: var(--text-light);" id="mom-wt-trend">平穩</div>
+            </div>
+            <div class="card-body">
+                <div class="card-data-text"><div class="data-main" id="mom-wt-avg">--</div><div class="data-sub">kg (近期紀錄)</div></div>
+                <div class="mini-chart"><svg viewBox="0 0 100 40" style="width: 100%; height: 100%; fill: none;"><path d="M0,30 L20,28 L40,25 L60,20 L80,15 L100,10" stroke="var(--accent-rose)" stroke-width="2.5" stroke-linecap="round"></path></svg></div>
             </div>
         </div>
 
@@ -283,6 +315,7 @@
                 <div class="mini-chart"><svg viewBox="0 0 36 36" style="width: 60px; height: 60px; transform: rotate(-90deg);"><circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(130,150,140,0.15)" stroke-width="4"></circle><circle id="mini-vax-ring" cx="18" cy="18" r="15.9" fill="none" stroke="var(--accent-jade)" stroke-width="4" stroke-dasharray="0, 100" stroke-linecap="round"></circle></svg></div>
             </div>
         </div>
+
     </div>
 
     <div class="expand-overlay" id="detail-view">
@@ -297,13 +330,17 @@
             <div class="history-list" id="history-list-container"></div>
         </div>
     </div>
-
     <script>
-        function toggleMenu() { document.getElementById('side-menu').classList.toggle('open'); document.getElementById('side-menu-overlay').classList.toggle('open'); }
+        // ================= UI 與模組切換引擎 =================
+        function toggleMenu() { 
+            document.getElementById('side-menu').classList.toggle('open'); 
+            document.getElementById('side-menu-overlay').classList.toggle('open'); 
+        }
 
         let currentModule = 'finance';
         function switchModule(mod) {
             currentModule = mod;
+            // 頂部標籤狀態切換
             document.querySelectorAll('.mod-tab').forEach(t => t.className = 'mod-tab');
             let tab = document.getElementById('tab-' + mod);
             tab.classList.add('active');
@@ -311,9 +348,11 @@
             if(mod === 'health') tab.classList.add('mod-health');
             if(mod === 'mom') tab.classList.add('mod-mom');
 
+            // 視圖層切換
             document.querySelectorAll('.main-container').forEach(c => c.classList.remove('active'));
             document.getElementById('view-' + mod).classList.add('active');
             
+            // 觸發對應模組的運算
             if(mod === 'finance') renderFinanceSummary();
             if(mod === 'health') calculateHealthSummaries();
             if(mod === 'mom') calculateMomSummaries();
@@ -322,61 +361,71 @@
         let currentTimeFilter = 'month';
         function switchTime(el, filter) {
             document.querySelectorAll('.time-tab').forEach(t => t.classList.remove('active'));
-            el.classList.add('active'); currentTimeFilter = filter;
+            el.classList.add('active'); 
+            currentTimeFilter = filter;
             if(currentModule === 'finance') renderFinanceSummary();
             if(currentModule === 'health') calculateHealthSummaries();
             if(currentModule === 'mom') calculateMomSummaries();
         }
 
-        // ================= 資料庫系統 (模擬擴充經期與BMI) =================
+        // ================= 萬法歸一：資料庫 (DB) 引擎 =================
         let financeDB = { budget: 15000, transactions: [] };
         let healthDB = { med: [], bp: [], bs: [], wt: [], bmi: [] };
-        let momDB = { edd: "", dob: "", fetalCount: 0, vax: {}, periods: [] };
+        let momDB = { edd: "", dob: "", fetalCount: 0, vax: {}, periods: [], bp: [], gdm: [], wt: [] };
+        
         const colorMap = { '飲食': 'var(--cat-food)', '服飾美容': 'var(--cat-beauty)', '居住': 'var(--cat-house)', '交通': 'var(--cat-trans)', '育樂進修': 'var(--cat-ent)', '其他生活': 'var(--cat-other)' };
 
         window.onload = () => {
             initDB();
-            switchModule('finance'); 
+            switchModule('finance'); // 預設啟動財務大殿
         };
 
         function initDB() {
-            // 財務
+            // 1. 財務 DB
             let storedFin = localStorage.getItem('joy_accounting_app_data');
             if (storedFin) financeDB = JSON.parse(storedFin);
-            else financeDB.transactions = [ { id: 1, type: 'expense', date: '今天', cat: '飲食', sub: '午餐', amt: 150 } ];
+            else financeDB.transactions = [ { id: 1, type: 'expense', date: '今天', cat: '飲食', sub: '午餐', amt: 150 }, { id: 2, type: 'expense', date: '今天', cat: '服飾美容', sub: '保養', amt: 1200 } ];
             
-            // 健康 (擴充 BMI 模擬)
+            // 2. 健康 DB (包含 BMI)
             let storedHealth = localStorage.getItem('joy_health_history');
             if (storedHealth) healthDB = JSON.parse(storedHealth);
             else {
                 healthDB.med = [ { date: '10/25', time: '早晨', status: '已服', memo: '' } ];
-                healthDB.bp = [ { date: '10/21', sys: 122, dia: 80, tag: '晚間' } ];
+                healthDB.bp = [ { date: '10/21', sys: 122, dia: 80, tag: '晚間' }, { date: '10/25', sys: 116, dia: 74, tag: '早晨' } ];
                 healthDB.bs = [ { date: '10/21', val: 95, tag: '空腹', hba1c: null, memo: '' } ];
                 healthDB.bmi = [ { date: '09/01', val: 22.1 }, { date: '10/01', val: 21.8 }, { date: '10/25', val: 21.5 } ];
             }
 
-            // 母嬰 (擴充 月經週期 模擬)
+            // 3. 母嬰 DB (包含 月經/產檢血壓/GDM/孕期體重)
             let storedMom = localStorage.getItem('joy_mom_data');
             if (storedMom) momDB = JSON.parse(storedMom);
             else {
                 momDB.edd = "2026-08-15"; momDB.dob = ""; momDB.fetalCount = 12;
                 momDB.vax = { 'b1': true, 'bcg': true };
-                momDB.periods = [
-                    { startDate: '2026-08-01', endDate: '2026-08-06', length: 28 },
-                    { startDate: '2026-08-29', endDate: '2026-09-03', length: 29 },
-                    { startDate: '2026-09-27', endDate: '2026-10-02', length: 28 }
-                ];
+                momDB.periods = [ { startDate: '08/01', endDate: '08/06', length: 28 }, { startDate: '08/29', endDate: '09/03', length: 29 }, { startDate: '09/27', endDate: '10/02', length: 28 } ];
+                momDB.bp = [ { date: '08/15', sys: 110, dia: 70 }, { date: '09/15', sys: 115, dia: 75 }, { date: '10/15', sys: 118, dia: 78 } ];
+                momDB.gdm = [ { date: '10/20', val: 90, tag: '空腹' }, { date: '10/21', val: 115, tag: '午餐後2H' }, { date: '10/22', val: 125, tag: '晚餐後2H', memo: '偏高需注意' } ];
+                momDB.wt = [ { date: '08/15', val: 55.0 }, { date: '09/15', val: 56.5 }, { date: '10/15', val: 58.2 } ];
             }
         }
 
-        // ================= 模組一：財務引擎 =================
-        function getFilteredTransactions() {
-            return financeDB.transactions; // 省略過濾器細節以專注核心邏輯
-        }
+        // ================= 模組一：財務收支引擎 =================
+        function getFilteredTransactions() { return financeDB.transactions; }
+        
         function renderFinanceSummary() {
             let filteredTxs = getFilteredTransactions(); let expenseTotal = 0; let incomeTotal = 0; let catTotals = {};
-            filteredTxs.forEach(t => { if(t.type === 'expense') { expenseTotal += t.amt; if(!catTotals[t.cat]) catTotals[t.cat] = { amt: 0, color: t.color || colorMap[t.cat] || 'var(--cat-other)' }; catTotals[t.cat].amt += t.amt; } else if(t.type === 'income') { incomeTotal += t.amt; } });
-            let netBalance = incomeTotal - expenseTotal; document.getElementById('fin-net-balance').innerText = (netBalance >= 0 ? '$' : '-$') + Math.abs(netBalance).toLocaleString(); document.getElementById('fin-net-balance').style.color = netBalance >= 0 ? 'var(--text-main)' : 'var(--accent-red)'; document.getElementById('fin-total-inc').innerText = '+$' + incomeTotal.toLocaleString(); document.getElementById('fin-total-exp').innerText = '-$' + expenseTotal.toLocaleString(); document.getElementById('fin-expense-only').innerText = '$' + expenseTotal.toLocaleString();
+            filteredTxs.forEach(t => { 
+                if(t.type === 'expense') { expenseTotal += t.amt; if(!catTotals[t.cat]) catTotals[t.cat] = { amt: 0, color: t.color || colorMap[t.cat] || 'var(--cat-other)' }; catTotals[t.cat].amt += t.amt; } 
+                else if(t.type === 'income') { incomeTotal += t.amt; } 
+            });
+            
+            let netBalance = incomeTotal - expenseTotal; 
+            document.getElementById('fin-net-balance').innerText = (netBalance >= 0 ? '$' : '-$') + Math.abs(netBalance).toLocaleString(); 
+            document.getElementById('fin-net-balance').style.color = netBalance >= 0 ? 'var(--text-main)' : 'var(--accent-red)'; 
+            document.getElementById('fin-total-inc').innerText = '+$' + incomeTotal.toLocaleString(); 
+            document.getElementById('fin-total-exp').innerText = '-$' + expenseTotal.toLocaleString(); 
+            document.getElementById('fin-expense-only').innerText = '$' + expenseTotal.toLocaleString();
+            
             let budgetBox = document.getElementById('budget-section');
             if (financeDB.budget > 0) {
                 budgetBox.style.display = 'block'; let percent = (expenseTotal / financeDB.budget) * 100;
@@ -389,7 +438,7 @@
             if(expenseTotal > 0) { Object.keys(catTotals).forEach(cat => { let percent = (catTotals[cat].amt / expenseTotal) * 100; let visiblePercent = percent > 2 ? percent - 1.5 : percent; const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle"); circle.setAttribute("cx", "21"); circle.setAttribute("cy", "21"); circle.setAttribute("r", "15.9155"); circle.setAttribute("class", "donut-segment"); circle.setAttribute("stroke", catTotals[cat].color); circle.style.strokeDasharray = `0 100`; circle.style.strokeDashoffset = `-${cumulativePercent}`; donut.appendChild(circle); setTimeout(() => { circle.style.strokeDasharray = `${visiblePercent} ${100 - visiblePercent}`; }, 50); cumulativePercent += percent; }); }
         }
 
-        // ================= 模組二：健康引擎 (加入 BMI) =================
+        // ================= 模組二：健康觀照引擎 =================
         function calculateHealthSummaries() {
             if (healthDB.med.length > 0) { let doneCount = healthDB.med.filter(m => m.status === '已服').length; let percent = Math.round((doneCount / healthDB.med.length) * 100); document.getElementById('med-percent').innerHTML = `${percent}<span style="font-size: 1rem;">%</span>`; document.getElementById('mini-med-ring').style.strokeDasharray = `${percent}, 100`; }
             if (healthDB.bp.length > 0) { let sysSum = 0, diaSum = 0; healthDB.bp.forEach(b => { sysSum += b.sys; diaSum += b.dia; }); document.getElementById('bp-avg').innerHTML = `${Math.round(sysSum / healthDB.bp.length)}<span style="font-size:1.2rem; color:var(--text-light)">/${Math.round(diaSum / healthDB.bp.length)}</span>`; }
@@ -405,19 +454,14 @@
             }
         }
 
-        // ================= 模組三：母嬰引擎 (經期/疫苗/胎動) =================
+        // ================= 模組三：母嬰育兒引擎 =================
         function calculateMomSummaries() {
-            // 月經週期推算
+            // 週期推算
             if(momDB.periods && momDB.periods.length > 0) {
                 let lenSum = 0; momDB.periods.forEach(p => { lenSum += p.length; });
                 let avgLen = Math.round(lenSum / momDB.periods.length);
                 document.getElementById('period-avg').innerHTML = `${avgLen}<span style="font-size:1.2rem; color:var(--text-light)">天</span>`;
-                // 簡易推算下次 (最後一次 + 平均長度)
-                let lastPeriod = new Date(momDB.periods[momDB.periods.length - 1].startDate);
-                let nextPeriod = new Date(lastPeriod.getTime() + (avgLen * 86400000));
-                document.getElementById('period-next').innerText = `${nextPeriod.getMonth()+1}/${nextPeriod.getDate()}`;
             }
-
             // 孕期進度與胎動
             if(momDB.edd) {
                 document.getElementById('mom-edd').innerText = momDB.edd;
@@ -426,120 +470,184 @@
                 document.getElementById('mini-preg-ring').style.strokeDasharray = `${(diffDays / 280) * 100}, 100`;
             }
             document.getElementById('mom-fetal-total').innerText = momDB.fetalCount;
-
+            // 產檢血壓平均
+            if (momDB.bp && momDB.bp.length > 0) { let sysSum = 0, diaSum = 0; momDB.bp.forEach(b => { sysSum += b.sys; diaSum += b.dia; }); document.getElementById('mom-bp-avg').innerHTML = `${Math.round(sysSum / momDB.bp.length)}<span style="font-size:1.2rem; color:var(--text-light)">/${Math.round(diaSum / momDB.bp.length)}</span>`; }
+            // 妊娠血糖平均
+            if (momDB.gdm && momDB.gdm.length > 0) { let bsSum = 0; momDB.gdm.forEach(b => { bsSum += b.val; }); document.getElementById('mom-bs-avg').innerText = Math.round(bsSum / momDB.gdm.length); }
+            // 孕期體重最新紀錄
+            if (momDB.wt && momDB.wt.length > 0) { document.getElementById('mom-wt-avg').innerText = momDB.wt[momDB.wt.length - 1].val; }
             // 疫苗達成率
             let totalVax = 18; let doneVax = Object.keys(momDB.vax).filter(k => momDB.vax[k]).length;
             document.getElementById('vax-done-count').innerHTML = `${doneVax}<span style="font-size:1.2rem; color:var(--text-light)">/18</span>`;
             document.getElementById('mini-vax-ring').style.strokeDasharray = `${(doneVax / totalVax) * 100}, 100`;
         }
 
-        // ================= 禪定深觀 (全螢幕展開) =================
+        // ================= 禪定深觀 (全螢幕展開指揮中心) =================
         function openDetail(title, type) {
             document.getElementById('detail-title').innerText = title;
-            document.getElementById('detail-title').style.color = type.includes('finance') ? 'var(--accent-gold)' : (type === 'period' || type === 'preg' ? 'var(--accent-rose)' : 'var(--accent-jade)');
+            document.getElementById('detail-title').style.color = type.includes('finance') ? 'var(--accent-gold)' : (type.includes('mom') || type === 'period' || type === 'preg' ? 'var(--accent-rose)' : 'var(--accent-jade)');
             document.getElementById('detail-view').classList.add('open'); document.body.style.overflow = 'hidden'; 
             
             const stage = document.getElementById('chart-stage'); stage.innerHTML = ''; stage.style.display = 'flex';
             document.getElementById('list-title').innerText = type.includes('finance') ? '收支明細' : '歷史明細';
 
             setTimeout(() => {
+                // 財務
                 if (type === 'finance-list') { stage.style.display = 'none'; renderFinanceListEngine(); }
                 if (type === 'finance-chart') renderFinanceChartEngine(stage);
+                // 健康
                 if (type === 'med') renderMedicationEngine(stage);
                 if (type === 'bp') renderBPEngine(stage);
                 if (type === 'bs') renderBSEngine(stage);
                 if (type === 'bmi') renderBMIEngine(stage);
+                // 母嬰
                 if (type === 'period') renderPeriodEngine(stage);
-                if (type === 'vax') { stage.style.display = 'none'; renderVaxListEngine(); }
                 if (type === 'preg') { stage.style.display = 'none'; renderPregListEngine(); }
+                if (type === 'vax') { stage.style.display = 'none'; renderVaxListEngine(); }
+                if (type === 'mom-bp') renderMomBPEngine(stage);
+                if (type === 'mom-bs') renderMomGDMEngine(stage);
+                if (type === 'mom-wt') renderMomWtEngine(stage);
             }, 50);
         }
-
         function closeDetail() { document.getElementById('detail-view').classList.remove('open'); document.body.style.overflow = 'auto'; }
 
-        // --- 財務明細引擎 (省略重複代碼，保持與前一版相同) ---
-        function renderFinanceListEngine() { const list = document.getElementById('history-list-container'); list.innerHTML = '<div style="text-align:center; padding:20px;">展示財務明細</div>'; }
-        function renderFinanceChartEngine(stage) { stage.innerHTML = '<div style="text-align:center; padding:20px;">展示財務圓餅圖</div>'; renderFinanceListEngine(); }
+        // --- (圖表引擎 1) 財務系列 ---
+        function renderFinanceListEngine() {
+            let filteredTxs = getFilteredTransactions();
+            const list = document.getElementById('history-list-container'); list.innerHTML = '';
+            if(filteredTxs.length === 0) { list.innerHTML = '<div style="text-align:center; color:var(--text-light); padding:20px;">這段期間尚無紀錄</div>'; return; }
+            filteredTxs.forEach(t => {
+                let amtStr = t.type === 'income' ? `+$${t.amt}` : `-$${t.amt}`;
+                let amtColor = t.type === 'income' ? 'var(--accent-jade)' : 'var(--text-main)';
+                let memoHtml = t.memo ? `<div class="history-memo" style="margin-left:24px; margin-top:5px;">${t.memo}</div>` : '';
+                let color = t.color || colorMap[t.cat] || 'var(--cat-other)';
+                list.innerHTML += `<div class="history-item"><div class="history-top" style="justify-content: flex-start; gap: 12px;"><div class="cat-color-dot" style="background: ${color}"></div><div style="flex:1;"><div style="font-size: 0.95rem; font-weight: 500; color: var(--text-main); display:flex; align-items:center; gap:6px;">${t.cat} - ${t.sub}</div><div style="font-size: 0.75rem; color: var(--text-light);">${t.date}</div></div><div class="history-val" style="color:${amtColor}">${amtStr}</div></div>${memoHtml}</div>`;
+            });
+        }
+        function renderFinanceChartEngine(stage) {
+            let filteredTxs = getFilteredTransactions(); let expenseTotal = 0; let catTotals = {};
+            filteredTxs.forEach(t => { if(t.type === 'expense') { expenseTotal += t.amt; if(!catTotals[t.cat]) catTotals[t.cat] = { amt: 0, color: t.color || colorMap[t.cat] || 'var(--cat-other)' }; catTotals[t.cat].amt += t.amt; } });
+            let legendHtml = ''; Object.keys(catTotals).forEach(cat => { legendHtml += `<div class="legend-item"><div class="legend-dot" style="background: ${catTotals[cat].color};"></div>${cat}</div>`; });
+            stage.innerHTML = `<div class="giant-donut-wrap"><svg class="donut" viewBox="0 0 42 42" id="large-donut-chart"></svg><div class="giant-donut-text"><div class="num">$${expenseTotal.toLocaleString()}</div><div class="lbl">期間純支出</div></div></div><div class="chart-legend" style="margin-top: 15px;">${legendHtml}</div>`;
+            const donut = document.getElementById('large-donut-chart'); let cumulativePercent = 0;
+            if(expenseTotal > 0) { Object.keys(catTotals).forEach(cat => { let percent = (catTotals[cat].amt / expenseTotal) * 100; let visiblePercent = percent > 2 ? percent - 1.5 : percent; const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle"); circle.setAttribute("cx", "21"); circle.setAttribute("cy", "21"); circle.setAttribute("r", "15.9155"); circle.setAttribute("class", "donut-segment"); circle.setAttribute("stroke", catTotals[cat].color); circle.style.strokeDasharray = `0 100`; circle.style.strokeDashoffset = `-${cumulativePercent}`; donut.appendChild(circle); setTimeout(() => { circle.style.strokeDasharray = `${visiblePercent} ${100 - visiblePercent}`; }, 50); cumulativePercent += percent; }); }
+            renderFinanceListEngine();
+        }
 
-        // --- 健康引擎 (省略重複代碼) ---
-        function renderMedicationEngine(stage) { stage.innerHTML = '<div style="text-align:center; padding:20px;">展示規律光環</div>'; }
-        function renderBPEngine(stage) { stage.innerHTML = '<div style="text-align:center; padding:20px;">展示雙軌貝茲</div>'; }
-        function renderBSEngine(stage) { stage.innerHTML = '<div style="text-align:center; padding:20px;">展示單軌貝茲</div>'; }
-
-        // 【核心新增】BMI 單軌貝茲引擎
+        // --- (圖表引擎 2) 健康系列 ---
+        function renderMedicationEngine(stage) {
+            let percent = 0; if (healthDB.med.length > 0) { let doneCount = healthDB.med.filter(m => m.status === '已服').length; percent = Math.round((doneCount / healthDB.med.length) * 100); }
+            stage.innerHTML = `<div class="giant-donut-wrap"><svg viewBox="0 0 36 36" style="width:100%; height:100%; transform: rotate(-90deg);"><circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(130,150,140,0.15)" stroke-width="2.5"></circle><circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--accent-jade)" stroke-width="2.5" stroke-dasharray="${percent}, 100" stroke-linecap="round" style="transition: stroke-dasharray 1.5s ease-out;"></circle></svg><div class="giant-donut-text"><div class="num">${percent}%</div><div class="lbl">歷史圓滿度</div></div></div>`;
+            const list = document.getElementById('history-list-container'); list.innerHTML = '';
+            healthDB.med.forEach(d => { let isMissed = d.status === '未服'; let valColor = isMissed ? 'var(--accent-red)' : 'var(--accent-jade)'; let memoHtml = d.memo ? `<div class="history-memo">${d.memo}</div>` : ''; list.innerHTML += `<div class="history-item" style="${isMissed ? 'border-color: rgba(210,148,152,0.4); background: rgba(255,255,255,0.7);' : ''}"><div class="history-top"><div class="history-date"><span>${d.date}</span><span class="history-tag">${d.time}</span></div><div class="history-val" style="color: ${valColor}; font-weight: ${isMissed ? 'bold' : 'normal'};">${d.status}</div></div>${memoHtml}</div>`; });
+        }
+        function renderBPEngine(stage) {
+            stage.innerHTML = `<div class="chart-legend"><div class="legend-item"><div class="legend-dot" style="background: var(--text-main);"></div>收縮壓</div><div class="legend-item"><div class="legend-dot" style="background: var(--accent-jade);"></div>舒張壓</div></div><svg preserveAspectRatio="none"><path class="curve-sys" id="path-sys" d=""></path><path class="curve-dia" id="path-dia" d=""></path></svg><div class="chart-labels" id="bp-labels"></div>`;
+            let pointsSys = [], pointsDia = []; const w = stage.clientWidth, h = stage.clientHeight, padX = 20, padY = 50, useW = w - padX*2, useH = h - padY*2, range = 160 - 50; 
+            if(healthDB.bp.length > 0) {
+                healthDB.bp.forEach((d, i) => { let x = padX + (i / (Math.max(1, healthDB.bp.length - 1))) * useW; pointsSys.push({ x: x, y: padY + useH - ((d.sys - 50) / range) * useH }); pointsDia.push({ x: x, y: padY + useH - ((d.dia - 50) / range) * useH }); if (i===0 || i===healthDB.bp.length-1 || i%2===0) { document.getElementById('bp-labels').innerHTML += `<div style="position:absolute; left:${x}px; transform:translateX(-50%);">${d.date}</div>`; } });
+                setTimeout(() => { document.getElementById('path-sys').setAttribute('d', generateBezierPath(pointsSys, 0.25)); document.getElementById('path-dia').setAttribute('d', generateBezierPath(pointsDia, 0.25)); }, 50);
+            }
+            const list = document.getElementById('history-list-container'); list.innerHTML = '';
+            [...healthDB.bp].reverse().forEach(d => { let isWarn = d.sys > 120 || d.dia > 80; list.innerHTML += `<div class="history-item"><div class="history-top"><div class="history-date"><span>${d.date}</span><span class="history-tag">${d.tag}</span></div><div class="history-val" style="color: ${isWarn ? 'var(--accent-red)' : 'var(--text-main)'};">${d.sys} / ${d.dia}</div></div></div>`; });
+        }
+        function renderBSEngine(stage) {
+            stage.innerHTML = `<div class="chart-legend" style="justify-content: space-between; padding: 0 10px;"><div class="legend-item" style="color:var(--text-main);"><svg width="14" height="2" style="stroke:var(--text-light); stroke-dasharray:2,2; stroke-width:2;"><line x1="0" y1="1" x2="14" y2="1"></line></svg> 參考線 100</div><div class="legend-item"><div class="legend-dot" style="background: var(--accent-jade);"></div>綜合血糖</div></div><svg preserveAspectRatio="none"><line id="bs-baseline" x1="20" y1="0" x2="${stage.clientWidth-20}" y2="0" stroke="rgba(150,142,134,0.3)" stroke-width="1.5" stroke-dasharray="4,4"></line><path class="curve-single" id="path-bs" d=""></path></svg><div class="chart-labels" id="bs-labels"></div>`;
+            let points = []; const w = stage.clientWidth, h = stage.clientHeight, padX = 20, padY = 50, useW = w - padX*2, useH = h - padY*2, maxVal = 160, minVal = 70, range = maxVal - minVal;
+            let baseY = padY + useH - ((100 - minVal) / range) * useH; document.getElementById('bs-baseline').setAttribute('y1', baseY); document.getElementById('bs-baseline').setAttribute('y2', baseY);
+            if(healthDB.bs.length > 0) {
+                healthDB.bs.forEach((d, i) => { let x = padX + (i / (Math.max(1, healthDB.bs.length - 1))) * useW; points.push({ x: x, y: padY + useH - ((d.val - minVal) / range) * useH }); if (i===0 || i===healthDB.bs.length-1 || i%2===0) { document.getElementById('bs-labels').innerHTML += `<div style="position:absolute; left:${x}px; transform:translateX(-50%);">${d.date}</div>`; } });
+                setTimeout(() => { document.getElementById('path-bs').setAttribute('d', generateBezierPath(points, 0.25)); }, 50);
+            }
+            const list = document.getElementById('history-list-container'); list.innerHTML = '';
+            [...healthDB.bs].reverse().forEach(d => { let limit = d.tag === '空腹' ? 100 : 140; let isWarn = d.val > limit; let memoHtml = d.memo ? `<div class="history-memo">${d.memo}</div>` : ''; list.innerHTML += `<div class="history-item"><div class="history-top"><div class="history-date"><span>${d.date}</span><span class="history-tag">${d.tag}</span></div><div class="history-val" style="color: ${isWarn ? 'var(--accent-red)' : 'var(--text-main)'};">${d.val}</div></div>${memoHtml}</div>`; });
+        }
         function renderBMIEngine(stage) {
-            stage.innerHTML = `<div class="chart-legend" style="justify-content: space-between; padding: 0 10px;"><div class="legend-item" style="color:var(--text-main);"><svg width="14" height="2" style="stroke:var(--text-light); stroke-dasharray:2,2; stroke-width:2;"><line x1="0" y1="1" x2="14" y2="1"></line></svg> 標準上限 24</div><div class="legend-item"><div class="legend-dot" style="background: var(--accent-jade);"></div>BMI 變化軌跡</div></div><svg preserveAspectRatio="none"><line id="bmi-baseline" x1="20" y1="0" x2="${stage.clientWidth-20}" y2="0" stroke="rgba(150,142,134,0.3)" stroke-width="1.5" stroke-dasharray="4,4"></line><path class="curve-single" id="path-bmi" d=""></path></svg><div class="chart-labels" id="bmi-labels"></div>`;
+            stage.innerHTML = `<div class="chart-legend" style="justify-content: space-between; padding: 0 10px;"><div class="legend-item" style="color:var(--text-main);"><svg width="14" height="2" style="stroke:var(--text-light); stroke-dasharray:2,2; stroke-width:2;"><line x1="0" y1="1" x2="14" y2="1"></line></svg> 標準上限 24</div><div class="legend-item"><div class="legend-dot" style="background: var(--accent-jade);"></div>BMI 軌跡</div></div><svg preserveAspectRatio="none"><line id="bmi-baseline" x1="20" y1="0" x2="${stage.clientWidth-20}" y2="0" stroke="rgba(150,142,134,0.3)" stroke-width="1.5" stroke-dasharray="4,4"></line><path class="curve-single" id="path-bmi" d=""></path></svg><div class="chart-labels" id="bmi-labels"></div>`;
             let points = []; const w = stage.clientWidth, h = stage.clientHeight, padX = 20, padY = 50, useW = w - padX*2, useH = h - padY*2, maxVal = 28, minVal = 16, range = maxVal - minVal;
             let baseY = padY + useH - ((24 - minVal) / range) * useH; document.getElementById('bmi-baseline').setAttribute('y1', baseY); document.getElementById('bmi-baseline').setAttribute('y2', baseY);
-            
             if(healthDB.bmi && healthDB.bmi.length > 0) {
                 healthDB.bmi.forEach((d, i) => { let x = padX + (i / (Math.max(1, healthDB.bmi.length - 1))) * useW; points.push({ x: x, y: padY + useH - ((d.val - minVal) / range) * useH }); if (i===0 || i===healthDB.bmi.length-1 || i%2===0) { document.getElementById('bmi-labels').innerHTML += `<div style="position:absolute; left:${x}px; transform:translateX(-50%);">${d.date}</div>`; } });
                 setTimeout(() => { document.getElementById('path-bmi').setAttribute('d', generateBezierPath(points, 0.25)); }, 50);
             }
             const list = document.getElementById('history-list-container'); list.innerHTML = '';
-            if(healthDB.bmi) [...healthDB.bmi].reverse().forEach(d => { 
-                let isWarn = d.val >= 24 || d.val < 18.5; 
-                let tagTxt = d.val >= 24 ? '過重' : (d.val < 18.5 ? '偏輕' : '標準');
-                let tagColor = d.val >= 24 ? 'var(--accent-red)' : (d.val < 18.5 ? 'var(--accent-gold)' : 'var(--text-light)');
-                list.innerHTML += `<div class="history-item"><div class="history-top"><div class="history-date"><span>${d.date}</span><span class="history-tag" style="color:${tagColor}; border-color:${tagColor}">${tagTxt}</span></div><div class="history-val" style="color: ${isWarn ? 'var(--accent-red)' : 'var(--text-main)'};">${d.val}</div></div></div>`; 
-            });
+            if(healthDB.bmi) [...healthDB.bmi].reverse().forEach(d => { let isWarn = d.val >= 24 || d.val < 18.5; let tagTxt = d.val >= 24 ? '過重' : (d.val < 18.5 ? '偏輕' : '標準'); let tagColor = d.val >= 24 ? 'var(--accent-red)' : (d.val < 18.5 ? 'var(--accent-gold)' : 'var(--text-light)'); list.innerHTML += `<div class="history-item"><div class="history-top"><div class="history-date"><span>${d.date}</span><span class="history-tag" style="color:${tagColor}; border-color:${tagColor}">${tagTxt}</span></div><div class="history-val" style="color: ${isWarn ? 'var(--accent-red)' : 'var(--text-main)'};">${d.val}</div></div></div>`; });
         }
 
-        // 【核心新增】月經週期條狀圖引擎
+        // --- (圖表引擎 3) 母嬰系列 (包含週期、GDM、血壓、體重) ---
         function renderPeriodEngine(stage) {
-            stage.innerHTML = `
-                <div style="width:100%; padding: 10px 20px; display:flex; flex-direction:column; gap:15px; overflow-y:auto; max-height:240px;">
-                    <div style="font-size: 0.8rem; color: var(--text-light); text-align:center;">週期長度分佈 (滿版為35天)</div>
-                    <div id="period-bars-container"></div>
-                </div>
-            `;
-            const barContainer = document.getElementById('period-bars-container');
-            const list = document.getElementById('history-list-container'); list.innerHTML = '';
-            
+            stage.innerHTML = `<div style="width:100%; padding: 10px 20px; display:flex; flex-direction:column; gap:15px; overflow-y:auto; max-height:240px;"><div style="font-size: 0.8rem; color: var(--text-light); text-align:center;">週期長度分佈 (滿格為35天)</div><div id="period-bars-container"></div></div>`;
+            const barContainer = document.getElementById('period-bars-container'); const list = document.getElementById('history-list-container'); list.innerHTML = '';
             if(momDB.periods && momDB.periods.length > 0) {
                 [...momDB.periods].reverse().forEach(p => {
-                    // 畫條狀圖 (以35天為滿格)
                     let percent = Math.min((p.length / 35) * 100, 100);
-                    barContainer.innerHTML += `
-                        <div class="period-bar-wrap">
-                            <div class="period-day-lbl">${p.length}天</div>
-                            <div class="period-bar-bg"><div class="period-bar-fill" style="width: 0%; transition: width 1s ease-out;" onload="this.style.width='${percent}%'"></div></div>
-                        </div>
-                    `;
-                    
-                    // 畫歷史清單
-                    list.innerHTML += `
-                        <div class="history-item">
-                            <div class="history-top">
-                                <div class="history-date"><span>${p.startDate} ~ ${p.endDate}</span><span class="history-tag" style="background:var(--accent-rose-light); color:var(--accent-rose); border-color:var(--accent-rose);">週期 ${p.length} 天</span></div>
-                            </div>
-                        </div>
-                    `;
+                    barContainer.innerHTML += `<div class="period-bar-wrap"><div class="period-day-lbl">${p.length}天</div><div class="period-bar-bg"><div class="period-bar-fill" style="width: 0%;" data-w="${percent}%"></div></div></div>`;
+                    list.innerHTML += `<div class="history-item"><div class="history-top"><div class="history-date"><span>${p.startDate} ~ ${p.endDate}</span><span class="history-tag" style="background:var(--accent-rose-light); color:var(--accent-rose); border-color:var(--accent-rose);">週期 ${p.length} 天</span></div></div></div>`;
                 });
-                // 觸發進度條動畫
-                setTimeout(() => {
-                    document.querySelectorAll('.period-bar-fill').forEach((el, idx) => {
-                        let p = [...momDB.periods].reverse()[idx];
-                        el.style.width = `${Math.min((p.length / 35) * 100, 100)}%`;
-                    });
-                }, 100);
+                setTimeout(() => { document.querySelectorAll('.period-bar-fill').forEach(el => el.style.width = el.getAttribute('data-w')); }, 100);
             }
         }
 
-        // 疫苗與孕期明細 (僅列表，無圖表)
+        function renderMomBPEngine(stage) {
+            stage.innerHTML = `<div class="chart-legend"><div class="legend-item"><div class="legend-dot" style="background: var(--text-main);"></div>收縮壓 (警戒140)</div><div class="legend-item"><div class="legend-dot" style="background: var(--accent-rose);"></div>舒張壓 (警戒90)</div></div><svg preserveAspectRatio="none"><path class="curve-sys" id="path-mom-sys" d=""></path><path class="curve-single" id="path-mom-dia" d="" style="stroke:var(--accent-rose);"></path></svg><div class="chart-labels" id="mom-bp-labels"></div>`;
+            let pointsSys = [], pointsDia = []; const w = stage.clientWidth, h = stage.clientHeight, padX = 20, padY = 50, useW = w - padX*2, useH = h - padY*2, range = 160 - 50; 
+            if(momDB.bp && momDB.bp.length > 0) {
+                momDB.bp.forEach((d, i) => { let x = padX + (i / (Math.max(1, momDB.bp.length - 1))) * useW; pointsSys.push({ x: x, y: padY + useH - ((d.sys - 50) / range) * useH }); pointsDia.push({ x: x, y: padY + useH - ((d.dia - 50) / range) * useH }); if (i===0 || i===momDB.bp.length-1 || i%2===0) { document.getElementById('mom-bp-labels').innerHTML += `<div style="position:absolute; left:${x}px; transform:translateX(-50%);">${d.date}</div>`; } });
+                setTimeout(() => { document.getElementById('path-mom-sys').setAttribute('d', generateBezierPath(pointsSys, 0.25)); document.getElementById('path-mom-dia').setAttribute('d', generateBezierPath(pointsDia, 0.25)); }, 50);
+            }
+            const list = document.getElementById('history-list-container'); list.innerHTML = '';
+            if(momDB.bp) [...momDB.bp].reverse().forEach(d => { let isWarn = d.sys >= 140 || d.dia >= 90; list.innerHTML += `<div class="history-item"><div class="history-top"><div class="history-date"><span>${d.date}</span></div><div class="history-val" style="color: ${isWarn ? 'var(--accent-red)' : 'var(--text-main)'};">${d.sys} / ${d.dia}</div></div></div>`; });
+        }
+
+        function renderMomGDMEngine(stage) {
+            stage.innerHTML = `<div class="chart-legend" style="justify-content: space-between; padding: 0 10px;"><div class="legend-item" style="color:var(--accent-red);"><svg width="14" height="2" style="stroke:currentColor; stroke-dasharray:2,2; stroke-width:2;"><line x1="0" y1="1" x2="14" y2="1"></line></svg> 飯後高標 120</div><div class="legend-item"><div class="legend-dot" style="background: var(--accent-rose);"></div>妊娠血糖</div></div><svg preserveAspectRatio="none"><line id="gdm-baseline" x1="20" y1="0" x2="${stage.clientWidth-20}" y2="0" stroke="var(--accent-red)" stroke-width="1.5" stroke-dasharray="4,4" style="opacity:0.5;"></line><path class="curve-single" id="path-gdm" d="" style="stroke:var(--accent-rose);"></path></svg><div class="chart-labels" id="gdm-labels"></div>`;
+            let points = []; const w = stage.clientWidth, h = stage.clientHeight, padX = 20, padY = 50, useW = w - padX*2, useH = h - padY*2, maxVal = 160, minVal = 70, range = maxVal - minVal;
+            let baseY = padY + useH - ((120 - minVal) / range) * useH; document.getElementById('gdm-baseline').setAttribute('y1', baseY); document.getElementById('gdm-baseline').setAttribute('y2', baseY);
+            if(momDB.gdm && momDB.gdm.length > 0) {
+                momDB.gdm.forEach((d, i) => { let x = padX + (i / (Math.max(1, momDB.gdm.length - 1))) * useW; points.push({ x: x, y: padY + useH - ((d.val - minVal) / range) * useH }); if (i===0 || i===momDB.gdm.length-1 || i%2===0) { document.getElementById('gdm-labels').innerHTML += `<div style="position:absolute; left:${x}px; transform:translateX(-50%);">${d.date}</div>`; } });
+                setTimeout(() => { document.getElementById('path-gdm').setAttribute('d', generateBezierPath(points, 0.25)); }, 50);
+            }
+            const list = document.getElementById('history-list-container'); list.innerHTML = '';
+            if(momDB.gdm) [...momDB.gdm].reverse().forEach(d => { let limit = d.tag.includes('空腹') ? 95 : 120; let isWarn = d.val >= limit; let memoHtml = d.memo ? `<div class="history-memo">${d.memo}</div>` : ''; list.innerHTML += `<div class="history-item"><div class="history-top"><div class="history-date"><span>${d.date}</span><span class="history-tag">${d.tag}</span></div><div class="history-val" style="color: ${isWarn ? 'var(--accent-red)' : 'var(--text-main)'};">${d.val}</div></div>${memoHtml}</div>`; });
+        }
+
+        function renderMomWtEngine(stage) {
+            stage.innerHTML = `<div class="chart-legend" style="justify-content: center; padding: 0 10px;"><div class="legend-item"><div class="legend-dot" style="background: var(--accent-rose);"></div>孕期體重變化</div></div><svg preserveAspectRatio="none"><path class="curve-single" id="path-mom-wt" d="" style="stroke:var(--accent-rose);"></path></svg><div class="chart-labels" id="mom-wt-labels"></div>`;
+            let points = []; const w = stage.clientWidth, h = stage.clientHeight, padX = 20, padY = 50, useW = w - padX*2, useH = h - padY*2;
+            if(momDB.wt && momDB.wt.length > 0) {
+                let maxVal = Math.max(...momDB.wt.map(w => w.val)) + 2; let minVal = Math.min(...momDB.wt.map(w => w.val)) - 2; let range = maxVal - minVal || 10;
+                momDB.wt.forEach((d, i) => { let x = padX + (i / (Math.max(1, momDB.wt.length - 1))) * useW; points.push({ x: x, y: padY + useH - ((d.val - minVal) / range) * useH }); if (i===0 || i===momDB.wt.length-1 || i%2===0) { document.getElementById('mom-wt-labels').innerHTML += `<div style="position:absolute; left:${x}px; transform:translateX(-50%);">${d.date}</div>`; } });
+                setTimeout(() => { document.getElementById('path-mom-wt').setAttribute('d', generateBezierPath(points, 0.25)); }, 50);
+            }
+            const list = document.getElementById('history-list-container'); list.innerHTML = '';
+            if(momDB.wt) [...momDB.wt].reverse().forEach(d => { list.innerHTML += `<div class="history-item"><div class="history-top"><div class="history-date"><span>${d.date}</span></div><div class="history-val" style="color: var(--text-main);">${d.val} kg</div></div></div>`; });
+        }
+
         function renderVaxListEngine() {
             const list = document.getElementById('history-list-container'); list.innerHTML = '';
             let totalVax = 18; let doneVax = Object.keys(momDB.vax).filter(k => momDB.vax[k]).length;
             list.innerHTML = `<div style="text-align:center; padding:15px; font-size:1.5rem; color:var(--accent-jade);">達成率 ${Math.round((doneVax/totalVax)*100)}%</div>`;
-            Object.keys(momDB.vax).forEach(k => {
-                if(momDB.vax[k]) list.innerHTML += `<div class="history-item"><div class="history-top"><div class="history-date"><span style="color:var(--accent-jade);">✔ 已完成</span></div><div class="history-val">${k}</div></div></div>`;
-            });
+            Object.keys(momDB.vax).forEach(k => { if(momDB.vax[k]) list.innerHTML += `<div class="history-item"><div class="history-top"><div class="history-date"><span style="color:var(--accent-jade);">✔ 已完成</span></div><div class="history-val" style="font-size:0.9rem;">疫苗代碼: ${k}</div></div></div>`; });
         }
+        
         function renderPregListEngine() {
-            const list = document.getElementById('history-list-container'); list.innerHTML = `<div style="text-align:center; padding:20px; font-size:1.1rem; color:var(--accent-rose);">預產期：${momDB.edd}</div><div style="text-align:center; color:var(--text-light);">累計胎動：${momDB.fetalCount}次</div>`;
+            const list = document.getElementById('history-list-container');
+            list.innerHTML = `<div style="text-align:center; padding:20px; font-size:1.1rem; color:var(--accent-rose);">預產期：${momDB.edd || '尚未設定'}</div><div style="text-align:center; color:var(--text-light);">累計胎動：${momDB.fetalCount} 次</div>`;
         }
 
-        function generateBezierPath(points, tension) { if(points.length === 0) return ""; if(points.length === 1) return `M ${points[0].x},${points[0].y} L ${points[0].x + 1},${points[0].y}`; let pathData = `M ${points[0].x},${points[0].y}`; for (let i = 0; i < points.length - 1; i++) { let p0 = points[i === 0 ? 0 : i - 1]; let p1 = points[i]; let p2 = points[i + 1]; let p3 = points[i + 2 === points.length ? i + 1 : i + 2]; let cp1x = p1.x + (p2.x - p0.x) * tension, cp1y = p1.y + (p2.y - p0.y) * tension; let cp2x = p2.x - (p3.x - p1.x) * tension, cp2y = p2.y - (p3.y - p1.y) * tension; pathData += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${p2.x},${p2.y}`; } return pathData; }
+        // ================= 核心 SVG 貝茲曲線演算法 =================
+        function generateBezierPath(points, tension) {
+            if(points.length === 0) return ""; 
+            if(points.length === 1) return `M ${points[0].x},${points[0].y} L ${points[0].x + 1},${points[0].y}`; 
+            let pathData = `M ${points[0].x},${points[0].y}`; 
+            for (let i = 0; i < points.length - 1; i++) { 
+                let p0 = points[i === 0 ? 0 : i - 1]; let p1 = points[i]; let p2 = points[i + 1]; let p3 = points[i + 2 === points.length ? i + 1 : i + 2]; 
+                let cp1x = p1.x + (p2.x - p0.x) * tension, cp1y = p1.y + (p2.y - p0.y) * tension; 
+                let cp2x = p2.x - (p3.x - p1.x) * tension, cp2y = p2.y - (p3.y - p1.y) * tension; 
+                pathData += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${p2.x},${p2.y}`; 
+            } 
+            return pathData; 
+        }
     </script>
 </body>
 </html>
