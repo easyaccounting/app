@@ -6,14 +6,24 @@
     <title>柔光記帳</title>
     <style>
         :root {
+            /* 基礎色彩系統 */
             --bg-gradient: linear-gradient(135deg, #F9F8F6, #EAE6DF);
-            --glass-bg: rgba(255, 255, 255, 0.45);
-            --glass-border: rgba(255, 255, 255, 0.7);
+            --glass-bg: rgba(255, 255, 255, 0.55);
+            --glass-border: rgba(255, 255, 255, 0.8);
             --glass-shadow: 0 8px 32px rgba(180, 175, 170, 0.15);
             --text-main: #5C544E; --text-light: #9A928B;
-            --accent-gold: #D4A373; --accent-green: #8BA89C; --accent-red: #D89A9E;
+            --accent-gold: #D4A373; 
+            --accent-green: #849A8E; /* 優化：更高級的莫蘭迪薄荷玉色 */
+            --accent-red: #D89A9E;
+            
+            /* 分類專屬色彩 */
             --cat-food: #E2B4B7; --cat-trans: #A8C2CB; --cat-house: #D4A373;
             --cat-ent: #8BA89C; --cat-beauty: #DDA7A5; --cat-other: #C4B7CB;
+            
+            /* 選單模組色彩 */
+            --menu-acc-fin: rgba(212, 163, 115, 0.15); /* 記帳色塊 */
+            --menu-acc-health: rgba(132, 154, 142, 0.15); /* 健康色塊 */
+            --menu-acc-pure: rgba(168, 194, 203, 0.15); /* 淨土色塊 */
         }
 
         html, body { 
@@ -31,16 +41,12 @@
         #main-view { transform: translateX(0); } 
         #report-view { transform: translateX(100%); }
 
-        /* ================= 側邊選單 (新增) ================= */
-        .side-menu-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.3); backdrop-filter: blur(4px); 
-            z-index: 900; opacity: 0; pointer-events: none; transition: opacity 0.3s;
-        }
+        /* ================= 側邊選單 (美學進化版) ================= */
+        .side-menu-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); backdrop-filter: blur(4px); z-index: 900; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .side-menu-overlay.open { opacity: 1; pointer-events: auto; }
         
         .side-menu {
-            position: absolute; top: 0; left: 0; width: 75%; max-width: 280px; height: 100%;
+            position: absolute; top: 0; left: 0; width: 80%; max-width: 300px; height: 100%;
             background: rgba(249, 248, 246, 0.95); backdrop-filter: blur(20px);
             border-right: 1px solid var(--glass-border); box-shadow: 10px 0 30px rgba(0,0,0,0.1);
             transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -48,19 +54,43 @@
         }
         .side-menu.open { transform: translateX(0); }
         
-        .menu-profile { padding: 0 25px 30px; border-bottom: 1px solid rgba(92,84,78,0.1); margin-bottom: 10px; }
-        .menu-title { font-size: 1.5rem; font-weight: 300; color: var(--text-main); letter-spacing: 2px; }
-        .menu-subtitle { font-size: 0.8rem; color: var(--accent-gold); letter-spacing: 1px; margin-top: 5px; }
+        .menu-profile { padding: 0 25px 25px; border-bottom: 1px solid rgba(92,84,78,0.08); margin-bottom: 15px; }
+        .menu-title { font-size: 1.6rem; font-weight: 300; color: var(--text-main); letter-spacing: 3px; }
+        .menu-subtitle { font-size: 0.75rem; color: var(--accent-gold); letter-spacing: 1px; margin-top: 8px; opacity: 0.9; }
         
-        .menu-list { flex: 1; overflow-y: auto; padding: 10px 15px; }
+        .menu-list { flex: 1; overflow-y: auto; padding: 0 20px 40px; display: flex; flex-direction: column; gap: 12px; }
+        
+        /* 模組按鈕色塊化 */
         .menu-item {
-            padding: 15px 20px; margin-bottom: 8px; border-radius: 15px;
-            display: flex; align-items: center; gap: 15px; font-size: 1rem; color: var(--text-main);
-            cursor: pointer; transition: background 0.2s;
+            padding: 16px 20px; border-radius: 20px; border: 1px solid var(--glass-border);
+            display: flex; align-items: center; gap: 15px; font-size: 0.95rem; color: var(--text-main);
+            font-weight: 500; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            background: var(--glass-bg);
         }
-        .menu-item:active { background: rgba(0,0,0,0.05); }
-        .menu-item svg { stroke: var(--text-light); fill: none; stroke-width: 1.5; width: 20px; height: 20px; }
-        /* ================================================ */
+        .menu-item:active { transform: scale(0.97); }
+        
+        /* 賦予不同模組微光底色 */
+        .menu-item.mod-fin { background: linear-gradient(135deg, var(--glass-bg), var(--menu-acc-fin)); }
+        .menu-item.mod-health { background: linear-gradient(135deg, var(--glass-bg), var(--menu-acc-health)); }
+        .menu-item.mod-pure { background: linear-gradient(135deg, var(--glass-bg), var(--menu-acc-pure)); }
+        
+        /* 圖示獨立圓框 */
+        .menu-icon-wrap { width: 32px; height: 32px; border-radius: 50%; background: #fff; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .menu-item svg { stroke: var(--text-main); fill: none; stroke-width: 1.8; width: 16px; height: 16px; }
+        .mod-fin svg { stroke: var(--accent-gold); } .mod-health svg { stroke: var(--accent-green); } .mod-pure svg { stroke: #A8C2CB; }
+
+        /* 虛線預留按鈕 */
+        .menu-item.mod-dashed {
+            background: transparent; border: 1.5px dashed rgba(154, 146, 139, 0.3);
+            color: var(--text-light); justify-content: center; font-weight: 400; font-size: 0.85rem;
+            letter-spacing: 1px; box-shadow: none; margin-top: 5px;
+        }
+        .mod-dashed svg { stroke: var(--text-light); width: 14px; height: 14px; }
+
+        /* 底部功能小按鈕 */
+        .menu-bottom-links { display: flex; justify-content: space-around; padding-top: 15px; border-top: 1px solid rgba(92,84,78,0.08); }
+        .menu-sub-link { font-size: 0.75rem; color: var(--text-light); cursor: pointer; padding: 5px 10px; }
+        /* ======================================================== */
 
         /* Header */
         .header-bar { width: 90%; display: flex; justify-content: space-between; align-items: center; margin-top: max(20px, env(safe-area-inset-top)); margin-bottom: 10px; z-index: 10; }
@@ -85,7 +115,9 @@
         /* Keyboard */
         .keyboard-panel { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(249, 248, 246, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--glass-border); box-shadow: 0 -10px 40px rgba(180, 175, 170, 0.1); border-radius: 30px 30px 0 0; padding: 15px 20px calc(20px + env(safe-area-inset-bottom)) 20px; box-sizing: border-box; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.4s; z-index: 100; }
         .keyboard-panel.open { transform: translateY(0); }
-        .keyboard-panel.income-mode { background: rgba(240, 248, 245, 0.95); }
+        
+        /* 優化：收入模式的背景色更具高級感，不再刺眼 */
+        .keyboard-panel.income-mode { background: rgba(238, 243, 240, 0.95); }
 
         .kb-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 0 5px; margin-bottom: 10px; opacity: 0; transition: opacity 0.3s; }
         .kb-toolbar.show { opacity: 1; }
@@ -99,8 +131,17 @@
         .sub-tag.selected { background: rgba(255, 255, 255, 0.9); color: var(--text-main); border-color: var(--accent-gold); font-weight: 500; transform: scale(0.96); }
         .sub-tag-income.selected { border-color: var(--accent-green); }
 
+        /* 優化：備註按鈕設計，加入精緻 SVG，移除 emoji */
         .input-display-area { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; border-bottom: 1px solid rgba(92, 84, 78, 0.1); padding-bottom: 5px; }
-        .memo-btn { font-size: 0.85rem; color: var(--text-light); cursor: pointer; padding: 5px; max-width: 45%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .memo-btn { 
+            font-size: 0.85rem; color: var(--text-light); cursor: pointer; padding: 6px 10px; 
+            max-width: 45%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.4); 
+            border-radius: 12px; border: 1px solid var(--glass-border); transition: all 0.2s;
+        }
+        .memo-btn:active { background: rgba(255,255,255,0.8); transform: scale(0.97); }
+        .memo-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+        
         .input-display { flex: 1; text-align: right; font-size: 2.2rem; color: var(--text-main); height: 45px; line-height: 45px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
         .key-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
@@ -145,6 +186,9 @@
         
         .modal-btn { background: var(--accent-gold); color: white; border: none; padding: 10px 25px; border-radius: 20px; font-size: 1rem; cursor: pointer; margin: 5px; }
         .modal-btn-alt { background: var(--glass-bg); color: var(--text-main); border: 1px solid var(--glass-border); padding: 10px 25px; border-radius: 20px; font-size: 1rem; cursor: pointer; margin: 5px; }
+        
+        /* 說明文字專區 */
+        .manual-text { font-size: 0.85rem; color: var(--text-light); text-align: left; line-height: 1.6; margin-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -158,18 +202,32 @@
             <div class="menu-subtitle">萬法唯心造，記帳亦修行</div>
         </div>
         <div class="menu-list">
-            <div class="menu-item" onclick="toggleMenu()">
-                <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> 財務記帳
+            <div class="menu-item mod-fin" onclick="toggleMenu()">
+                <div class="menu-icon-wrap"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>
+                財務記帳
             </div>
-            <div class="menu-item" onclick="openHealthModule()">
-                <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> 健康日誌 <span style="font-size: 0.7rem; color: var(--accent-gold);">(血壓/用藥)</span>
+            <div class="menu-item mod-health" onclick="openHealthModule()">
+                <div class="menu-icon-wrap"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+                <div>健康日誌 <span style="font-size: 0.65rem; color: var(--accent-green); display: block; margin-top:2px;">(血壓/血糖/用藥)</span></div>
             </div>
-            <div class="menu-item" onclick="window.location.href='https://namoamitabhapureland.github.io/bodhicitta/index.html'">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg> 彌陀淨土系統
+            <div class="menu-item mod-pure" onclick="window.location.href='https://namoamitabhapureland.github.io/bodhicitta/index.html'">
+                <div class="menu-icon-wrap"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg></div>
+                彌陀淨土系統
             </div>
-            <div class="menu-item" onclick="toggleMenu(); showModal('settings-modal');" style="margin-top: 20px; border-top: 1px solid rgba(92,84,78,0.1); padding-top: 25px; border-radius: 0;">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> 偏好設定
+            
+            <div class="menu-item mod-dashed" onclick="alert('模組靜心開發中，敬請期待')">
+                <svg viewBox="0 0 24 24" stroke-dasharray="4"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                擴充功能預留
             </div>
+            <div class="menu-item mod-dashed" onclick="alert('模組靜心開發中，敬請期待')">
+                <svg viewBox="0 0 24 24" stroke-dasharray="4"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                擴充功能預留
+            </div>
+        </div>
+
+        <div class="menu-bottom-links">
+            <div class="menu-sub-link" onclick="toggleMenu(); showModal('settings-modal');">⚙️ 偏好設定</div>
+            <div class="menu-sub-link" onclick="toggleMenu(); showModal('manual-modal');">📖 使用說明</div>
         </div>
     </div>
 
@@ -201,8 +259,13 @@
             <div class="cat-btn" onclick="openKeyboard(this, '居住')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg><span>居住</span></div>
             <div class="cat-btn" onclick="openKeyboard(this, '育樂進修')"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="15" rx="2"/><path d="M17 22V5a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v17M12 7v15M7 11h10M7 15h10M7 19h10"/></svg><span>育樂進修</span></div>
             <div class="cat-btn" onclick="openKeyboard(this, '其他生活')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg><span>其他生活</span></div>
-            <div class="cat-btn cat-btn-income" style="grid-column: span 3; aspect-ratio: auto; height: 50px; flex-direction: row; gap: 15px; border-color: rgba(139, 168, 156, 0.3);" onclick="openKeyboard(this, '收入', true)">
-                <svg viewBox="0 0 24 24" style="stroke: var(--accent-green);"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span style="color: var(--accent-green); font-size: 0.9rem; letter-spacing: 2px;">記一筆收入</span>
+            
+            <div class="cat-btn cat-btn-income" style="grid-column: span 3; aspect-ratio: auto; height: 50px; flex-direction: row; gap: 15px; border-color: rgba(132, 154, 142, 0.3);" onclick="openKeyboard(this, '收入', true)">
+                <svg viewBox="0 0 24 24" style="stroke: var(--accent-green);">
+                    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+                    <polyline points="16 7 22 7 22 13"></polyline>
+                </svg>
+                <span style="color: var(--accent-green); font-size: 0.9rem; letter-spacing: 2px;">記一筆收入</span>
             </div>
         </div>
 
@@ -214,7 +277,10 @@
             <div class="sub-tags-wrapper" id="sub-tags-container"></div>
             
             <div class="input-display-area">
-                <div class="memo-btn" id="memo-display-btn" onclick="showMemoModal()">✍️ 備註...</div>
+                <div class="memo-btn" id="memo-display-btn" onclick="showMemoModal()">
+                    <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    <span id="memo-text-span">輸入備註</span>
+                </div>
                 <div class="input-display" id="input-amt">0</div>
             </div>
 
@@ -309,6 +375,19 @@
     </div>
 </div>
 
+<div class="modal-overlay" id="manual-modal" onclick="closeModal('manual-modal')">
+    <div class="glass-modal" onclick="event.stopPropagation()">
+        <h3 style="margin-top:0; color:var(--text-main); font-weight: 500; letter-spacing: 1px;">使用指南</h3>
+        <div class="manual-text">
+            <b>1. 絕對隱私：</b><br>所有資料皆存於您的手機本機（LocalStorage），無伺服器連線，絕對安全。<br><br>
+            <b>2. 零摩擦記帳：</b><br>點擊分類 ➔ 選擇/新增細項 ➔ 輸入金額 ➔ 打勾完成。無須切換頁面。<br><br>
+            <b>3. 發票記帳：</b><br>我們不讀取您的相機或連線財政部。點擊鍵盤上方「🧾」即可優雅標記該筆帳目有發票。<br><br>
+            <b>4. 資料自主：</b><br>於設定中可隨時免費匯出 CSV (供 Excel 統計) 或 JSON 備份檔。
+        </div>
+        <button class="modal-btn" onclick="closeModal('manual-modal')">我瞭解了</button>
+    </div>
+</div>
+
 <script>
     const Code39 = {
         chars: { '0':'000110100','1':'100100001','2':'001100001','3':'101100000','4':'000110001','5':'100110000','6':'001110000','7':'000100101','8':'100100100','9':'001100100','A':'100001001','B':'001001001','C':'101001000','D':'000011001','E':'100011000','F':'001011000','G':'000001101','H':'100001100','I':'001001100','J':'000011100','K':'100000011','L':'001000011','M':'101000010','N':'000010011','O':'100010010','P':'001010010','Q':'000000111','R':'100000110','S':'001000110','T':'000010110','U':'110000001','V':'011000001','W':'111000000','X':'010010001','Y':'110010000','Z':'011010000','-':'010000101','.':'110000100',' ':'011000100','*':'010010100','+':'010001010','/':'010100010','%':'000101010','$':'010101000' },
@@ -347,23 +426,22 @@
         document.getElementById('carrier-top-txt').innerText = appData.carrier;
     }
 
-    /* ================= 側邊選單邏輯 ================= */
+    /* 側邊選單邏輯 */
     function toggleMenu() {
         const menu = document.getElementById('side-menu');
         const overlay = document.getElementById('side-menu-overlay');
         if (menu.classList.contains('open')) {
             menu.classList.remove('open'); overlay.classList.remove('open');
         } else {
-            closeKeyboard(); // 開啟選單時確保鍵盤收起
+            closeKeyboard(); 
             menu.classList.add('open'); overlay.classList.add('open');
         }
     }
     
     function openHealthModule() {
         toggleMenu();
-        alert('「健康日誌」模組正在靜心開發中，即將支援血壓、血糖與用藥紀錄，敬請期待。');
+        setTimeout(() => alert('「健康日誌」模組靜心開發中，即將支援血壓、血糖與用藥紀錄，敬請期待。'), 300);
     }
-    /* ================================================ */
 
     const categoryData = { '飲食': ['早餐','午餐','晚餐','飲料','便利商店'], '服飾美容': ['衣服','鞋包','保養品','理髮','醫美'], '交通': ['捷運公車','計程車','加油/充電','停車費','車保養'], '居住': ['房租/房貸','水電瓦斯','管理費','網路費','居家用品'], '育樂進修': ['電影展覽','數位訂閱','旅遊','書籍','3C產品'], '其他生活': ['電話費','保險費','醫療','交際孝親','信用卡'], '收入': ['薪水','獎金','投資收益','政府回饋','其他收入'] };
     const colorMap = { '飲食': 'var(--cat-food)', '服飾美容': 'var(--cat-beauty)', '居住': 'var(--cat-house)', '交通': 'var(--cat-trans)', '育樂進修': 'var(--cat-ent)', '其他生活': 'var(--cat-other)' };
@@ -413,9 +491,17 @@
     function showMemoModal() { document.getElementById('memo-input').value = currentMemo; showModal('memo-modal'); }
     function confirmMemo() {
         currentMemo = document.getElementById('memo-input').value.trim();
+        let span = document.getElementById('memo-text-span');
         let btn = document.getElementById('memo-display-btn');
-        if(currentMemo) { btn.innerText = currentMemo; btn.style.color = "var(--text-main)"; } 
-        else { btn.innerText = "✍️ 備註..."; btn.style.color = "var(--text-light)"; }
+        if(currentMemo) { 
+            span.innerText = currentMemo; 
+            btn.style.color = "var(--text-main)"; 
+            btn.style.background = "rgba(255,255,255,0.8)";
+        } else { 
+            span.innerText = "輸入備註"; 
+            btn.style.color = "var(--text-light)"; 
+            btn.style.background = "rgba(255,255,255,0.4)";
+        }
         closeModal('memo-modal');
     }
 
@@ -424,8 +510,9 @@
         isIncomeMode = isIncome; hasInvoice = false; document.getElementById('invoice-btn').classList.remove('active');
         
         currentInput = "0"; currentMemo = "";
-        document.getElementById('memo-display-btn').innerText = "✍️ 備註...";
+        document.getElementById('memo-text-span').innerText = "輸入備註";
         document.getElementById('memo-display-btn').style.color = "var(--text-light)";
+        document.getElementById('memo-display-btn').style.background = "rgba(255,255,255,0.4)";
         
         updateDisplay(); renderSubTags(category, isIncome);
         
