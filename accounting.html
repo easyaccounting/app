@@ -246,25 +246,23 @@
         </div>
     </div>
 
-        <div class="modal-overlay" id="carrier-modal">
-        <div class="glass-modal" style="max-width: 320px; padding: 30px 20px;">
+           <div class="modal-overlay" id="carrier-modal">
+        <div class="glass-modal" style="max-width: 340px; padding: 30px 20px;">
             <h3 style="margin-top:0; color:var(--text-main); font-weight: 500; letter-spacing: 2px;">手機條碼載具</h3>
             
-            <div style="margin: 20px 0; background: rgba(255,255,255,0.9); padding: 25px 15px 15px; border-radius: 16px; border: 1px solid var(--glass-border); box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+            <div style="margin: 20px 0; background: #FFFFFF; padding: 25px 15px 15px; border-radius: 16px; border: 1px solid var(--glass-border); box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                <div id="barcode-svg-container" style="width: 100%; height: 80px; display: flex; justify-content: center; align-items: center;"></div>
                 
-                <svg viewBox="0 0 300 80" style="width: 100%; height: 75px; fill: var(--text-main); margin-bottom: 12px;">
-                    <rect x="10" y="0" width="6" height="80"></rect><rect x="22" y="0" width="2" height="80"></rect><rect x="30" y="0" width="8" height="80"></rect><rect x="44" y="0" width="2" height="80"></rect><rect x="52" y="0" width="6" height="80"></rect><rect x="64" y="0" width="4" height="80"></rect><rect x="74" y="0" width="8" height="80"></rect><rect x="88" y="0" width="2" height="80"></rect><rect x="96" y="0" width="6" height="80"></rect><rect x="108" y="0" width="2" height="80"></rect><rect x="116" y="0" width="8" height="80"></rect><rect x="130" y="0" width="4" height="80"></rect><rect x="140" y="0" width="6" height="80"></rect><rect x="152" y="0" width="2" height="80"></rect><rect x="160" y="0" width="8" height="80"></rect><rect x="174" y="0" width="4" height="80"></rect><rect x="184" y="0" width="6" height="80"></rect><rect x="196" y="0" width="2" height="80"></rect><rect x="204" y="0" width="8" height="80"></rect><rect x="218" y="0" width="4" height="80"></rect><rect x="228" y="0" width="6" height="80"></rect><rect x="240" y="0" width="2" height="80"></rect><rect x="248" y="0" width="8" height="80"></rect><rect x="262" y="0" width="4" height="80"></rect><rect x="272" y="0" width="6" height="80"></rect><rect x="284" y="0" width="6" height="80"></rect>
-                </svg>
-                
-                <div id="carrier-display" style="font-size: 1.8rem; font-weight: bold; letter-spacing: 3px; color: var(--accent-gold);">
+                <div id="modal-carrier-txt" style="font-size: 1.8rem; font-weight: bold; letter-spacing: 3px; color: var(--text-main); margin-top: 10px;">
                     尚未設定
                 </div>
             </div>
             
-            <div style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 20px;">請至左側「偏好設定」綁定載具</div>
+            <div style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 20px;" id="carrier-hint">請至左側「偏好設定」綁定載具</div>
             <button class="m-btn m-btn-confirm" style="width: 100%;" onclick="document.getElementById('carrier-modal').classList.remove('show')">關閉</button>
         </div>
     </div>
+
 
 
     <div class="modal-overlay" id="global-settings-modal">
@@ -327,17 +325,77 @@
             alert("全局設定已儲存，心靈預算與載具已更新！");
         }
 
-        function showCarrier() {
-            let displayEl = document.getElementById('carrier-display');
-            if (appData.carrier) {
-                displayEl.innerText = appData.carrier;
-                displayEl.style.color = "var(--text-main)";
-            } else {
-                displayEl.innerText = "尚未設定";
-                displayEl.style.color = "var(--accent-gold)";
+                // ================= 發票載具 Code 39 核心引擎 (總工程師親鑄) =================
+        const Code39 = {
+            chars: {
+                '0': '000110100', '1': '100100001', '2': '001100001', '3': '101100000',
+                '4': '000110001', '5': '100110000', '6': '001110000', '7': '000100101',
+                '8': '100100100', '9': '001100100', 'A': '100001001', 'B': '001001001',
+                'C': '101001000', 'D': '000011001', 'E': '100011000', 'F': '001011000',
+                'G': '000001101', 'H': '100001100', 'I': '001001100', 'J': '000011100',
+                'K': '100000011', 'L': '001000011', 'M': '101000010', 'N': '000010011',
+                'O': '100010010', 'P': '001010010', 'Q': '000000111', 'R': '100000110',
+                'S': '001000110', 'T': '000010110', 'U': '110000001', 'V': '011000001',
+                'W': '111000000', 'X': '010010001', 'Y': '110010000', 'Z': '011010000',
+                '-': '010000101', '.': '110000100', ' ': '011000100', '*': '010010100',
+                '+': '010001010', '/': '010100010', '%': '000101010', '$': '010101000'
+            },
+            generateSVG: function(text) {
+                text = text.toUpperCase();
+                let barcodeText = '*' + text + '*';
+                let svgLines = '';
+                let xPosition = 0;
+                
+                const narrow = 2; const wide = narrow * 3; const gap = narrow; const height = 60;
+                
+                for (let i = 0; i < barcodeText.length; i++) {
+                    let char = barcodeText[i];
+                    let code = this.chars[char];
+                    if (!code) continue; 
+                    
+                    for (let j = 0; j < 9; j++) {
+                        let isBar = (j % 2 === 0); 
+                        let isWide = (code[j] === '1');
+                        let lineWidth = isWide ? wide : narrow;
+                        
+                        if (isBar) {
+                            svgLines += `<rect x="${xPosition}" y="0" width="${lineWidth}" height="${height}" fill="#2C2A29" />`;
+                        }
+                        xPosition += lineWidth;
+                    }
+                    xPosition += gap; 
+                }
+                return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${xPosition} ${height}" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">${svgLines}</svg>`;
             }
-            document.getElementById('carrier-modal').classList.add('show');
+        };
+
+        // ================= 發票載具呼叫功能 (動態渲染) =================
+        function showCarrier() {
+            const modal = document.getElementById('carrier-modal');
+            const svgContainer = document.getElementById('barcode-svg-container');
+            const textContainer = document.getElementById('modal-carrier-txt');
+            const hintContainer = document.getElementById('carrier-hint');
+            
+            // 從資料庫讀取，如果沒有就空字串
+            let code = appData.carrier; 
+
+            if (code) {
+                // 成功讀取：呼叫總工程師的引擎畫出 SVG
+                svgContainer.innerHTML = Code39.generateSVG(code);
+                textContainer.innerText = code;
+                textContainer.style.color = "var(--text-main)";
+                hintContainer.innerText = "給店員嗶一下，發票存雲端";
+            } else {
+                // 尚未設定：顯示淡淡的預設圖騰
+                svgContainer.innerHTML = `<svg viewBox="0 0 300 80" style="width: 100%; height: 75px; fill: rgba(150,142,134,0.15);"><rect x="10" y="0" width="6" height="80"></rect><rect x="22" y="0" width="2" height="80"></rect><rect x="30" y="0" width="8" height="80"></rect><rect x="44" y="0" width="2" height="80"></rect><rect x="52" y="0" width="6" height="80"></rect><rect x="64" y="0" width="4" height="80"></rect><rect x="74" y="0" width="8" height="80"></rect></svg>`;
+                textContainer.innerText = "尚未設定";
+                textContainer.style.color = "var(--accent-gold)";
+                hintContainer.innerText = "請至左側「偏好設定」綁定載具";
+            }
+            
+            modal.classList.add('show');
         }
+
 
         function exportEcosystemData(type) {
             let ecoData = {
