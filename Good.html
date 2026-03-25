@@ -2,213 +2,243 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SVG 貝茲曲線與無摩擦鍵盤 ． 核心道場</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>淨息流 ． 生命軌跡</title>
     <style>
         :root {
-            --bg-deep: #F2F5F4;
-            --accent-jade: #82968C;
-            --accent-gold: #CBA37A;
-            --accent-red: #D29498;
-            --text-main: #58504A;
-            --text-light: #968E86;
-            --glass-bg: rgba(255, 255, 255, 0.7);
+            --bg-gradient: linear-gradient(135deg, #F9FAF9, #E6EBE9);
+            --glass-bg: rgba(255, 255, 255, 0.65);
             --glass-border: rgba(255, 255, 255, 0.9);
+            --text-main: #58504A; --text-light: #968E86;
+            --accent-gold: #CBA37A; --accent-jade: #82968C; --accent-red: #D29498;
             --shadow-soft: 0 10px 40px rgba(160, 155, 150, 0.12);
         }
 
-        * { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; user-select: none; }
+        * { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg-gradient); color: var(--text-main); font-family: -apple-system, sans-serif; overflow-x: hidden; }
+
+        /* --- 頂部導航 --- */
+        .top-nav { position: fixed; top: 0; left: 0; width: 100%; z-index: 800; padding: max(15px, env(safe-area-inset-top)) 20px 10px; display: flex; flex-direction: column; align-items: center; background: rgba(249,250,249,0.9); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(255,255,255,0.5); }
+        .nav-content { width: 100%; max-width: 720px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .nav-btn { display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-main); box-shadow: var(--shadow-soft); cursor: pointer; transition: all 0.2s; }
+        .nav-btn:active { transform: scale(0.92); }
+        .nav-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
+        .page-title { font-size: 1.15rem; font-weight: 500; letter-spacing: 3px; color: var(--accent-gold); }
+
+        /* 模組切換標籤 (記帳 / 健康 / 預留) */
+        .module-tabs { width: 100%; max-width: 720px; display: flex; overflow-x: auto; gap: 10px; padding-bottom: 5px; scrollbar-width: none; -ms-overflow-style: none; }
+        .module-tabs::-webkit-scrollbar { display: none; }
+        .mod-tab { flex-shrink: 0; padding: 8px 18px; border-radius: 20px; font-size: 0.9rem; font-weight: 500; color: var(--text-light); border: 1px solid transparent; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 6px; }
+        .mod-tab svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+        .mod-tab.active { background: var(--glass-bg); color: var(--accent-jade); border-color: var(--glass-border); box-shadow: 0 2px 10px rgba(130,150,140,0.1); }
+
+        /* --- 時間維度切換 --- */
+        .time-filter-wrap { width: 100%; max-width: 720px; margin: calc(130px + env(safe-area-inset-top)) auto 15px; padding: 0 20px; display: flex; justify-content: center; }
+        .time-tabs { display: flex; background: rgba(255,255,255,0.4); border: 1px solid var(--glass-border); border-radius: 20px; padding: 4px; width: 100%; max-width: 400px; }
+        .time-tab { flex: 1; text-align: center; padding: 6px 0; font-size: 0.85rem; color: var(--text-light); border-radius: 16px; cursor: pointer; transition: all 0.3s; }
+        .time-tab.active { background: var(--glass-bg); color: var(--text-main); font-weight: 500; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+
+        /* --- 主要內容區 (微觀卡片) --- */
+        .main-container { width: 100%; max-width: 720px; margin: 0 auto; padding: 0 20px 100px; display: flex; flex-direction: column; gap: 15px; }
         
-        body { 
-            margin: 0; padding: 20px; min-height: 100vh; background: var(--bg-deep); 
-            font-family: -apple-system, sans-serif; color: var(--text-main);
-            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 30px;
-        }
-
-        .container {
-            width: 100%; max-width: 400px; background: var(--glass-bg); backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border); border-radius: 30px; padding: 30px 20px;
-            box-shadow: var(--shadow-soft); display: flex; flex-direction: column; gap: 25px;
-        }
-
-        /* --- 1. 動態貝茲曲線展示區 --- */
-        .chart-wrapper { width: 100%; height: 180px; position: relative; }
-        svg.trend-chart { width: 100%; height: 100%; overflow: visible; }
+        .stat-card { background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-radius: 24px; padding: 20px; box-shadow: var(--shadow-soft); cursor: pointer; transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); position: relative; overflow: hidden; display: flex; flex-direction: column; }
+        .stat-card:active { transform: scale(0.97); background: rgba(255,255,255,0.9); }
         
-        /* 曲線本身的樣式 */
-        .trend-path { 
-            fill: none; stroke: var(--accent-jade); stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round;
-            filter: drop-shadow(0 6px 10px rgba(130, 150, 140, 0.25)); transition: d 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .card-title { font-size: 1rem; font-weight: 500; letter-spacing: 1px; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+        .card-title svg { width: 18px; height: 18px; stroke: var(--accent-jade); fill: none; stroke-width: 2; }
         
-        /* 曲線下方的柔和漸層光暈 */
-        .trend-fill { 
-            fill: url(#jade-gradient); opacity: 0.3; transition: d 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
+        .card-body { display: flex; align-items: center; justify-content: space-between; gap: 15px; }
+        .card-data-text { flex: 1; }
+        .data-main { font-size: 1.8rem; font-weight: 300; color: var(--text-main); line-height: 1.2; }
+        .data-sub { font-size: 0.8rem; color: var(--text-light); }
+        
+        /* 迷你圖表容器 (純向量示意) */
+        .mini-chart { width: 120px; height: 60px; display: flex; justify-content: center; align-items: center; position: relative; }
+        
+        /* --- 全螢幕展開層 (禪定深觀) --- */
+        .expand-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; background: var(--bg-gradient); z-index: 2000; transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; flex-direction: column; overflow-y: auto; }
+        .expand-overlay.open { transform: translateY(0); }
+        
+        .expand-header { padding: max(20px, env(safe-area-inset-top)) 20px 15px; display: flex; justify-content: space-between; align-items: center; background: rgba(249,250,249,0.95); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 10; border-bottom: 1px solid var(--glass-border); }
+        .expand-title { font-size: 1.15rem; font-weight: 500; letter-spacing: 2px; color: var(--accent-jade); }
+        
+        .expand-content { flex: 1; width: 100%; max-width: 720px; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+        
+        /* 放大版圖表舞台 */
+        .large-chart-stage { width: 100%; height: 300px; background: var(--glass-bg); border-radius: 24px; border: 1px solid var(--glass-border); box-shadow: var(--shadow-soft); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding: 15px; }
+        .large-chart-stage svg { width: 100%; height: 100%; overflow: visible; }
+        .chart-placeholder-text { position: absolute; font-size: 0.85rem; color: var(--text-light); letter-spacing: 1px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .chart-placeholder-text svg { width: 24px; height: 24px; stroke: var(--accent-jade); }
 
-        /* --- 2. 顯示與輸入邏輯 --- */
-        .display-area { display: flex; flex-direction: column; align-items: center; border-bottom: 1px solid rgba(130, 150, 140, 0.2); padding-bottom: 15px; }
-        .data-array-text { font-size: 0.8rem; color: var(--text-light); margin-bottom: 10px; letter-spacing: 1px; }
-        .input-value { font-size: 3.2rem; font-weight: 300; color: var(--accent-jade); line-height: 1; min-height: 55px; }
-
-        /* --- 3. 無摩擦純向量鍵盤 --- */
-        .key-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-        .key {
-            background: rgba(255,255,255,0.5); border: 1px solid var(--glass-border); border-radius: 20px;
-            height: 65px; font-size: 1.6rem; color: var(--text-main); font-weight: 300;
-            display: flex; justify-content: center; align-items: center; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: all 0.15s;
-        }
-        .key:active { transform: scale(0.92); background: rgba(255,255,255,0.95); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .key-ac { color: var(--accent-red); font-weight: 400; font-size: 1.2rem; letter-spacing: 1px; }
-        .key-submit { grid-column: span 3; background: var(--accent-gold); color: white; border: none; font-weight: 400; letter-spacing: 4px; box-shadow: 0 6px 20px rgba(203, 163, 122, 0.25); }
-        .key-submit:active { background: #b89166; }
+        /* 歷史紀錄列表 */
+        .history-list { display: flex; flex-direction: column; gap: 10px; }
+        .history-item { background: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.6); border-radius: 16px; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .history-date { font-size: 0.85rem; color: var(--text-light); }
+        .history-val { font-size: 1.1rem; font-weight: 500; color: var(--text-main); }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="chart-wrapper" id="chart-wrapper">
-            <svg class="trend-chart" preserveAspectRatio="none">
-                <defs>
-                    <linearGradient id="jade-gradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stop-color="var(--accent-jade)" stop-opacity="1" />
-                        <stop offset="100%" stop-color="var(--accent-jade)" stop-opacity="0" />
-                    </linearGradient>
-                </defs>
-                <path class="trend-fill" id="fill-path" d=""></path>
-                <path class="trend-path" id="line-path" d=""></path>
-            </svg>
+    <div class="top-nav">
+        <div class="nav-content">
+            <div class="nav-btn" onclick="history.back()"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></div>
+            <div class="page-title">生命軌跡</div>
+            <div style="width: 42px;"></div> </div>
+        <div class="module-tabs">
+            <div class="mod-tab" onclick="alert('切換至：財務收支總覽')">
+                <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                財務收支
+            </div>
+            <div class="mod-tab active">
+                <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                健康觀照
+            </div>
+            <div class="mod-tab" onclick="alert('切換至：形體變化總覽')">
+                <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path></svg>
+                形體變化
+            </div>
+        </div>
+    </div>
+
+    <div class="time-filter-wrap">
+        <div class="time-tabs">
+            <div class="time-tab" onclick="switchTime(this)">近七日</div>
+            <div class="time-tab active" onclick="switchTime(this)">本月</div>
+            <div class="time-tab" onclick="switchTime(this)">近半年</div>
+            <div class="time-tab" onclick="switchTime(this)">今年</div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        
+        <div class="stat-card" onclick="openDetail('服藥規律度', 'donut')">
+            <div class="card-header">
+                <div class="card-title"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"></rect><line x1="12" y1="8" x2="12" y2="16"></line></svg> 規律觀照</div>
+                <div style="font-size: 0.8rem; color: var(--accent-jade);">狀態良好</div>
+            </div>
+            <div class="card-body">
+                <div class="card-data-text">
+                    <div class="data-main">92<span style="font-size: 1rem;">%</span></div>
+                    <div class="data-sub">本月達成率</div>
+                </div>
+                <div class="mini-chart">
+                    <svg viewBox="0 0 36 36" style="width: 60px; height: 60px; transform: rotate(-90deg);">
+                        <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(130,150,140,0.2)" stroke-width="4"></circle>
+                        <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--accent-jade)" stroke-width="4" stroke-dasharray="92, 100" stroke-linecap="round"></circle>
+                    </svg>
+                </div>
+            </div>
         </div>
 
-        <div class="display-area">
-            <div class="data-array-text" id="data-array-display">紀錄：[ 尚無數據 ]</div>
-            <div class="input-value" id="current-input">0</div>
+        <div class="stat-card" onclick="openDetail('血壓脈搏趨勢', 'dual-curve')">
+            <div class="card-header">
+                <div class="card-title"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg> 血壓觀測</div>
+                <div style="font-size: 0.8rem; color: var(--text-light);">平均值</div>
+            </div>
+            <div class="card-body">
+                <div class="card-data-text">
+                    <div class="data-main">118<span style="font-size:1.2rem; color:var(--text-light)">/76</span></div>
+                    <div class="data-sub">mmHg (平穩)</div>
+                </div>
+                <div class="mini-chart">
+                    <svg viewBox="0 0 100 40" style="width: 100%; height: 100%; stroke-linecap: round; fill: none; stroke-width: 2.5;">
+                        <path d="M0,10 Q25,5 50,15 T100,8" stroke="var(--accent-red)" style="opacity: 0.6;"></path>
+                        <path d="M0,30 Q25,25 50,32 T100,28" stroke="var(--accent-jade)"></path>
+                    </svg>
+                </div>
+            </div>
         </div>
 
-        <div class="key-grid">
-            <div class="key" onclick="inputChar('1')">1</div>
-            <div class="key" onclick="inputChar('2')">2</div>
-            <div class="key" onclick="inputChar('3')">3</div>
+        <div class="stat-card" onclick="openDetail('血糖起伏分析', 'single-curve')">
+            <div class="card-header">
+                <div class="card-title"><svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg> 血糖觀測</div>
+                <div style="font-size: 0.8rem; color: var(--accent-gold);">空腹基準</div>
+            </div>
+            <div class="card-body">
+                <div class="card-data-text">
+                    <div class="data-main">98</div>
+                    <div class="data-sub">mg/dL (平均)</div>
+                </div>
+                <div class="mini-chart">
+                    <svg viewBox="0 0 100 40" style="width: 100%; height: 100%; fill: none;">
+                        <line x1="0" y1="20" x2="100" y2="20" stroke="var(--accent-gold)" stroke-width="1" stroke-dasharray="4,4"></line>
+                        <path d="M0,25 Q20,35 40,15 T80,22 T100,18" stroke="var(--accent-jade)" stroke-width="2.5" stroke-linecap="round"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="expand-overlay" id="detail-view">
+        <div class="expand-header">
+            <div class="nav-btn" onclick="closeDetail()"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></div>
+            <div class="expand-title" id="detail-title">詳細軌跡</div>
+            <div style="width: 42px;"></div>
+        </div>
+        
+        <div class="expand-content">
+            <div class="large-chart-stage" id="detail-chart-stage">
+                <div class="chart-placeholder-text">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 9l-5 5-4-4-5 5"/></svg>
+                    <span id="detail-chart-desc">此處將渲染可互動的純 SVG 貝茲曲線 / 光環</span>
+                    <span style="font-size: 0.7rem; opacity: 0.7;">(支援觸控滑動查看節點數值)</span>
+                </div>
+            </div>
             
-            <div class="key" onclick="inputChar('4')">4</div>
-            <div class="key" onclick="inputChar('5')">5</div>
-            <div class="key" onclick="inputChar('6')">6</div>
+            <div style="font-size: 0.95rem; color: var(--text-main); font-weight: 500; margin-top: 10px; letter-spacing: 1px;">歷史明細</div>
             
-            <div class="key" onclick="inputChar('7')">7</div>
-            <div class="key" onclick="inputChar('8')">8</div>
-            <div class="key" onclick="inputChar('9')">9</div>
-            
-            <div class="key key-ac" onclick="clearInput()">AC</div>
-            <div class="key" onclick="inputChar('0')">0</div>
-            <div class="key" onclick="inputChar('.')">.</div>
-            
-            <div class="key key-submit" onclick="submitData()">寫入觀照</div>
+            <div class="history-list">
+                <div class="history-item">
+                    <div class="history-date">10月24日 08:30</div>
+                    <div class="history-val">118 / 75</div>
+                </div>
+                <div class="history-item">
+                    <div class="history-date">10月23日 08:15</div>
+                    <div class="history-val">120 / 78</div>
+                </div>
+                <div class="history-item">
+                    <div class="history-date">10月22日 08:40</div>
+                    <div class="history-val" style="color: var(--accent-red);">125 / 82</div>
+                </div>
+                <div class="history-item">
+                    <div class="history-date">10月21日 08:20</div>
+                    <div class="history-val">115 / 72</div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // --- 核心邏輯狀態 ---
-        let currentString = "0";
-        let healthData = [110, 125, 118, 130, 115, 122]; // 預設一組數據，讓一開始就有曲線
-        
-        const inputDisplay = document.getElementById('current-input');
-        const arrayDisplay = document.getElementById('data-array-display');
-        const linePath = document.getElementById('line-path');
-        const fillPath = document.getElementById('fill-path');
-        const chartWrapper = document.getElementById('chart-wrapper');
-
-        // --- 鍵盤輸入邏輯 ---
-        function inputChar(char) {
-            if (currentString === "0" && char !== ".") {
-                currentString = char;
-            } else if (char === "." && currentString.includes(".")) {
-                return; // 防止輸入兩個小數點
-            } else if (currentString.length < 6) {
-                currentString += char;
-            }
-            updateInputDisplay();
+        function switchTime(el) {
+            document.querySelectorAll('.time-tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            // 這裡未來會觸發圖表資料的重新抓取與渲染
         }
 
-        function clearInput() { currentString = "0"; updateInputDisplay(); }
-
-        function updateInputDisplay() { inputDisplay.innerText = currentString; }
-
-        function submitData() {
-            let val = parseFloat(currentString);
-            if (!isNaN(val) && val > 0) {
-                healthData.push(val);
-                // 為了視覺效果，我們限制畫面上最多顯示 10 個點，超過就往前推
-                if (healthData.length > 10) healthData.shift(); 
-                
-                clearInput();
-                renderBezierChart();
-            }
+        // 開啟禪定深觀 (全螢幕詳情)
+        function openDetail(title, type) {
+            document.getElementById('detail-title').innerText = title;
+            
+            // 根據類型，預告裡面會畫什麼圖
+            let desc = "";
+            if(type === 'donut') desc = "此處將渲染 [吃藥規律度] 的大型動態光環與月曆分布";
+            if(type === 'dual-curve') desc = "此處將渲染 [收縮/舒張壓] 的互動式雙軌貝茲曲線";
+            if(type === 'single-curve') desc = "此處將渲染 [血糖/體重] 帶有醫學警戒線的平滑曲線";
+            
+            document.getElementById('detail-chart-desc').innerText = desc;
+            
+            document.getElementById('detail-view').classList.add('open');
+            // 鎖定底層捲動
+            document.body.style.overflow = 'hidden'; 
         }
 
-        // --- 核心演算法：將陣列轉為 SVG 平滑貝茲曲線 ---
-        function renderBezierChart() {
-            arrayDisplay.innerText = "紀錄：[ " + healthData.join(", ") + " ]";
-            
-            if (healthData.length < 2) {
-                linePath.setAttribute("d", ""); fillPath.setAttribute("d", ""); return;
-            }
-
-            const w = chartWrapper.clientWidth;
-            const h = chartWrapper.clientHeight;
-            
-            // 找出陣列最大最小值，以決定 Y 軸縮放比例
-            const max = Math.max(...healthData);
-            const min = Math.min(...healthData);
-            const range = (max - min) || 1; // 避免除以零
-            
-            // 留出上下 15% 的空白 padding，才不會讓曲線頂到天花板或地板
-            const padding = h * 0.15; 
-            const usableHeight = h - padding * 2;
-
-            // 1. 將真實數據映射為 SVG 畫布上的 X, Y 座標點
-            let points = healthData.map((val, index) => {
-                let x = (index / (healthData.length - 1)) * w;
-                // Y 軸在螢幕上是向下為正，所以要做翻轉：數值越大，Y座標越小(越靠上)
-                let y = padding + usableHeight - ((val - min) / range) * usableHeight;
-                return { x: x, y: y };
-            });
-
-            // 2. 演算法：計算控制點以產生平滑曲線 (Tension 決定曲線的圓滑度)
-            let pathData = `M ${points[0].x},${points[0].y}`;
-            const tension = 0.2; // 0.2 是一般視覺最溫和舒適的弧度
-
-            for (let i = 0; i < points.length - 1; i++) {
-                // 為了計算控制點，我們需要當前點的前一個點 (p0) 與後一個點 (p3)
-                // 若為邊界點，則以自身為參照
-                let p0 = points[i === 0 ? 0 : i - 1];
-                let p1 = points[i];
-                let p2 = points[i + 1];
-                let p3 = points[i + 2 === points.length ? i + 1 : i + 2];
-                
-                // 貝茲曲線控制點計算公式
-                let cp1x = p1.x + (p2.x - p0.x) * tension;
-                let cp1y = p1.y + (p2.y - p0.y) * tension;
-                let cp2x = p2.x - (p3.x - p1.x) * tension;
-                let cp2y = p2.y - (p3.y - p1.y) * tension;
-                
-                // 寫入 SVG 的 Cubic Bezier Curve 語法：C cp1x,cp1y cp2x,cp2y x,y
-                pathData += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${p2.x},${p2.y}`;
-            }
-
-            // 3. 繪製那條發光的線條
-            linePath.setAttribute("d", pathData);
-
-            // 4. 繪製底部的漸層光暈區域
-            // 將線條路徑延伸到底部左右角落，形成一個封閉的多邊形
-            let fillData = pathData + ` L ${w},${h} L 0,${h} Z`;
-            fillPath.setAttribute("d", fillData);
+        // 關閉詳情
+        function closeDetail() {
+            document.getElementById('detail-view').classList.remove('open');
+            document.body.style.overflow = 'auto';
         }
-
-        // 初始化時繪製一次
-        window.addEventListener('resize', renderBezierChart);
-        renderBezierChart();
-
     </script>
 </body>
 </html>
