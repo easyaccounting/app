@@ -246,16 +246,26 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="carrier-modal">
+        <div class="modal-overlay" id="carrier-modal">
         <div class="glass-modal" style="max-width: 320px; padding: 30px 20px;">
             <h3 style="margin-top:0; color:var(--text-main); font-weight: 500; letter-spacing: 2px;">手機條碼載具</h3>
-            <div id="carrier-display" style="font-size: 1.8rem; font-weight: bold; letter-spacing: 2px; color: var(--accent-gold); margin: 20px 0; background: rgba(255,255,255,0.8); padding: 15px; border-radius: 12px; border: 1px solid var(--glass-border);">
-                尚未設定
+            
+            <div style="margin: 20px 0; background: rgba(255,255,255,0.9); padding: 25px 15px 15px; border-radius: 16px; border: 1px solid var(--glass-border); box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                
+                <svg viewBox="0 0 300 80" style="width: 100%; height: 75px; fill: var(--text-main); margin-bottom: 12px;">
+                    <rect x="10" y="0" width="6" height="80"></rect><rect x="22" y="0" width="2" height="80"></rect><rect x="30" y="0" width="8" height="80"></rect><rect x="44" y="0" width="2" height="80"></rect><rect x="52" y="0" width="6" height="80"></rect><rect x="64" y="0" width="4" height="80"></rect><rect x="74" y="0" width="8" height="80"></rect><rect x="88" y="0" width="2" height="80"></rect><rect x="96" y="0" width="6" height="80"></rect><rect x="108" y="0" width="2" height="80"></rect><rect x="116" y="0" width="8" height="80"></rect><rect x="130" y="0" width="4" height="80"></rect><rect x="140" y="0" width="6" height="80"></rect><rect x="152" y="0" width="2" height="80"></rect><rect x="160" y="0" width="8" height="80"></rect><rect x="174" y="0" width="4" height="80"></rect><rect x="184" y="0" width="6" height="80"></rect><rect x="196" y="0" width="2" height="80"></rect><rect x="204" y="0" width="8" height="80"></rect><rect x="218" y="0" width="4" height="80"></rect><rect x="228" y="0" width="6" height="80"></rect><rect x="240" y="0" width="2" height="80"></rect><rect x="248" y="0" width="8" height="80"></rect><rect x="262" y="0" width="4" height="80"></rect><rect x="272" y="0" width="6" height="80"></rect><rect x="284" y="0" width="6" height="80"></rect>
+                </svg>
+                
+                <div id="carrier-display" style="font-size: 1.8rem; font-weight: bold; letter-spacing: 3px; color: var(--accent-gold);">
+                    尚未設定
+                </div>
             </div>
+            
             <div style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 20px;">請至左側「偏好設定」綁定載具</div>
             <button class="m-btn m-btn-confirm" style="width: 100%;" onclick="document.getElementById('carrier-modal').classList.remove('show')">關閉</button>
         </div>
     </div>
+
 
     <div class="modal-overlay" id="global-settings-modal">
         <div class="glass-modal" style="max-width: 360px;">
