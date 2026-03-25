@@ -1,17 +1,214 @@
-{
-    id: "lotus_lamp", 
-    name: "金剛蓮華燈", 
-    tag: "破迷 ‧ 息災",
-    desc: "蓮燈長明，金剛為座。既有慧劍破除世業迷網之鋒，亦具淨瓶息滅四大違和之潤。若逢身心事業交相逼迫，此燈或可映照內外清淨。皆因行者至誠發無上菩提，感得法界幽微之迴響。冀以此緣，福慧雙修，無礙前行。",
-    svg: `<svg viewBox="0 0 100 150">
-            <g transform="translate(0, 10)">
-                <polygon points="30,120 70,120 60,135 40,135" fill="rgba(212, 175, 55, 0.4)" stroke="#f3e5ab" stroke-width="0.5"/>
-                <polygon points="40,135 60,135 55,145 45,145" fill="rgba(243, 229, 171, 0.2)" stroke="#f3e5ab" stroke-width="0.5"/>
-                <polygon points="45,120 55,120 65,70 35,70" fill="url(#pure-glass)" stroke="#f3e5ab" stroke-width="0.6"/>
-                <polygon points="45,120 50,120 50,70 35,70" fill="rgba(255,255,255,0.3)" stroke="none"/>
-                <path d="M50 20 Q65 50 50 70 Q35 50 50 20 Z" fill="url(#pure-glass)" stroke="#fff" stroke-width="0.5" filter="drop-shadow(0 0 15px rgba(243,229,171,0.8))"/>
-                <path d="M50 35 Q58 55 50 65 Q42 55 50 35 Z" fill="rgba(255,255,255,0.8)" stroke="none"/>
-                <circle cx="50" cy="55" r="30" fill="none" stroke="rgba(243, 229, 171, 0.3)" stroke-width="1" stroke-dasharray="2 4"/>
-            </g>
-          </svg>`
-}
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SVG 貝茲曲線與無摩擦鍵盤 ． 核心道場</title>
+    <style>
+        :root {
+            --bg-deep: #F2F5F4;
+            --accent-jade: #82968C;
+            --accent-gold: #CBA37A;
+            --accent-red: #D29498;
+            --text-main: #58504A;
+            --text-light: #968E86;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.9);
+            --shadow-soft: 0 10px 40px rgba(160, 155, 150, 0.12);
+        }
+
+        * { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; user-select: none; }
+        
+        body { 
+            margin: 0; padding: 20px; min-height: 100vh; background: var(--bg-deep); 
+            font-family: -apple-system, sans-serif; color: var(--text-main);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 30px;
+        }
+
+        .container {
+            width: 100%; max-width: 400px; background: var(--glass-bg); backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border); border-radius: 30px; padding: 30px 20px;
+            box-shadow: var(--shadow-soft); display: flex; flex-direction: column; gap: 25px;
+        }
+
+        /* --- 1. 動態貝茲曲線展示區 --- */
+        .chart-wrapper { width: 100%; height: 180px; position: relative; }
+        svg.trend-chart { width: 100%; height: 100%; overflow: visible; }
+        
+        /* 曲線本身的樣式 */
+        .trend-path { 
+            fill: none; stroke: var(--accent-jade); stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round;
+            filter: drop-shadow(0 6px 10px rgba(130, 150, 140, 0.25)); transition: d 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        
+        /* 曲線下方的柔和漸層光暈 */
+        .trend-fill { 
+            fill: url(#jade-gradient); opacity: 0.3; transition: d 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        /* --- 2. 顯示與輸入邏輯 --- */
+        .display-area { display: flex; flex-direction: column; align-items: center; border-bottom: 1px solid rgba(130, 150, 140, 0.2); padding-bottom: 15px; }
+        .data-array-text { font-size: 0.8rem; color: var(--text-light); margin-bottom: 10px; letter-spacing: 1px; }
+        .input-value { font-size: 3.2rem; font-weight: 300; color: var(--accent-jade); line-height: 1; min-height: 55px; }
+
+        /* --- 3. 無摩擦純向量鍵盤 --- */
+        .key-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .key {
+            background: rgba(255,255,255,0.5); border: 1px solid var(--glass-border); border-radius: 20px;
+            height: 65px; font-size: 1.6rem; color: var(--text-main); font-weight: 300;
+            display: flex; justify-content: center; align-items: center; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: all 0.15s;
+        }
+        .key:active { transform: scale(0.92); background: rgba(255,255,255,0.95); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .key-ac { color: var(--accent-red); font-weight: 400; font-size: 1.2rem; letter-spacing: 1px; }
+        .key-submit { grid-column: span 3; background: var(--accent-gold); color: white; border: none; font-weight: 400; letter-spacing: 4px; box-shadow: 0 6px 20px rgba(203, 163, 122, 0.25); }
+        .key-submit:active { background: #b89166; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="chart-wrapper" id="chart-wrapper">
+            <svg class="trend-chart" preserveAspectRatio="none">
+                <defs>
+                    <linearGradient id="jade-gradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="var(--accent-jade)" stop-opacity="1" />
+                        <stop offset="100%" stop-color="var(--accent-jade)" stop-opacity="0" />
+                    </linearGradient>
+                </defs>
+                <path class="trend-fill" id="fill-path" d=""></path>
+                <path class="trend-path" id="line-path" d=""></path>
+            </svg>
+        </div>
+
+        <div class="display-area">
+            <div class="data-array-text" id="data-array-display">紀錄：[ 尚無數據 ]</div>
+            <div class="input-value" id="current-input">0</div>
+        </div>
+
+        <div class="key-grid">
+            <div class="key" onclick="inputChar('1')">1</div>
+            <div class="key" onclick="inputChar('2')">2</div>
+            <div class="key" onclick="inputChar('3')">3</div>
+            
+            <div class="key" onclick="inputChar('4')">4</div>
+            <div class="key" onclick="inputChar('5')">5</div>
+            <div class="key" onclick="inputChar('6')">6</div>
+            
+            <div class="key" onclick="inputChar('7')">7</div>
+            <div class="key" onclick="inputChar('8')">8</div>
+            <div class="key" onclick="inputChar('9')">9</div>
+            
+            <div class="key key-ac" onclick="clearInput()">AC</div>
+            <div class="key" onclick="inputChar('0')">0</div>
+            <div class="key" onclick="inputChar('.')">.</div>
+            
+            <div class="key key-submit" onclick="submitData()">寫入觀照</div>
+        </div>
+    </div>
+
+    <script>
+        // --- 核心邏輯狀態 ---
+        let currentString = "0";
+        let healthData = [110, 125, 118, 130, 115, 122]; // 預設一組數據，讓一開始就有曲線
+        
+        const inputDisplay = document.getElementById('current-input');
+        const arrayDisplay = document.getElementById('data-array-display');
+        const linePath = document.getElementById('line-path');
+        const fillPath = document.getElementById('fill-path');
+        const chartWrapper = document.getElementById('chart-wrapper');
+
+        // --- 鍵盤輸入邏輯 ---
+        function inputChar(char) {
+            if (currentString === "0" && char !== ".") {
+                currentString = char;
+            } else if (char === "." && currentString.includes(".")) {
+                return; // 防止輸入兩個小數點
+            } else if (currentString.length < 6) {
+                currentString += char;
+            }
+            updateInputDisplay();
+        }
+
+        function clearInput() { currentString = "0"; updateInputDisplay(); }
+
+        function updateInputDisplay() { inputDisplay.innerText = currentString; }
+
+        function submitData() {
+            let val = parseFloat(currentString);
+            if (!isNaN(val) && val > 0) {
+                healthData.push(val);
+                // 為了視覺效果，我們限制畫面上最多顯示 10 個點，超過就往前推
+                if (healthData.length > 10) healthData.shift(); 
+                
+                clearInput();
+                renderBezierChart();
+            }
+        }
+
+        // --- 核心演算法：將陣列轉為 SVG 平滑貝茲曲線 ---
+        function renderBezierChart() {
+            arrayDisplay.innerText = "紀錄：[ " + healthData.join(", ") + " ]";
+            
+            if (healthData.length < 2) {
+                linePath.setAttribute("d", ""); fillPath.setAttribute("d", ""); return;
+            }
+
+            const w = chartWrapper.clientWidth;
+            const h = chartWrapper.clientHeight;
+            
+            // 找出陣列最大最小值，以決定 Y 軸縮放比例
+            const max = Math.max(...healthData);
+            const min = Math.min(...healthData);
+            const range = (max - min) || 1; // 避免除以零
+            
+            // 留出上下 15% 的空白 padding，才不會讓曲線頂到天花板或地板
+            const padding = h * 0.15; 
+            const usableHeight = h - padding * 2;
+
+            // 1. 將真實數據映射為 SVG 畫布上的 X, Y 座標點
+            let points = healthData.map((val, index) => {
+                let x = (index / (healthData.length - 1)) * w;
+                // Y 軸在螢幕上是向下為正，所以要做翻轉：數值越大，Y座標越小(越靠上)
+                let y = padding + usableHeight - ((val - min) / range) * usableHeight;
+                return { x: x, y: y };
+            });
+
+            // 2. 演算法：計算控制點以產生平滑曲線 (Tension 決定曲線的圓滑度)
+            let pathData = `M ${points[0].x},${points[0].y}`;
+            const tension = 0.2; // 0.2 是一般視覺最溫和舒適的弧度
+
+            for (let i = 0; i < points.length - 1; i++) {
+                // 為了計算控制點，我們需要當前點的前一個點 (p0) 與後一個點 (p3)
+                // 若為邊界點，則以自身為參照
+                let p0 = points[i === 0 ? 0 : i - 1];
+                let p1 = points[i];
+                let p2 = points[i + 1];
+                let p3 = points[i + 2 === points.length ? i + 1 : i + 2];
+                
+                // 貝茲曲線控制點計算公式
+                let cp1x = p1.x + (p2.x - p0.x) * tension;
+                let cp1y = p1.y + (p2.y - p0.y) * tension;
+                let cp2x = p2.x - (p3.x - p1.x) * tension;
+                let cp2y = p2.y - (p3.y - p1.y) * tension;
+                
+                // 寫入 SVG 的 Cubic Bezier Curve 語法：C cp1x,cp1y cp2x,cp2y x,y
+                pathData += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${p2.x},${p2.y}`;
+            }
+
+            // 3. 繪製那條發光的線條
+            linePath.setAttribute("d", pathData);
+
+            // 4. 繪製底部的漸層光暈區域
+            // 將線條路徑延伸到底部左右角落，形成一個封閉的多邊形
+            let fillData = pathData + ` L ${w},${h} L 0,${h} Z`;
+            fillPath.setAttribute("d", fillData);
+        }
+
+        // 初始化時繪製一次
+        window.addEventListener('resize', renderBezierChart);
+        renderBezierChart();
+
+    </script>
+</body>
+</html>
