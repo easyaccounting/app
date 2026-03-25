@@ -6,16 +6,16 @@
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-        <meta name="theme-color" content="#F9F8F6">
-<link rel="manifest" href="data:application/json,{'name':'柔光記帳','short_name':'記帳','start_url':'.','display':'standalone','background_color':'#F9F8F6','theme_color':'#F9F8F6'}">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
+    <meta name="theme-color" content="#F9F8F6">
+    <link rel="manifest" href="data:application/json,{'name':'柔光記帳','short_name':'記帳','start_url':'.','display':'standalone','background_color':'#F9F8F6','theme_color':'#F9F8F6'}">
 
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    
     <title>柔光記帳</title>
     <style>
         :root {
-            var(--bg-gradient): linear-gradient(135deg, #F9F8F6, #EAE6DF);
+            --bg-gradient: linear-gradient(135deg, #F9F8F6, #EAE6DF);
             --glass-bg: rgba(255, 255, 255, 0.55);
             --glass-border: rgba(255, 255, 255, 0.8);
             --glass-shadow: 0 8px 32px rgba(180, 175, 170, 0.15);
@@ -28,18 +28,20 @@
             --menu-acc-pure: rgba(168, 194, 203, 0.15);
         }
 
-        /* ★ 徹底超渡雙擊放大的物理設定 */
         * { touch-action: manipulation; }
 
         html, body { 
-            margin: 0; padding: 0; width: 100%; height: 100%; background: #000; color: var(--text-main); 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            background: #F9F8F6; /* 替換為柔光底色 */
+            color: var(--text-main); 
             font-family: -apple-system, sans-serif; overflow: hidden; touch-action: none; 
             -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; 
         }
 
         .app-viewport { 
-            width: 100%; max-width: 400px; height: 100dvh; margin: 0 auto; background: var(--bg-gradient); 
-            position: relative; overflow: hidden; box-shadow: 0 0 20px rgba(0,0,0,0.5); 
+            width: 100%; max-width: 450px; /* 放寬以適應大螢幕手機 */
+            height: 100dvh; margin: 0 auto; background: var(--bg-gradient); 
+            position: relative; overflow: hidden; box-shadow: 0 0 30px rgba(180, 175, 170, 0.2); 
         }
 
         .view-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
@@ -83,7 +85,8 @@
         .mod-dashed svg { stroke: var(--text-light); width: 14px; height: 14px; }
 
         .menu-bottom-links { display: flex; justify-content: space-around; padding-top: 15px; border-top: 1px solid rgba(92,84,78,0.08); }
-        .menu-sub-link { font-size: 0.75rem; color: var(--text-light); cursor: pointer; padding: 5px 10px; }
+        .menu-sub-link { font-size: 0.75rem; color: var(--text-light); cursor: pointer; padding: 5px 10px; display: flex; align-items: center; gap: 6px; }
+        .menu-sub-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.5; }
 
         /* Header */
         .header-bar { width: 90%; display: flex; justify-content: space-between; align-items: center; margin-top: max(20px, env(safe-area-inset-top)); margin-bottom: 10px; z-index: 10; }
@@ -209,8 +212,14 @@
         </div>
 
         <div class="menu-bottom-links">
-            <div class="menu-sub-link" onclick="toggleMenu(); showModal('settings-modal');">⚙️ 偏好設定</div>
-            <div class="menu-sub-link" onclick="toggleMenu(); showModal('manual-modal');">📖 使用說明</div>
+            <div class="menu-sub-link" onclick="toggleMenu(); showModal('settings-modal');">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>偏好設定</span>
+            </div>
+            <div class="menu-sub-link" onclick="toggleMenu(); showModal('manual-modal');">
+                <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                <span>使用說明</span>
+            </div>
         </div>
     </div>
 
@@ -270,7 +279,9 @@
             <div class="key-grid">
                 <button class="key" onclick="inputNum(1)">1</button><button class="key" onclick="inputNum(2)">2</button><button class="key" onclick="inputNum(3)">3</button>
                 <button class="key" onclick="clearNum()" style="color: var(--accent-red); font-weight: 400;">AC</button>
-                <button class="key" onclick="inputNum(4)">4</button><button class="key" onclick="inputNum(5)">5</button><button class="key" onclick="inputNum(6)">6</button><button class="key key-enter" onclick="submitEntry()">✓</button>
+                <button class="key" onclick="inputNum(4)">4</button><button class="key" onclick="inputNum(5)">5</button><button class="key" onclick="inputNum(6)">6</button><button class="key key-enter" onclick="submitEntry()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </button>
                 <button class="key" onclick="inputNum(7)">7</button><button class="key" onclick="inputNum(8)">8</button><button class="key" onclick="inputNum(9)">9</button>
                 <button class="key" onclick="closeKeyboard()">取消</button><button class="key" onclick="inputNum(0)">0</button><button class="key" onclick="inputNum('00')">00</button>
             </div>
@@ -364,7 +375,7 @@
         <div class="manual-text">
             <b>1. 絕對隱私：</b><br>所有資料皆存於您的手機本機空間，無伺服器連線，極致清淨安全。<br><br>
             <b>2. 零摩擦輸入：</b><br>點擊分類 ➔ 點選細項 ➔ 輸入金額 ➔ 打勾完成。3秒無痕紀錄。<br><br>
-            <b>3. 發票記帳：</b><br>點擊鍵盤上方「🧾」即可優雅標記該筆帳目有發票。我們不讀相機，保護隱私。<br><br>
+            <b>3. 發票記帳：</b><br>點擊鍵盤上方「發票圖示」即可優雅標記該筆帳目有發票。我們不讀相機，保護隱私。<br><br>
             <b>4. 資料自主：</b><br>於偏好設定中，可隨時免費匯出 CSV 或 JSON 備份檔，資料永遠屬於您。
         </div>
         <button class="modal-btn" onclick="closeModal('manual-modal')">我瞭解了</button>
