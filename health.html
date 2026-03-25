@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>淨息流 ． 健康觀照</title>
     <style>
         :root {
@@ -24,13 +26,21 @@
         .menu-profile { padding: 0 25px 25px; border-bottom: 1px solid rgba(92,84,78,0.06); margin-bottom: 15px; }
         .menu-title { font-size: 1.6rem; font-weight: 300; letter-spacing: 3px; }
         .menu-subtitle { font-size: 0.75rem; color: var(--accent-gold); letter-spacing: 1px; margin-top: 8px; }
-        .menu-list { flex: 1; overflow-y: auto; padding: 0 20px 40px; display: flex; flex-direction: column; gap: 12px; }
+        
+        .menu-list { flex: 1; overflow-y: auto; padding: 0 20px 20px; display: flex; flex-direction: column; gap: 12px; }
         .menu-item { padding: 16px 20px; border-radius: 20px; border: 1px solid var(--glass-border); display: flex; align-items: center; gap: 15px; font-size: 0.95rem; font-weight: 500; cursor: pointer; background: var(--glass-bg); transition: all 0.2s; }
         .menu-item:active { transform: scale(0.97); }
         .menu-item.active { background: linear-gradient(135deg, var(--glass-bg), rgba(130, 150, 140, 0.12)); border-color: var(--accent-jade); color: var(--accent-jade); }
         .menu-icon-wrap { width: 32px; height: 32px; border-radius: 50%; background: #fff; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
         .menu-item svg { stroke: var(--text-main); fill: none; stroke-width: 1.8; width: 16px; height: 16px; }
         .menu-item.active svg { stroke: var(--accent-jade); }
+        .mod-dashed { background: transparent; border: 1.5px dashed rgba(150, 142, 134, 0.3); color: var(--text-light); justify-content: center; font-weight: 400; font-size: 0.85rem; letter-spacing: 1px; margin-top: 5px; box-shadow: none; }
+
+        /* 側邊選單底部 (設定與說明) */
+        .menu-bottom-links { display: flex; justify-content: space-around; padding: 20px 0; border-top: 1px solid rgba(92,84,78,0.06); }
+        .menu-sub-link { font-size: 0.8rem; color: var(--text-light); cursor: pointer; padding: 5px 15px; display: flex; align-items: center; gap: 6px; transition: color 0.2s; }
+        .menu-sub-link:active { color: var(--accent-gold); }
+        .menu-sub-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
 
         /* --- 頂部導航 --- */
         .top-nav { position: fixed; top: 0; left: 0; width: 100%; z-index: 800; padding: max(15px, env(safe-area-inset-top)) 20px 15px; display: flex; justify-content: center; background: linear-gradient(to bottom, rgba(249,250,249,0.95), rgba(249,250,249,0)); }
@@ -38,24 +48,32 @@
         .nav-btn { display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%; background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); color: var(--text-main); box-shadow: var(--shadow-soft); cursor: pointer; transition: all 0.2s; }
         .nav-btn:active { transform: scale(0.92); background: rgba(255,255,255,0.9); }
         .nav-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
-        .page-title { font-size: 1.15rem; font-weight: 500; letter-spacing: 3px; color: var(--accent-jade); }
+        .page-title { font-size: 1.15rem; font-weight: 500; letter-spacing: 3px; color: var(--accent-jade); cursor: pointer; }
 
         /* --- 觀照卡片 --- */
         .main-container { width: 100%; max-width: 720px; margin: 0 auto; padding: calc(85px + env(safe-area-inset-top)) 20px 100px; display: flex; flex-direction: column; gap: 20px; }
-        .health-card { background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-radius: 24px; padding: 22px; box-shadow: var(--shadow-soft); transition: all 0.3s; position: relative; overflow: hidden; }
+        .health-card { background: var(--glass-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-radius: 24px; padding: 22px; box-shadow: var(--shadow-soft); transition: all 0.3s; position: relative; overflow: hidden; }
         .health-card.clickable { cursor: pointer; }
         .health-card.clickable:active { transform: scale(0.98); background: rgba(255,255,255,0.8); }
 
-        /* 今日已記的圓滿印記 */
-        .done-badge { position: absolute; top: 22px; right: 22px; display: flex; align-items: center; gap: 4px; font-size: 0.75rem; color: var(--accent-jade); opacity: 0; transform: scale(0.8); transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
-        .done-badge svg { width: 14px; height: 14px; stroke: var(--accent-jade); fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
-        .health-card.is-done { border-color: rgba(130, 150, 140, 0.4); box-shadow: 0 4px 20px rgba(130, 150, 140, 0.15); }
-        .health-card.is-done .done-badge { opacity: 1; transform: scale(1); }
+        /* 呼吸金光 (吃藥提醒) */
+        @keyframes breatheGold { 0%, 100% { box-shadow: 0 4px 15px rgba(203, 163, 122, 0.1); border-color: rgba(255,255,255,0.9); } 50% { box-shadow: 0 4px 30px rgba(203, 163, 122, 0.4); border-color: rgba(203, 163, 122, 0.5); } }
+        .needs-action { animation: breatheGold 3.5s infinite ease-in-out; }
 
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        /* 修正版：卡片頭部 (解決重疊問題) */
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
         .card-title { display: flex; align-items: center; gap: 10px; font-size: 1.05rem; font-weight: 500; letter-spacing: 1px; }
         .card-icon { width: 22px; height: 22px; stroke: var(--accent-jade); fill: none; stroke-width: 1.8; }
         
+        .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+        .done-badge { display: none; align-items: center; gap: 4px; font-size: 0.75rem; color: var(--accent-jade); font-weight: 500; background: rgba(130, 150, 140, 0.1); padding: 3px 8px; border-radius: 12px; }
+        .done-badge svg { width: 12px; height: 12px; stroke: var(--accent-jade); fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+        .health-card.is-done { border-color: rgba(130, 150, 140, 0.4); box-shadow: 0 4px 20px rgba(130, 150, 140, 0.15); }
+        .health-card.is-done .done-badge { display: flex; } /* 顯示打勾，不再重疊 */
+        
+        .status-tag { font-size: 0.8rem; color: var(--text-light); text-align: right; }
+        .status-tag.highlight { background: rgba(130,150,140,0.1); padding: 2px 8px; border-radius: 10px; color: var(--accent-jade); }
+
         .pill-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
         .pill-btn { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; padding: 12px 5px; border-radius: 16px; border: 1px solid rgba(130,150,140,0.2); background: rgba(255,255,255,0.4); transition: all 0.3s; position: relative; }
         .pill-btn:active { transform: scale(0.92); }
@@ -74,14 +92,13 @@
         .dual-value-box { display: flex; gap: 30px; margin-top: 10px; }
 
         /* --- 智慧輸入抽屜 --- */
-        .bottom-drawer { position: fixed; bottom: 0; left: 0; width: 100vw; background: rgba(252, 251, 249, 0.95); backdrop-filter: blur(25px); border-top: 1px solid var(--glass-border); border-radius: 35px 35px 0 0; box-shadow: 0 -15px 50px rgba(160, 155, 150, 0.1); transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); z-index: 2000; display: flex; flex-direction: column; align-items: center; padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
+        .bottom-drawer { position: fixed; bottom: 0; left: 0; width: 100vw; background: rgba(252, 251, 249, 0.95); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-top: 1px solid var(--glass-border); border-radius: 35px 35px 0 0; box-shadow: 0 -15px 50px rgba(160, 155, 150, 0.1); transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); z-index: 2000; display: flex; flex-direction: column; align-items: center; padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
         .bottom-drawer.open { transform: translateY(0); }
         .drawer-content { width: 100%; max-width: 720px; padding: 0 25px; display: flex; flex-direction: column; }
         .drawer-handle { width: 40px; height: 4px; background: rgba(150,142,134,0.3); border-radius: 2px; margin: 15px auto 5px; cursor: pointer; }
         .drawer-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .drawer-title { font-size: 1.15rem; color: var(--text-main); letter-spacing: 2px; font-weight: 500; display: flex; align-items: center; gap: 8px; }
         
-        /* 統一風格的時間選擇按鈕 */
         .datetime-badge { font-size: 0.85rem; background: rgba(255,255,255,0.6); border: 1px solid var(--glass-border); color: var(--text-main); padding: 6px 12px; border-radius: 12px; display: flex; align-items: center; gap: 6px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.02); transition: all 0.2s; }
         .datetime-badge:active { transform: scale(0.95); }
         .datetime-badge svg { width: 12px; height: 12px; stroke: var(--accent-gold); fill: none; stroke-width: 2; }
@@ -98,16 +115,13 @@
         .input-slash { font-size: 2.5rem; font-weight: 300; color: var(--text-light); padding-bottom: 5px; }
         .input-unit { font-size: 1rem; color: var(--text-light); padding-bottom: 10px; }
         
-        /* 附加輸入區 (糖化血色素 & 備註) */
         .extra-inputs { display: flex; gap: 10px; margin-bottom: 15px; justify-content: center; }
         .styled-input { flex: 1; -webkit-appearance: none; background: rgba(255,255,255,0.6); border: 1px solid var(--glass-border); border-radius: 12px; padding: 10px 15px; font-size: 16px; color: var(--text-main); font-family: inherit; transition: all 0.2s; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02); }
         .styled-input:focus { outline: none; border-color: var(--accent-jade); background: rgba(255,255,255,0.9); }
-        .styled-input::placeholder { color: #bbb; font-weight: 300; }
         
         .medical-hint { font-size: 0.85rem; text-align: center; color: var(--text-light); min-height: 20px; margin-bottom: 15px; letter-spacing: 1px; transition: color 0.3s; }
         .medical-hint.warning { color: var(--accent-red); font-weight: 500; }
 
-        /* 吃藥專屬的狀態選擇按鈕 */
         .med-status-group { display: flex; gap: 15px; justify-content: center; margin-bottom: 20px; width: 100%; display: none; }
         .med-btn { flex: 1; padding: 15px; border-radius: 16px; font-size: 1rem; font-weight: 500; text-align: center; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.5); cursor: pointer; transition: all 0.2s; }
         .med-btn.btn-done { color: var(--accent-jade); }
@@ -118,13 +132,12 @@
         .key-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
         .key { background: rgba(255,255,255,0.6); border: 1px solid var(--glass-border); border-radius: 20px; height: 55px; font-size: 1.6rem; color: var(--text-main); font-weight: 300; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: all 0.1s; }
         .key:active { transform: scale(0.92); background: rgba(255,255,255,0.95); }
-        .key-submit { grid-column: span 3; background: var(--accent-gold); color: white; border: none; font-weight: 400; letter-spacing: 4px; box-shadow: 0 4px 15px rgba(203, 163, 122, 0.2); margin-top: 5px; }
+        .key-submit { grid-column: span 3; background: var(--accent-gold); color: white; border: none; font-weight: 400; letter-spacing: 4px; box-shadow: 0 4px 15px rgba(203, 163, 122, 0.2); margin-top: 5px; border-radius: 20px; font-size: 1.1rem; height: 55px; cursor: pointer; }
 
-        /* --- 統一風格的彈窗 (身高修改 / 自製時間滾輪) --- */
+        /* --- 彈窗系列 (身高/時間) --- */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 3000; opacity: 0; transition: opacity 0.3s; }
         .modal-overlay.show { display: flex; opacity: 1; }
         .glass-modal { background: rgba(252, 251, 249, 0.95); width: 85%; max-width: 320px; border-radius: 25px; padding: 25px; box-shadow: 0 15px 50px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.9); text-align: center; display: flex; flex-direction: column; align-items: center; }
-        
         .modal-btn-group { display: flex; gap: 10px; width: 100%; margin-top: 20px; }
         .m-btn { flex: 1; padding: 12px; border-radius: 16px; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; border: none; }
         .m-btn-cancel { background: rgba(255,255,255,0.5); border: 1px solid var(--glass-border); color: var(--text-main); }
@@ -132,13 +145,11 @@
         .m-btn-confirm { background: var(--accent-gold); color: white; box-shadow: 0 4px 15px rgba(203, 163, 122, 0.2); }
         .m-btn-confirm:active { transform: scale(0.95); }
 
-        /* 自製琉璃時間滾輪 */
         .roller-container { width: 100%; height: 150px; display: flex; position: relative; justify-content: center; gap: 20px; background: rgba(255,255,255,0.3); border-radius: 16px; border: 1px solid var(--glass-border); margin-top: 15px; overflow: hidden; }
         .roller-highlight { position: absolute; top: 50px; left: 0; width: 100%; height: 50px; border-top: 1px solid rgba(203, 163, 122, 0.5); border-bottom: 1px solid rgba(203, 163, 122, 0.5); background: rgba(203, 163, 122, 0.05); pointer-events: none; }
         .roller-col { height: 100%; width: 60px; overflow-y: scroll; scroll-snap-type: y mandatory; -ms-overflow-style: none; scrollbar-width: none; }
         .roller-col::-webkit-scrollbar { display: none; }
         .roller-item { height: 50px; display: flex; justify-content: center; align-items: center; font-size: 1.4rem; font-weight: 300; color: var(--text-main); scroll-snap-align: center; opacity: 0.3; transition: opacity 0.2s; }
-        /* 視覺留白用 */
         .roller-pad { height: 50px; }
         
         .height-edit-text { color: var(--accent-gold); border-bottom: 1px solid rgba(203, 163, 122, 0.4); padding-bottom: 1px; cursor: pointer; display: inline-block; transition: all 0.2s; }
@@ -153,17 +164,37 @@
             <div class="menu-subtitle">萬法唯心造，身心皆觀照</div>
         </div>
         <div class="menu-list">
-            <div class="menu-item" onclick="alert('導向財務記帳')">
+            <div class="menu-item" onclick="window.location.href='index.html'">
+                <div class="menu-icon-wrap"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg></div>淨息流大廳
+            </div>
+            <div class="menu-item" onclick="window.location.href='accounting.html'">
                 <div class="menu-icon-wrap"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>財務記帳
             </div>
             <div class="menu-item active" onclick="toggleMenu()">
-                <div class="menu-icon-wrap"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>健康日誌 (輸入)
+                <div class="menu-icon-wrap"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>健康日誌
             </div>
-            <div class="menu-item" style="border-color: rgba(203, 163, 122, 0.4);" onclick="alert('進入【生命軌跡】統計頁面')">
-                <div class="menu-icon-wrap"><svg viewBox="0 0 24 24" stroke="var(--accent-gold)"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div>生命軌跡 (總覽)
+            <div class="menu-item" style="border-color: rgba(203, 163, 122, 0.4);" onclick="window.location.href='dashboard.html'">
+                <div class="menu-icon-wrap"><svg viewBox="0 0 24 24" stroke="var(--accent-gold)"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div>生命軌跡 (統計)
+            </div>
+            <div class="menu-item mod-dashed" onclick="alert('「孕母與育兒」模組靜心開發中')">
+                <svg viewBox="0 0 24 24" stroke-dasharray="4"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>孕母與育兒
+            </div>
+            <div class="menu-item mod-dashed" onclick="alert('「毛孩觀照」模組靜心開發中')">
+                <svg viewBox="0 0 24 24" stroke-dasharray="4"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm4 0h-2v-2h2v2zm-2-4q-2 0-3-1.5T9 8h2q0 1 1 1.5t2 0V12z"/></svg>毛孩手冊
             </div>
             <div class="menu-item" onclick="window.location.href='https://namoamitabhapureland.github.io/bodhicitta/index.html'">
                 <div class="menu-icon-wrap"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg></div>彌陀淨土系統
+            </div>
+        </div>
+        
+        <div class="menu-bottom-links">
+            <div class="menu-sub-link" onclick="alert('設定模組開發中')">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                偏好設定
+            </div>
+            <div class="menu-sub-link" onclick="alert('說明文件整理中')">
+                <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                使用說明
             </div>
         </div>
     </div>
@@ -171,18 +202,20 @@
     <div class="top-nav">
         <div class="nav-content">
             <div class="nav-btn" onclick="toggleMenu()"><svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></div>
-            <div class="page-title">健康日誌</div>
-            <div class="nav-btn" onclick="alert('進入【生命軌跡】統計頁面')"><svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div>
+            <div class="page-title" onclick="window.location.href='index.html'">健康日誌</div>
+            <div class="nav-btn" onclick="window.location.href='dashboard.html'"><svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div>
         </div>
     </div>
 
     <div class="main-container">
         
         <div class="health-card" id="card-med">
-            <div class="done-badge" id="badge-med"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>今日圓滿</div>
             <div class="card-header">
                 <div class="card-title"><svg class="card-icon" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"></rect><line x1="12" y1="8" x2="12" y2="16"></line></svg> 今日服藥</div>
-                <div style="font-size: 0.8rem; color: var(--text-light);">點擊紀錄狀態與備註</div>
+                <div class="header-right">
+                    <div class="done-badge" id="badge-med"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>今日圓滿</div>
+                    <div class="status-tag">點擊標記狀態</div>
+                </div>
             </div>
             <div class="pill-grid">
                 <div class="pill-btn" id="pill-早晨" onclick="openMedDrawer('早晨')"><div class="pill-memo-dot"></div><div class="pill-dot"></div><div class="pill-label">早晨</div></div>
@@ -193,10 +226,12 @@
         </div>
 
         <div class="health-card clickable" id="card-bp" onclick="openDrawer('血壓')">
-            <div class="done-badge" id="badge-bp"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>今日已記</div>
             <div class="card-header">
                 <div class="card-title"><svg class="card-icon" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg> 血壓脈搏</div>
-                <div style="font-size: 0.8rem; color: var(--text-light);" id="card-bp-tag">尚未紀錄</div>
+                <div class="header-right">
+                    <div class="done-badge" id="badge-bp"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>今日已記</div>
+                    <div class="status-tag" id="card-bp-tag">尚未紀錄</div>
+                </div>
             </div>
             <div class="value-display">
                 <div class="main-value" id="card-bp-sys">--</div><div class="sub-value">/ <span id="card-bp-dia">--</span> mmHg</div>
@@ -204,10 +239,12 @@
         </div>
 
         <div class="health-card clickable" id="card-bs" onclick="openDrawer('血糖')">
-            <div class="done-badge" id="badge-bs"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>今日已記</div>
             <div class="card-header">
                 <div class="card-title"><svg class="card-icon" viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg> 血糖觀測</div>
-                <div style="font-size: 0.8rem; background: rgba(130,150,140,0.1); padding: 2px 8px; border-radius: 10px; color: var(--accent-jade); opacity:0;" id="card-bs-tag">空腹</div>
+                <div class="header-right">
+                    <div class="done-badge" id="badge-bs"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>今日已記</div>
+                    <div class="status-tag highlight" id="card-bs-tag" style="opacity:0;">空腹</div>
+                </div>
             </div>
             <div class="value-display">
                 <div class="main-value" id="card-bs-val">--</div><div class="sub-value">mg/dL</div>
@@ -215,10 +252,12 @@
         </div>
 
         <div class="health-card clickable" id="card-wt" onclick="openDrawer('體重')">
-            <div class="done-badge" id="badge-wt"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>今日已記</div>
             <div class="card-header">
                 <div class="card-title"><svg class="card-icon" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg> 形體觀照</div>
-                <div style="font-size: 0.8rem; color: var(--text-light);" id="card-bmi-val">BMI: --</div>
+                <div class="header-right">
+                    <div class="done-badge" id="badge-wt"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>今日已記</div>
+                    <div class="status-tag" id="card-bmi-val">BMI: --</div>
+                </div>
             </div>
             <div class="dual-value-box">
                 <div><div style="font-size:0.8rem; color:var(--text-light);">體重</div><div class="value-display"><div class="main-value" id="card-wt-val">--</div><div class="sub-value">kg</div></div></div>
@@ -247,7 +286,6 @@
 
             <div id="input-core-area">
                 <div class="input-display-area" id="drawer-input-area"></div>
-                
                 <div class="extra-inputs">
                     <input type="number" id="input-hba1c" class="styled-input" placeholder="糖化血色素 % (選填)" step="0.1" style="display:none; flex: 0.5;">
                     <input type="text" id="input-memo" class="styled-input" placeholder="點此輸入備註 (選填)" maxlength="20">
@@ -262,7 +300,7 @@
                 <div class="key" onclick="inputChar('7')">7</div><div class="key" onclick="inputChar('8')">8</div><div class="key" onclick="inputChar('9')">9</div>
                 <div class="key key-ac" onclick="clearInput()">AC</div><div class="key" onclick="inputChar('0')">0</div><div class="key" onclick="inputChar('.')">.</div>
             </div>
-            <button class="key-submit" style="width:100%; height:55px; border-radius:20px; font-size:1.1rem; cursor:pointer;" onclick="submitData()">寫入觀照</button>
+            <button class="key-submit" onclick="submitData()">寫入觀照</button>
         </div>
     </div>
 
@@ -282,20 +320,12 @@
     <div class="modal-overlay" id="time-modal">
         <div class="glass-modal" style="padding: 20px 15px;">
             <h3 style="margin-top:0; color:var(--text-main); font-weight: 500; letter-spacing: 1px;">選擇紀錄時間</h3>
-            
             <div class="roller-container">
                 <div class="roller-highlight"></div>
-                <div class="roller-col" id="roller-hours" onscroll="updateRollerUI('hours')">
-                    <div class="roller-pad"></div>
-                    <div class="roller-pad"></div>
-                </div>
+                <div class="roller-col" id="roller-hours" onscroll="updateRollerUI('hours')"><div class="roller-pad"></div></div>
                 <div style="font-size: 1.5rem; line-height: 150px; color: var(--text-main);">:</div>
-                <div class="roller-col" id="roller-mins" onscroll="updateRollerUI('mins')">
-                    <div class="roller-pad"></div>
-                    <div class="roller-pad"></div>
-                </div>
+                <div class="roller-col" id="roller-mins" onscroll="updateRollerUI('mins')"><div class="roller-pad"></div></div>
             </div>
-
             <div class="modal-btn-group">
                 <button class="m-btn m-btn-cancel" onclick="document.getElementById('time-modal').classList.remove('show')">取消</button>
                 <button class="m-btn m-btn-confirm" onclick="confirmTime()">確認時間</button>
@@ -304,25 +334,115 @@
     </div>
 
     <script>
+        // ================= 1. 藏識 (Local Storage) 資料庫引擎 =================
+        const STORAGE_KEY = 'joy_health_today';
+        
+        let todayData = {
+            date: "", // 用來判斷是否跨日，若是不同日則清空畫面
+            userHeight: 170,
+            med: { "早晨": null, "中午": null, "晚間": null, "睡前": null }, // null, 'done', 'missed'
+            bp: { sys: 0, dia: 0, tag: "" },
+            bs: { val: 0, tag: "" },
+            wt: { val: 0 }
+        };
+
+        function getTodayString() {
+            const d = new Date();
+            return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`;
+        }
+
+        // F5 重新整理時載入資料
+        function loadTodayData() {
+            let stored = localStorage.getItem(STORAGE_KEY);
+            let currentDate = getTodayString();
+            if (stored) {
+                let parsed = JSON.parse(stored);
+                if (parsed.date === currentDate) {
+                    todayData = parsed; // 日期吻合，載入今日資料
+                } else {
+                    // 日期不同，只繼承身高，其餘重置
+                    todayData.userHeight = parsed.userHeight || 170;
+                    todayData.date = currentDate;
+                }
+            } else {
+                todayData.date = currentDate;
+            }
+            
+            userHeightCm = todayData.userHeight;
+            document.getElementById('card-ht-val').innerText = userHeightCm;
+
+            // 復原畫面 UI
+            restoreUIFromData();
+        }
+
+        function saveTodayData() {
+            todayData.date = getTodayString();
+            todayData.userHeight = userHeightCm;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(todayData));
+        }
+
+        function restoreUIFromData() {
+            // 復原吃藥
+            let allMedMarked = true;
+            let anyMedMarked = false;
+            ['早晨', '中午', '晚間', '睡前'].forEach(slot => {
+                let status = todayData.med[slot];
+                let btn = document.getElementById('pill-' + slot);
+                if (status === 'done') { btn.className = 'pill-btn done'; anyMedMarked = true; }
+                else if (status === 'missed') { btn.className = 'pill-btn missed'; anyMedMarked = true; }
+                else { btn.className = 'pill-btn'; allMedMarked = false; }
+            });
+            if (allMedMarked && anyMedMarked) document.getElementById('card-med').classList.add('is-done');
+
+            // 復原血壓
+            if (todayData.bp.sys > 0) {
+                document.getElementById('card-bp-sys').innerText = todayData.bp.sys;
+                document.getElementById('card-bp-dia').innerText = todayData.bp.dia;
+                document.getElementById('card-bp-tag').innerText = todayData.bp.tag;
+                document.getElementById('card-bp-sys').style.color = (todayData.bp.sys > 120 || todayData.bp.dia > 80) ? 'var(--accent-red)' : 'var(--text-main)';
+                document.getElementById('card-bp').classList.add('is-done');
+            }
+
+            // 復原血糖
+            if (todayData.bs.val > 0) {
+                document.getElementById('card-bs-val').innerText = todayData.bs.val;
+                document.getElementById('card-bs-tag').innerText = todayData.bs.tag;
+                document.getElementById('card-bs-tag').style.opacity = 1;
+                let limit = todayData.bs.tag === '空腹' ? 100 : 140;
+                document.getElementById('card-bs-val').style.color = todayData.bs.val > limit ? 'var(--accent-red)' : 'var(--text-main)';
+                document.getElementById('card-bs').classList.add('is-done');
+            }
+
+            // 復原體重
+            if (todayData.wt.val > 0) {
+                document.getElementById('card-wt-val').innerText = todayData.wt.val;
+                let bmi = (todayData.wt.val / Math.pow(userHeightCm/100, 2)).toFixed(1);
+                document.getElementById('card-bmi-val').innerText = `BMI: ${bmi}`;
+                document.getElementById('card-wt').classList.add('is-done');
+            }
+        }
+
+
+        // ================= 2. UI 互動與抽屜引擎 =================
         let currentMode = ""; let currentTag = ""; let currentMedSlot = "";
         let inputData = { sys: "0", dia: "0", single: "0" }; let activeInput = "single";
-        let userHeightCm = 170;
         let selectedHour = "08"; let selectedMin = "00";
 
         const tagsDef = { '血壓': ['早晨', '晚間'], '血糖': ['空腹', '飯後2H', '隨機'], '體重': [] };
 
-        // 初始化
         window.onload = () => {
             initTimeRoller();
             const now = new Date();
             selectedHour = now.getHours().toString().padStart(2, '0');
             selectedMin = now.getMinutes().toString().padStart(2, '0');
             document.getElementById('current-time-display').innerText = `今天 ${selectedHour}:${selectedMin}`;
+            
+            // 啟動本機資料庫
+            loadTodayData();
         };
 
         function toggleMenu() { document.getElementById('side-menu').classList.toggle('open'); document.getElementById('side-menu-overlay').classList.toggle('open'); }
 
-        // --- 抽屜管理 ---
         function openDrawer(mode) {
             currentMode = mode;
             document.getElementById('drawer-title').innerText = mode + '紀錄';
@@ -330,17 +450,14 @@
             document.getElementById('number-keyboard').style.display = 'grid';
             document.getElementById('input-core-area').style.display = 'block';
             document.getElementById('input-hba1c').style.display = mode === '血糖' ? 'block' : 'none';
-            document.getElementById('input-memo').value = '';
-            document.getElementById('input-hba1c').value = '';
+            document.getElementById('input-memo').value = ''; document.getElementById('input-hba1c').value = '';
 
-            const tagsBox = document.getElementById('drawer-tags');
-            tagsBox.innerHTML = '';
+            const tagsBox = document.getElementById('drawer-tags'); tagsBox.innerHTML = '';
             if (tagsDef[mode].length > 0) {
                 currentTag = tagsDef[mode][0];
                 tagsDef[mode].forEach(tag => {
-                    let el = document.createElement('div');
-                    el.className = `sub-tag ${tag === currentTag ? 'selected' : ''}`;
-                    el.innerText = tag; el.onclick = () => { currentTag = tag; Array.from(el.parentNode.children).forEach(c => c.classList.remove('selected')); el.classList.add('selected'); checkMedicalLogic(); };
+                    let el = document.createElement('div'); el.className = `sub-tag ${tag === currentTag ? 'selected' : ''}`; el.innerText = tag;
+                    el.onclick = () => { currentTag = tag; Array.from(el.parentNode.children).forEach(c => c.classList.remove('selected')); el.classList.add('selected'); checkMedicalLogic(); };
                     tagsBox.appendChild(el);
                 });
             }
@@ -354,27 +471,22 @@
                 let unit = mode === '血糖' ? 'mg/dL' : 'kg';
                 inputArea.innerHTML = `<div class="input-box active" id="in-single">0</div><div class="input-unit">${unit}</div>`;
             }
-
-            checkMedicalLogic();
-            document.getElementById('action-drawer').classList.add('open');
+            checkMedicalLogic(); document.getElementById('action-drawer').classList.add('open');
         }
 
-        // 吃藥專屬抽屜
         function openMedDrawer(slot) {
             currentMode = "吃藥"; currentMedSlot = slot;
             document.getElementById('drawer-title').innerText = `${slot} 藥物觀照`;
             document.getElementById('drawer-tags').innerHTML = '';
             document.getElementById('number-keyboard').style.display = 'none';
             document.getElementById('input-core-area').style.display = 'block';
-            document.getElementById('drawer-input-area').innerHTML = ''; // 隱藏數字輸入
+            document.getElementById('drawer-input-area').innerHTML = ''; 
             document.getElementById('input-hba1c').style.display = 'none';
             document.getElementById('input-memo').value = '';
             document.getElementById('medical-hint').innerText = "若有異常反應，請於上方填寫備註";
             document.getElementById('medical-hint').className = "medical-hint";
-            
             document.getElementById('med-status-area').style.display = 'flex';
-            setMedStatus('done'); // 預設點開是已服
-
+            setMedStatus('done'); 
             document.getElementById('action-drawer').classList.add('open');
         }
 
@@ -389,14 +501,10 @@
         function closeDrawer() { document.getElementById('action-drawer').classList.remove('open'); }
         function setActiveInput(target) { activeInput = target; document.getElementById('in-sys').classList.remove('active'); document.getElementById('in-dia').classList.remove('active'); document.getElementById('in-' + target).classList.add('active'); }
 
-        // --- 鍵盤與邏輯 ---
         function inputChar(char) {
             let val = inputData[activeInput];
-            if (val === "0" && char !== ".") val = char;
-            else if (char === "." && val.includes(".")) return;
-            else if (val.length < 5) val += char;
-            inputData[activeInput] = val;
-            document.getElementById('in-' + activeInput).innerText = val;
+            if (val === "0" && char !== ".") val = char; else if (char === "." && val.includes(".")) return; else if (val.length < 5) val += char;
+            inputData[activeInput] = val; document.getElementById('in-' + activeInput).innerText = val;
             if (currentMode === '血壓' && activeInput === 'sys' && val.length >= 3) { setTimeout(() => setActiveInput('dia'), 200); }
             checkMedicalLogic();
         }
@@ -431,92 +539,64 @@
             }
         }
 
-        // --- 寫入與打勾 (Done Badge) 邏輯 ---
+        // 寫入並儲存至本機
         function submitData() {
             let memoStr = document.getElementById('input-memo').value.trim();
             
             if (currentMode === '吃藥') {
-                const pill = document.getElementById('pill-' + currentMedSlot);
-                pill.className = `pill-btn ${currentMedStatus === 'done' ? 'done' : 'missed'}`;
-                if(memoStr !== "") pill.classList.add('has-memo'); else pill.classList.remove('has-memo');
-                
-                // 檢查是否四顆都標記了
-                const pills = document.querySelectorAll('.pill-btn');
-                let allMarked = Array.from(pills).every(p => p.classList.contains('done') || p.classList.contains('missed'));
-                if(allMarked) {
-                    document.getElementById('card-med').classList.add('is-done');
-                }
+                todayData.med[currentMedSlot] = currentMedStatus;
+                saveTodayData();
+                restoreUIFromData(); // 重新渲染卡片UI
             } else if (currentMode === '血壓') {
                 let sys = parseInt(inputData.sys); let dia = parseInt(inputData.dia);
                 if(sys > 0 || dia > 0) {
-                    document.getElementById('card-bp-sys').innerText = sys || '--'; document.getElementById('card-bp-dia').innerText = dia || '--';
-                    document.getElementById('card-bp-tag').innerText = currentTag;
-                    document.getElementById('card-bp-sys').style.color = (sys > 120 || dia > 80) ? 'var(--accent-red)' : 'var(--text-main)';
-                    document.getElementById('card-bp').classList.add('is-done');
+                    todayData.bp = { sys: sys, dia: dia, tag: currentTag };
+                    saveTodayData();
+                    restoreUIFromData();
                 }
             } else if (currentMode === '血糖') {
                 let val = parseInt(inputData.single);
                 if(val > 0) {
-                    document.getElementById('card-bs-val').innerText = val; document.getElementById('card-bs-tag').innerText = currentTag;
-                    document.getElementById('card-bs-tag').style.opacity = 1;
-                    let limit = currentTag === '空腹' ? 100 : 140;
-                    document.getElementById('card-bs-val').style.color = val > limit ? 'var(--accent-red)' : 'var(--text-main)';
-                    document.getElementById('card-bs').classList.add('is-done');
+                    todayData.bs = { val: val, tag: currentTag };
+                    saveTodayData();
+                    restoreUIFromData();
                 }
             } else if (currentMode === '體重') {
                 let val = parseFloat(inputData.single);
                 if(val > 0) {
-                    document.getElementById('card-wt-val').innerText = val;
-                    let bmi = (val / Math.pow(userHeightCm/100, 2)).toFixed(1);
-                    document.getElementById('card-bmi-val').innerText = `BMI: ${bmi} | 身高: ${userHeightCm}cm`;
-                    document.getElementById('card-wt').classList.add('is-done');
+                    todayData.wt = { val: val };
+                    saveTodayData();
+                    restoreUIFromData();
                 }
             }
             closeDrawer();
         }
 
-        // --- 彈窗：身高修改 ---
-        function openHeightModal() {
-            document.getElementById('height-input-box').value = userHeightCm;
-            document.getElementById('height-modal').classList.add('show');
-        }
+        // --- 彈窗系統 ---
+        function openHeightModal() { document.getElementById('height-input-box').value = userHeightCm; document.getElementById('height-modal').classList.add('show'); }
         function confirmHeight() {
             let val = parseFloat(document.getElementById('height-input-box').value);
-            if(val > 50 && val < 250) {
-                userHeightCm = val;
-                document.getElementById('card-ht-val').innerText = userHeightCm;
-                checkMedicalLogic(); // 即時更新 BMI
-                document.getElementById('height-modal').classList.remove('show');
-            }
+            if(val > 50 && val < 250) { userHeightCm = val; document.getElementById('card-ht-val').innerText = userHeightCm; checkMedicalLogic(); document.getElementById('height-modal').classList.remove('show'); saveTodayData(); }
         }
 
-        // --- 彈窗：自製琉璃時間滾輪 ---
         function initTimeRoller() {
-            let hCol = document.getElementById('roller-hours');
-            let mCol = document.getElementById('roller-mins');
+            let hCol = document.getElementById('roller-hours'); let mCol = document.getElementById('roller-mins');
             for(let i=0; i<24; i++) { hCol.innerHTML += `<div class="roller-item" id="h-${i}">${i.toString().padStart(2, '0')}</div>`; }
             for(let i=0; i<60; i++) { mCol.innerHTML += `<div class="roller-item" id="m-${i}">${i.toString().padStart(2, '0')}</div>`; }
             hCol.innerHTML += `<div class="roller-pad"></div>`; mCol.innerHTML += `<div class="roller-pad"></div>`;
         }
-        
         function openTimePicker() {
             document.getElementById('time-modal').classList.add('show');
-            // 捲動到目前時間
             let hCol = document.getElementById('roller-hours'); let mCol = document.getElementById('roller-mins');
             hCol.scrollTop = parseInt(selectedHour) * 50; mCol.scrollTop = parseInt(selectedMin) * 50;
             updateRollerUI('hours'); updateRollerUI('mins');
         }
-
         function updateRollerUI(type) {
             let col = document.getElementById('roller-' + type);
             let items = col.querySelectorAll('.roller-item');
             let centerIdx = Math.round(col.scrollTop / 50);
-            items.forEach((item, idx) => {
-                item.style.opacity = (idx === centerIdx) ? '1' : '0.3';
-                item.style.fontWeight = (idx === centerIdx) ? '500' : '300';
-            });
+            items.forEach((item, idx) => { item.style.opacity = (idx === centerIdx) ? '1' : '0.3'; item.style.fontWeight = (idx === centerIdx) ? '500' : '300'; });
         }
-
         function confirmTime() {
             let hCol = document.getElementById('roller-hours'); let mCol = document.getElementById('roller-mins');
             selectedHour = Math.round(hCol.scrollTop / 50).toString().padStart(2, '0');
