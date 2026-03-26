@@ -364,85 +364,125 @@
             renderTodayList(); 
         }
 
-        // --- 1. 掃描與解析引擎 ---
-        const InvoiceParser = {
-            parse: function(qrStr) {
-                if (qrStr.length < 50) return null;
-                try {
-                    // 台灣電子發票左側碼解析：金額位於 29-37 碼 (十六進位)
-                    const amountHex = qrStr.substring(29, 37);
-                    const amount = parseInt(amountHex, 16);
-                    const year = parseInt(qrStr.substring(10, 13)) + 1911;
-                    const month = qrStr.substring(13, 15);
-                    const day = qrStr.substring(15, 17);
-                    if (isNaN(amount) || amount === 0) return null;
-                    return { amt: amount, date: `${month}月${day}日`, sub: "發票自動紀錄", cat: "飲食" };
-                } catch(e) { return null; }
+        // --- [1] 數據核心：加入明細存儲結構 ---
+let db = JSON.parse(localStorage.getItem('PX_EN_V15.0')) || {
+    name: "Miaoyi",
+    totalNian: 0,
+    bodhiLedger: [] // 每筆紀錄包含 {id, amount, items: [], date}
+};
+
+function save() { localStorage.setItem('PX_EN_V15.0', JSON.stringify(db)); }
+
+// --- [2] 萬用法門：發票明細解析器 ---
+const InvoiceParser = {
+    // 解析左側碼
+    parseSummary: function(raw) {
+        if (raw.length < 50 || raw.startsWith("**")) return null;
+        try {
+            const amount = parseInt(raw.substring(29, 37), 16);
+            const invNum = raw.substring(0, 10);
+            return { 
+                invNum: invNum, 
+                amount: amount, 
+                date: (parseInt(raw.substring(10, 13)) + 1911) + "-" + raw.substring(13, 15) + "-" + raw.substring(15, 17)
+            };
+        } catch(e) { return null; }
+    },
+    // 解析右側碼 (明細)
+    parseDetails: function(raw) {
+        if (!raw.startsWith("**")) return null;
+        try {
+            // 移除前綴 ** 並根據冒號分割
+            // 格式通常為：品名:數量:單價:品名:數量:單價...
+            const content = raw.substring(2);
+            const parts = content.split(":");
+            let items = [];
+            for (let i = 0; i < parts.length; i += 3) {
+                if (parts[i]) {
+                    items.push({
+                        name: parts[i].trim(),
+                        qty: parts[i+1] || "1",
+                        price: parts[i+2] || "0"
+                    });
+                }
             }
-        };
+            return items;
+        } catch(e) { return null; }
+    }
+};
 
-        let scanActive = false, videoStream = null;
+// --- [3] 掃描控制中心：兩段式注入 ---
+let lastInvNum = null; // 暫存剛掃到的發票號碼，用來對接明細
 
-        async function openScannerPortal(isP2PSync = false) {
-            document.getElementById('scanner-modal').style.display = 'flex';
-            const video = document.getElementById('preview-video');
-            const status = document.getElementById('scan-status');
-            const canvas = document.getElementById('scan-canvas');
-            const ctx = canvas.getContext('2d', { willReadFrequently: true });
-
-            try {
-                videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-                video.srcObject = videoStream;
-                await video.play();
-                scanActive = true;
-                status.innerText = isP2PSync ? "請對準另一台設備的密鑰" : "對準發票左側 QR 碼";
-
-                const tick = () => {
-                    if (!scanActive) return;
-                    if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                        const code = jsQR(imageData.data, imageData.width, imageData.height);
-                        
-                        if (code) {
-                            if (isP2PSync) {
-                                P2PEngine.finalize(code.data);
-                                closeScanner();
-                            } else {
-                                const res = InvoiceParser.parse(code.data);
-                                if (res) {
-                                    handleAutoEntry(res);
-                                    closeScanner();
-                                } else {
-                                    status.innerText = "格式不符，請換左邊 QR 掃描";
-                                    status.style.color = "var(--accent-red)";
-                                    setTimeout(() => { status.innerText = "對準發票左側 QR 碼"; status.style.color = "var(--accent-gold)"; }, 1500);
-                                }
-                            }
-                        }
-                    }
-                    if (scanActive) requestAnimationFrame(tick);
-                };
-                tick();
-            } catch(e) { alert("相機啟動失敗，請確認 HTTPS 環境與權限。"); }
+async function handleScanResult(raw, status) {
+    // 優先判斷是否為明細 (右側碼)
+    if (raw.startsWith("**")) {
+        const details = InvoiceParser.parseDetails(raw);
+        if (details && db.bodhiLedger.length > 0) {
+            // 尋找最後一筆紀錄（或比對發票號碼）進行注入
+            db.bodhiLedger[0].items = details;
+            save(); updateUI();
+            if (navigator.vibrate) navigator.vibrate([30, 100]);
+            status.innerText = "✨ Details Injected! Record Complete.";
+            setTimeout(closeScanner, 1000); 
+        } else {
+            status.innerText = "Please scan the LEFT QR first.";
         }
-
-        function closeScanner() {
-            scanActive = false;
-            if (videoStream) videoStream.getTracks().forEach(t => t.stop());
-            document.getElementById('scanner-modal').style.display = 'none';
-        }
-
-        function handleAutoEntry(res) {
-            appData.transactions.unshift({
-                id: Date.now(), timestamp: Date.now(), type: 'expense',
-                date: res.date, cat: res.cat, sub: res.sub, amt: res.amt,
-                memo: "掃描記帳圓滿", invoice: true, color: colorMap[res.cat]
+    } 
+    // 否則判斷是否為總金額 (左側碼)
+    else {
+        const summary = InvoiceParser.parseSummary(raw);
+        if (summary) {
+            // 建立新紀錄，放在最前面
+            db.bodhiLedger.unshift({
+                id: Date.now(),
+                invNum: summary.invNum,
+                amount: summary.amount,
+                date: summary.date,
+                cat: "General",
+                items: [], // 等待右側碼掃描
+                color: "var(--accent-gold)"
             });
-            saveData();
-            alert(`✅ 已自動記入修行資糧：$${res.amt}`);
+            save(); updateUI();
+            if (navigator.vibrate) navigator.vibrate(50);
+            status.innerText = `Captured $${summary.amount}! Now scan the RIGHT code.`;
+            status.style.color = "var(--accent-jade)";
         }
+    }
+}
+
+// --- [4] UI 顯化：蓮花綻放式清單 ---
+function updateUI() {
+    const total = db.bodhiLedger.reduce((acc, t) => acc + t.amount, 0);
+    const balanceDisplay = document.getElementById('main-balance');
+    if(balanceDisplay) balanceDisplay.innerText = "$" + total.toLocaleString();
+
+    const listObj = document.getElementById('ledger-list');
+    if(!listObj) return;
+    
+    listObj.innerHTML = db.bodhiLedger.slice(0, 10).map(t => `
+        <div class="t-item" style="flex-direction: column; align-items: flex-start; gap: 5px;" onclick="this.querySelector('.details-panel').style.display = this.querySelector('.details-panel').style.display === 'none' ? 'block' : 'none'">
+            <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                <div class="t-item-left">
+                    <div class="t-dot" style="background: ${t.color}"></div>
+                    <div class="t-info">
+                        <div class="t-cat">${t.date} ${t.invNum || ''}</div>
+                    </div>
+                </div>
+                <div class="t-amt t-expense">-$${t.amount.toLocaleString()}</div>
+            </div>
+            <div class="details-panel" style="display: none; width: 100%; padding-left: 22px; margin-top: 5px; border-top: 1px dashed rgba(0,0,0,0.05);">
+                ${t.items.length > 0 ? t.items.map(i => `
+                    <div style="font-size: 0.75rem; color: var(--text-light); display: flex; justify-content: space-between; padding: 2px 0;">
+                        <span>${i.name} x${i.qty}</span>
+                        <span>$${i.price}</span>
+                    </div>
+                `).join('') : '<div style="font-size: 0.7rem; color: #ccc;">No details (Scan right QR to add)</div>'}
+            </div>
+        </div>
+    `).join('');
+}
+
 
         // --- 2. P2P 同步引擎 ---
         const P2PEngine = {
