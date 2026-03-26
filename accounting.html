@@ -8,7 +8,6 @@
     <title>淨息流 ． 財務記帳</title>
     <style>
         :root {
-            /* 淨土色系，與健康模組完全統一 */
             --bg-gradient: linear-gradient(135deg, #F9FAF9, #E6EBE9);
             --glass-bg: rgba(255, 255, 255, 0.65);
             --glass-border: rgba(255, 255, 255, 0.9);
@@ -27,7 +26,7 @@
             font-family: -apple-system, sans-serif; overflow-x: hidden; -webkit-user-select: none; user-select: none; 
         }
 
-        /* --- 側邊選單 (琉璃懸浮大一統) --- */
+        /* --- 側邊選單 --- */
         .side-menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.25); backdrop-filter: blur(5px); z-index: 900; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .side-menu-overlay.open { opacity: 1; pointer-events: auto; }
         .side-menu { position: fixed; top: 0; left: 0; width: 80%; max-width: 320px; height: 100%; background: rgba(252, 251, 249, 0.95); backdrop-filter: blur(20px); border-right: 1px solid var(--glass-border); box-shadow: 10px 0 40px rgba(0,0,0,0.08); transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); z-index: 901; display: flex; flex-direction: column; padding-top: max(40px, env(safe-area-inset-top)); }
@@ -43,12 +42,12 @@
         .menu-icon-wrap { width: 32px; height: 32px; border-radius: 50%; background: #fff; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
         .menu-item svg { stroke: currentColor; fill: none; stroke-width: 1.8; width: 16px; height: 16px; }
         
-        .menu-bottom-links { display: flex; justify-content: space-around; padding: 20px 0; border-top: 1px solid rgba(92,84,78,0.06); }
-        .menu-sub-link { font-size: 0.8rem; color: var(--text-light); cursor: pointer; padding: 5px 15px; display: flex; align-items: center; gap: 6px; transition: color 0.2s; }
+        .menu-bottom-links { display: flex; flex-direction: column; gap: 8px; padding: 20px 0; border-top: 1px solid rgba(92,84,78,0.06); }
+        .menu-sub-link { font-size: 0.85rem; color: var(--text-light); cursor: pointer; padding: 8px 25px; display: flex; align-items: center; justify-content: flex-start; gap: 10px; transition: color 0.2s; }
         .menu-sub-link:active { color: var(--accent-gold); }
-        .menu-sub-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+        .menu-sub-link svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
 
-        /* --- 頂部導航 (加入載具快捷鍵) --- */
+        /* --- 頂部導航 --- */
         .top-nav { position: fixed; top: 0; left: 0; width: 100%; z-index: 800; padding: max(15px, env(safe-area-inset-top)) 20px 15px; display: flex; justify-content: center; background: linear-gradient(to bottom, rgba(249,250,249,0.95), rgba(249,250,249,0)); }
         .nav-content { width: 100%; max-width: 720px; display: flex; justify-content: space-between; align-items: center; }
         .nav-btn { display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%; background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); color: var(--text-main); box-shadow: var(--glass-shadow); cursor: pointer; transition: all 0.2s; }
@@ -59,9 +58,14 @@
         /* --- 記帳主視圖 --- */
         .main-container { width: 100%; max-width: 720px; margin: 0 auto; padding: calc(85px + env(safe-area-inset-top)) 20px 100px; display: flex; flex-direction: column; align-items: center; gap: 30px; transition: transform 0.4s; }
         
-        .balance-section { width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 20px; }
+        .balance-section { width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 10px; position: relative; }
         .balance-label { font-size: 0.95rem; letter-spacing: 2px; color: var(--text-light); margin-bottom: 5px; }
         .balance-amount { font-size: 4rem; font-weight: 300; color: var(--accent-gold); text-shadow: 0 4px 20px rgba(203, 163, 122, 0.15); transition: opacity 0.3s;}
+        
+        /* 置中專屬載具按鈕 */
+        .center-carrier-btn { display: flex; align-items: center; gap: 6px; padding: 6px 16px; background: rgba(255,255,255,0.6); border: 1px solid var(--glass-border); border-radius: 20px; color: var(--accent-gold); font-size: 0.8rem; font-weight: 500; letter-spacing: 1px; cursor: pointer; margin-bottom: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); transition: all 0.2s; }
+        .center-carrier-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.9); }
+        .center-carrier-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
         
         /* 分類按鈕網格 */
         .category-grid { width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
@@ -77,7 +81,7 @@
         .cat-btn-income.active span { color: var(--accent-jade); }
 
         /* --- 數字鍵盤抽屜 --- */
-        .keyboard-panel { position: fixed; bottom: 0; left: 0; width: 100vw; background: rgba(252, 251, 249, 0.95); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-top: 1px solid var(--glass-border); box-shadow: 0 -15px 50px rgba(160, 155, 150, 0.1); border-radius: 35px 35px 0 0; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.4s; z-index: 2000; display: flex; flex-direction: column; align-items: center; padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
+        .keyboard-panel { position: fixed; bottom: 0; left: 0; width: 100vw; background: rgba(252, 251, 249, 0.95); backdrop-filter: blur(25px); border-top: 1px solid var(--glass-border); box-shadow: 0 -15px 50px rgba(160, 155, 150, 0.1); border-radius: 35px 35px 0 0; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.4s; z-index: 2000; display: flex; flex-direction: column; align-items: center; padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
         .keyboard-panel.open { transform: translateY(0); }
         .keyboard-panel.income-mode { background: rgba(246, 248, 246, 0.95); }
         
@@ -122,7 +126,6 @@
         .m-btn-cancel:active { background: rgba(255,255,255,0.9); }
         .m-btn-confirm { background: var(--accent-gold); color: white; box-shadow: 0 4px 15px rgba(203, 163, 122, 0.2); }
         .m-btn-confirm:active { transform: scale(0.95); }
-
     </style>
 </head>
 <body>
@@ -159,24 +162,33 @@
         <div class="menu-bottom-links">
             <div class="menu-sub-link" onclick="toggleMenu(); document.getElementById('global-settings-modal').classList.add('show');">
                 <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                偏好設定與備份
+                偏好設定
+            </div>
+            <div class="menu-sub-link" onclick="toggleMenu(); document.getElementById('backup-modal').classList.add('show');" style="color: var(--accent-gold);">
+                <svg viewBox="0 0 24 24" stroke="var(--accent-gold)"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                資料下載與保全
             </div>
         </div>
     </div>
 
     <div class="top-nav">
         <div class="nav-content">
-            <div class="nav-btn" onclick="toggleMenu()"><svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></div>
+            <div class="nav-btn" onclick="toggleMenu()">
+                <svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </div>
             <div class="page-title" onclick="window.location.href='index.html'">財務記帳</div>
-            <div class="nav-btn" onclick="showCarrier()" style="width: auto; padding: 0 12px; gap: 6px;">
-                <svg viewBox="0 0 24 24" style="width: 16px; height: 16px;"><path d="M4 5v14M8 5v14M12 5v14M16 5v14M20 5v14"/></svg>
-                <span id="carrier-top-txt" style="font-size: 0.8rem; color: var(--text-main); font-weight: 500;">/載具</span>
+            <div class="nav-btn" onclick="window.location.href='dashboard.html'">
+                <svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
             </div>
         </div>
     </div>
 
     <div class="main-container" id="main-container">
         <div class="balance-section">
+            <div class="center-carrier-btn" onclick="showCarrier()">
+                <svg viewBox="0 0 24 24"><path d="M4 5v14M8 5v14M12 5v14M16 5v14M20 5v14"/></svg> / 發票載具
+            </div>
+            
             <div class="balance-label">目前結餘</div>
             <div class="balance-amount" id="main-balance">$0</div>
         </div>
@@ -246,43 +258,25 @@
         </div>
     </div>
 
-           <div class="modal-overlay" id="carrier-modal">
+    <div class="modal-overlay" id="carrier-modal">
         <div class="glass-modal" style="max-width: 340px; padding: 30px 20px;">
             <h3 style="margin-top:0; color:var(--text-main); font-weight: 500; letter-spacing: 2px;">手機條碼載具</h3>
-            
             <div style="margin: 20px 0; background: #FFFFFF; padding: 25px 15px 15px; border-radius: 16px; border: 1px solid var(--glass-border); box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
                 <div id="barcode-svg-container" style="width: 100%; height: 80px; display: flex; justify-content: center; align-items: center;"></div>
-                
-                <div id="modal-carrier-txt" style="font-size: 1.8rem; font-weight: bold; letter-spacing: 3px; color: var(--text-main); margin-top: 10px;">
-                    尚未設定
-                </div>
+                <div id="modal-carrier-txt" style="font-size: 1.8rem; font-weight: bold; letter-spacing: 3px; color: var(--text-main); margin-top: 10px;">尚未設定</div>
             </div>
-            
             <div style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 20px;" id="carrier-hint">請至左側「偏好設定」綁定載具</div>
             <button class="m-btn m-btn-confirm" style="width: 100%;" onclick="document.getElementById('carrier-modal').classList.remove('show')">關閉</button>
         </div>
     </div>
 
-
-
     <div class="modal-overlay" id="global-settings-modal">
         <div class="glass-modal" style="max-width: 360px;">
             <h3 style="margin-top:0; color:var(--accent-gold); font-weight: 500; letter-spacing: 2px;">全局偏好設定</h3>
-            
             <div style="text-align: left; font-size: 0.85rem; color: var(--text-light); margin-left: 5px;">心靈預算 (財務)</div>
             <input type="number" id="setting-budget" class="modal-input" style="width: 100%; margin-bottom: 15px;" placeholder="例如：15000">
-            
             <div style="text-align: left; font-size: 0.85rem; color: var(--text-light); margin-left: 5px;">發票載具 (財務)</div>
             <input type="text" id="setting-carrier" class="modal-input" style="width: 100%; margin-bottom: 20px; text-transform: uppercase;" placeholder="例如：/12ABCDE">
-            
-            <div style="border-top: 1px dashed rgba(150,142,134,0.3); padding-top: 15px; margin-bottom: 10px;">
-                <div style="font-size: 0.9rem; color: var(--text-main); font-weight: 500; margin-bottom: 10px;">資料保全中心</div>
-                <div style="display: flex; gap: 10px; justify-content: center;">
-                    <button class="m-btn m-btn-cancel" onclick="exportEcosystemData('csv')" style="font-size: 0.85rem; padding: 10px;">匯出 CSV 報表</button>
-                    <button class="m-btn m-btn-cancel" onclick="exportEcosystemData('json')" style="font-size: 0.85rem; padding: 10px; background: rgba(203, 163, 122, 0.1); border-color: var(--accent-gold); color: var(--accent-gold);">一鍵打包 JSON</button>
-                </div>
-            </div>
-            
             <div class="modal-btn-group" style="margin-top: 15px;">
                 <button class="m-btn m-btn-cancel" onclick="document.getElementById('global-settings-modal').classList.remove('show')">關閉</button>
                 <button class="m-btn m-btn-confirm" onclick="saveGlobalSettings()">儲存設定</button>
@@ -290,28 +284,33 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="backup-modal">
+        <div class="glass-modal" style="max-width: 340px;">
+            <h3 style="margin-top:0; color:var(--text-main); font-weight: 500; letter-spacing: 2px;">資料下載與保全</h3>
+            <div style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 20px;">一鍵匯出四大法界 (財務/健康/母嬰/毛孩) 所有紀錄，資料完全由您掌握。</div>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <button class="m-btn m-btn-cancel" onclick="exportEcosystemData('csv')" style="background: rgba(255,255,255,0.8); border-color: var(--accent-jade); color: var(--accent-jade);">匯出全紀錄 CSV 報表</button>
+                <button class="m-btn m-btn-confirm" onclick="exportEcosystemData('json')">一鍵打包系統 JSON</button>
+            </div>
+            <button class="m-btn m-btn-cancel" style="width: 100%; margin-top: 15px; background: transparent; border: none; font-size: 0.85rem;" onclick="document.getElementById('backup-modal').classList.remove('show')">關閉視窗</button>
+        </div>
+    </div>
+
     <script>
-        // ================= 1. 萬法歸一：本機藏識 =================
         const STORAGE_KEY = 'joy_accounting_app_data';
         let appData = { budget: 15000, carrier: "", transactions: [] };
         
         window.onload = () => {
             const stored = localStorage.getItem(STORAGE_KEY);
             if (stored) appData = JSON.parse(stored);
-            
             let today = new Date();
             document.getElementById('date-str').innerText = `${today.getMonth()+1}月${today.getDate()}日`;
-            
-            loadGlobalSettings(); // 讀取設定
+            loadGlobalSettings();
             updateSystemUI();
         };
 
-        function saveData() { 
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); 
-            updateSystemUI(); 
-        }
+        function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); updateSystemUI(); }
 
-        // ================= 2. 全局設定與生態系打包引擎 =================
         function loadGlobalSettings() {
             document.getElementById('setting-budget').value = appData.budget || "";
             document.getElementById('setting-carrier').value = appData.carrier || "";
@@ -322,45 +321,21 @@
             appData.carrier = document.getElementById('setting-carrier').value.trim().toUpperCase() || "";
             saveData(); 
             document.getElementById('global-settings-modal').classList.remove('show');
-            alert("全局設定已儲存，心靈預算與載具已更新！");
+            alert("全局設定已儲存！");
         }
 
-                // ================= 發票載具 Code 39 核心引擎 (總工程師親鑄) =================
         const Code39 = {
             chars: {
-                '0': '000110100', '1': '100100001', '2': '001100001', '3': '101100000',
-                '4': '000110001', '5': '100110000', '6': '001110000', '7': '000100101',
-                '8': '100100100', '9': '001100100', 'A': '100001001', 'B': '001001001',
-                'C': '101001000', 'D': '000011001', 'E': '100011000', 'F': '001011000',
-                'G': '000001101', 'H': '100001100', 'I': '001001100', 'J': '000011100',
-                'K': '100000011', 'L': '001000011', 'M': '101000010', 'N': '000010011',
-                'O': '100010010', 'P': '001010010', 'Q': '000000111', 'R': '100000110',
-                'S': '001000110', 'T': '000010110', 'U': '110000001', 'V': '011000001',
-                'W': '111000000', 'X': '010010001', 'Y': '110010000', 'Z': '011010000',
-                '-': '010000101', '.': '110000100', ' ': '011000100', '*': '010010100',
-                '+': '010001010', '/': '010100010', '%': '000101010', '$': '010101000'
+                '0': '000110100', '1': '100100001', '2': '001100001', '3': '101100000', '4': '000110001', '5': '100110000', '6': '001110000', '7': '000100101', '8': '100100100', '9': '001100100', 'A': '100001001', 'B': '001001001', 'C': '101001000', 'D': '000011001', 'E': '100011000', 'F': '001011000', 'G': '000001101', 'H': '100001100', 'I': '001001100', 'J': '000011100', 'K': '100000011', 'L': '001000011', 'M': '101000010', 'N': '000010011', 'O': '100010010', 'P': '001010010', 'Q': '000000111', 'R': '100000110', 'S': '001000110', 'T': '000010110', 'U': '110000001', 'V': '011000001', 'W': '111000000', 'X': '010010001', 'Y': '110010000', 'Z': '011010000', '-': '010000101', '.': '110000100', ' ': '011000100', '*': '010010100', '+': '010001010', '/': '010100010', '%': '000101010', '$': '010101000'
             },
             generateSVG: function(text) {
-                text = text.toUpperCase();
-                let barcodeText = '*' + text + '*';
-                let svgLines = '';
-                let xPosition = 0;
-                
+                text = text.toUpperCase(); let barcodeText = '*' + text + '*'; let svgLines = ''; let xPosition = 0;
                 const narrow = 2; const wide = narrow * 3; const gap = narrow; const height = 60;
-                
                 for (let i = 0; i < barcodeText.length; i++) {
-                    let char = barcodeText[i];
-                    let code = this.chars[char];
-                    if (!code) continue; 
-                    
+                    let char = barcodeText[i]; let code = this.chars[char]; if (!code) continue; 
                     for (let j = 0; j < 9; j++) {
-                        let isBar = (j % 2 === 0); 
-                        let isWide = (code[j] === '1');
-                        let lineWidth = isWide ? wide : narrow;
-                        
-                        if (isBar) {
-                            svgLines += `<rect x="${xPosition}" y="0" width="${lineWidth}" height="${height}" fill="#2C2A29" />`;
-                        }
+                        let isBar = (j % 2 === 0); let isWide = (code[j] === '1'); let lineWidth = isWide ? wide : narrow;
+                        if (isBar) { svgLines += `<rect x="${xPosition}" y="0" width="${lineWidth}" height="${height}" fill="#2C2A29" />`; }
                         xPosition += lineWidth;
                     }
                     xPosition += gap; 
@@ -369,64 +344,38 @@
             }
         };
 
-        // ================= 發票載具呼叫功能 (動態渲染) =================
         function showCarrier() {
-            const modal = document.getElementById('carrier-modal');
-            const svgContainer = document.getElementById('barcode-svg-container');
-            const textContainer = document.getElementById('modal-carrier-txt');
-            const hintContainer = document.getElementById('carrier-hint');
-            
-            // 從資料庫讀取，如果沒有就空字串
+            const modal = document.getElementById('carrier-modal'); const svgContainer = document.getElementById('barcode-svg-container'); const textContainer = document.getElementById('modal-carrier-txt'); const hintContainer = document.getElementById('carrier-hint');
             let code = appData.carrier; 
-
-            if (code) {
-                // 成功讀取：呼叫總工程師的引擎畫出 SVG
-                svgContainer.innerHTML = Code39.generateSVG(code);
-                textContainer.innerText = code;
-                textContainer.style.color = "var(--text-main)";
-                hintContainer.innerText = "給店員嗶一下，發票存雲端";
-            } else {
-                // 尚未設定：顯示淡淡的預設圖騰
-                svgContainer.innerHTML = `<svg viewBox="0 0 300 80" style="width: 100%; height: 75px; fill: rgba(150,142,134,0.15);"><rect x="10" y="0" width="6" height="80"></rect><rect x="22" y="0" width="2" height="80"></rect><rect x="30" y="0" width="8" height="80"></rect><rect x="44" y="0" width="2" height="80"></rect><rect x="52" y="0" width="6" height="80"></rect><rect x="64" y="0" width="4" height="80"></rect><rect x="74" y="0" width="8" height="80"></rect></svg>`;
-                textContainer.innerText = "尚未設定";
-                textContainer.style.color = "var(--accent-gold)";
-                hintContainer.innerText = "請至左側「偏好設定」綁定載具";
-            }
-            
+            if (code) { svgContainer.innerHTML = Code39.generateSVG(code); textContainer.innerText = code; textContainer.style.color = "var(--text-main)"; hintContainer.innerText = "給店員嗶一下，發票存雲端"; } 
+            else { svgContainer.innerHTML = `<svg viewBox="0 0 300 80" style="width: 100%; height: 75px; fill: rgba(150,142,134,0.15);"><rect x="10" y="0" width="6" height="80"></rect><rect x="22" y="0" width="2" height="80"></rect><rect x="30" y="0" width="8" height="80"></rect><rect x="44" y="0" width="2" height="80"></rect><rect x="52" y="0" width="6" height="80"></rect><rect x="64" y="0" width="4" height="80"></rect><rect x="74" y="0" width="8" height="80"></rect></svg>`; textContainer.innerText = "尚未設定"; textContainer.style.color = "var(--accent-gold)"; hintContainer.innerText = "請至左側「偏好設定」綁定載具"; }
             modal.classList.add('show');
         }
 
-
         function exportEcosystemData(type) {
-            let ecoData = {
-                accounting: JSON.parse(localStorage.getItem('joy_accounting_app_data')) || {},
-                health: JSON.parse(localStorage.getItem('joy_health_history')) || {},
-                mom: JSON.parse(localStorage.getItem('joy_mom_data')) || {}
-            };
-
+            let ecoData = { accounting: JSON.parse(localStorage.getItem('joy_accounting_app_data')) || {}, health: JSON.parse(localStorage.getItem('joy_health_history')) || {}, mom: JSON.parse(localStorage.getItem('joy_mom_data')) || {}, pet: JSON.parse(localStorage.getItem('joy_pet_data')) || {} };
             if (type === 'json') {
-                let content = JSON.stringify(ecoData, null, 2); 
-                let filename = `JoyEcosystem_Backup_${new Date().getTime()}.json`;
-                let blob = new Blob([content], { type: 'application/json' }); 
-                let link = document.createElement("a");
-                link.href = URL.createObjectURL(blob); link.download = filename; 
-                document.body.appendChild(link); link.click(); document.body.removeChild(link);
+                let content = JSON.stringify(ecoData, null, 2); let filename = `JoyEcosystem_Backup_${new Date().getTime()}.json`; let blob = new Blob([content], { type: 'application/json' }); let link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = filename; document.body.appendChild(link); link.click(); document.body.removeChild(link);
             } else {
-                let content = "\uFEFF模組,類型,日期,分類,細項,金額,備註,有發票\n";
-                if(ecoData.accounting.transactions) {
-                    ecoData.accounting.transactions.forEach(t => { 
-                        content += `財務,${t.type === 'income'?'收入':'支出'},${t.date},${t.cat},${t.sub},${t.amt},${t.memo||''},${t.invoice?'是':'否'}\n`; 
-                    });
-                }
-                let filename = `JoyEcosystem_Export_${new Date().getTime()}.csv`;
-                let blob = new Blob([content], { type: 'text/csv;charset=utf-8;' }); 
-                let link = document.createElement("a");
-                link.href = URL.createObjectURL(blob); link.download = filename; 
-                document.body.appendChild(link); link.click(); document.body.removeChild(link);
+                let csvContent = "\uFEFF模組,紀錄類型,日期,時間,分類/項目,數值/狀態,備註\n";
+                if(ecoData.accounting.transactions) ecoData.accounting.transactions.forEach(t => csvContent += `財務記帳,${t.type === 'income'?'收入':'支出'},${t.date},,${t.cat}-${t.sub},${t.amt},${t.memo||''}\n`);
+                if(ecoData.health.bp) ecoData.health.bp.forEach(t => csvContent += `健康日誌,血壓,${t.date},,${t.tag||''},${t.sys}/${t.dia},${t.memo||''}\n`);
+                if(ecoData.health.bs) ecoData.health.bs.forEach(t => csvContent += `健康日誌,血糖,${t.date},,${t.tag||''},${t.val},${t.memo||''}\n`);
+                if(ecoData.health.wt) ecoData.health.wt.forEach(t => csvContent += `健康日誌,體重,${t.date},,,${t.val},${t.memo||''}\n`);
+                if(ecoData.health.med) ecoData.health.med.forEach(t => csvContent += `健康日誌,服藥,${t.date},${t.time||''},,${t.status},${t.memo||''}\n`);
+                if(ecoData.health.periods) ecoData.health.periods.forEach(t => csvContent += `健康日誌,一般經期,${t.startDate}~${t.endDate},,週期長度,${t.length}天,\n`);
+                if(ecoData.mom.bp) ecoData.mom.bp.forEach(t => csvContent += `孕母育兒,產檢血壓,${t.date},,,${t.sys}/${t.dia},\n`);
+                if(ecoData.mom.gdm) ecoData.mom.gdm.forEach(t => csvContent += `孕母育兒,妊娠血糖,${t.date},,${t.tag||''},${t.val},${t.memo||''}\n`);
+                if(ecoData.mom.wt) ecoData.mom.wt.forEach(t => csvContent += `孕母育兒,孕期體重,${t.date},,,${t.val},\n`);
+                if(ecoData.mom.periods) ecoData.mom.periods.forEach(t => csvContent += `孕母育兒,備孕經期,${t.startDate}~${t.endDate},,週期長度,${t.length}天,\n`);
+                if(ecoData.pet.wt) ecoData.pet.wt.forEach(t => csvContent += `毛孩手冊,體重,${t.date},,,${t.val},${t.memo||''}\n`);
+                if(ecoData.pet.actions) ecoData.pet.actions.forEach(t => csvContent += `毛孩手冊,日常照護,${t.date},${t.time||''},${t.type},完成,${t.memo||''}\n`);
+                if(ecoData.pet.medical) ecoData.pet.medical.forEach(t => csvContent += `毛孩手冊,醫療防護,${t.date},${t.time||''},${t.type},完成,${t.memo||''}\n`);
+                let filename = `JoyEcosystem_Full_Export_${new Date().getTime()}.csv`; let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' }); let link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = filename; document.body.appendChild(link); link.click(); document.body.removeChild(link);
             }
+            document.getElementById('backup-modal').classList.remove('show');
         }
 
-        // ================= 3. 記帳邏輯引擎 =================
         function updateSystemUI() {
             let bal = appData.transactions.reduce((acc, t) => t.type === 'income' ? acc + t.amt : acc - t.amt, 0);
             document.getElementById('main-balance').innerText = "$" + bal.toLocaleString();
@@ -439,88 +388,44 @@
         let currentCustomEl = null, currentMemo = ""; 
         const kb = document.getElementById('keyboard'), display = document.getElementById('input-amt'), subContainer = document.getElementById('sub-tags-container');
 
-        function toggleMenu() { 
-            closeKeyboard();
-            document.getElementById('side-menu').classList.toggle('open'); 
-            document.getElementById('side-menu-overlay').classList.toggle('open'); 
-        }
-
+        function toggleMenu() { closeKeyboard(); document.getElementById('side-menu').classList.toggle('open'); document.getElementById('side-menu-overlay').classList.toggle('open'); }
         function updateDisplay() { display.innerText = currentInput === "0" ? "0" : Number(currentInput).toLocaleString(); }
         
         function renderSubTags(categoryName, isIncome) {
-            subContainer.innerHTML = ''; currentSubTag = "";
-            let tags = (categoryData[categoryName] || []).slice();
-            tags.push('ADD_CUSTOM');
-            
+            subContainer.innerHTML = ''; currentSubTag = ""; let tags = (categoryData[categoryName] || []).slice(); tags.push('ADD_CUSTOM');
             tags.forEach(tag => {
                 const el = document.createElement('div'); el.className = `sub-tag ${isIncome ? 'sub-tag-income' : ''}`;
                 if (tag === 'ADD_CUSTOM') {
                     el.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="margin-right:4px; vertical-align:-1px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>新增`;
                     el.onclick = function() { document.getElementById('custom-tag-input').value = ''; document.getElementById('custom-tag-modal').classList.add('show'); currentCustomEl = this; };
                 } else {
-                    el.innerText = tag;
-                    el.onclick = function() { Array.from(subContainer.children).forEach(t => t.classList.remove('selected')); this.classList.add('selected'); currentSubTag = tag; };
+                    el.innerText = tag; el.onclick = function() { Array.from(subContainer.children).forEach(t => t.classList.remove('selected')); this.classList.add('selected'); currentSubTag = tag; };
                 }
                 subContainer.appendChild(el);
             });
             setTimeout(() => subContainer.classList.add('show'), 50);
         }
 
-        function confirmCustomTag() {
-            let val = document.getElementById('custom-tag-input').value.trim();
-            if (val !== "" && currentCustomEl) {
-                currentSubTag = val; currentCustomEl.innerText = val;
-                Array.from(subContainer.children).forEach(t => t.classList.remove('selected'));
-                currentCustomEl.classList.add('selected');
-            }
-            document.getElementById('custom-tag-modal').classList.remove('show');
-        }
-
-        function confirmMemo() {
-            currentMemo = document.getElementById('memo-input').value.trim();
-            let span = document.getElementById('memo-text-span'); let btn = document.getElementById('memo-display-btn');
-            if(currentMemo) { span.innerText = currentMemo; btn.style.color = "var(--text-main)"; btn.style.background = "rgba(255,255,255,0.9)"; } 
-            else { span.innerText = "輸入備註"; btn.style.color = "var(--text-light)"; btn.style.background = "rgba(255,255,255,0.4)"; }
-            document.getElementById('memo-modal').classList.remove('show');
-        }
+        function confirmCustomTag() { let val = document.getElementById('custom-tag-input').value.trim(); if (val !== "" && currentCustomEl) { currentSubTag = val; currentCustomEl.innerText = val; Array.from(subContainer.children).forEach(t => t.classList.remove('selected')); currentCustomEl.classList.add('selected'); } document.getElementById('custom-tag-modal').classList.remove('show'); }
+        function confirmMemo() { currentMemo = document.getElementById('memo-input').value.trim(); let span = document.getElementById('memo-text-span'); let btn = document.getElementById('memo-display-btn'); if(currentMemo) { span.innerText = currentMemo; btn.style.color = "var(--text-main)"; btn.style.background = "rgba(255,255,255,0.9)"; } else { span.innerText = "輸入備註"; btn.style.color = "var(--text-light)"; btn.style.background = "rgba(255,255,255,0.4)"; } document.getElementById('memo-modal').classList.remove('show'); }
 
         function openKeyboard(btn, category, isIncome = false) {
             if(activeBtn) activeBtn.classList.remove('active'); activeBtn = btn; activeBtn.classList.add('active');
-            isIncomeMode = isIncome; hasInvoice = false; document.getElementById('invoice-btn').classList.remove('active');
-            currentInput = "0"; currentMemo = ""; document.getElementById('memo-input').value = '';
-            document.getElementById('memo-text-span').innerText = "輸入備註"; document.getElementById('memo-display-btn').style.color = "var(--text-light)"; document.getElementById('memo-display-btn').style.background = "rgba(255,255,255,0.5)";
-            
+            isIncomeMode = isIncome; hasInvoice = false; document.getElementById('invoice-btn').classList.remove('active'); currentInput = "0"; currentMemo = ""; document.getElementById('memo-input').value = ''; document.getElementById('memo-text-span').innerText = "輸入備註"; document.getElementById('memo-display-btn').style.color = "var(--text-light)"; document.getElementById('memo-display-btn').style.background = "rgba(255,255,255,0.5)";
             updateDisplay(); renderSubTags(category, isIncome);
-            if (isIncome) { kb.classList.add('income-mode'); document.getElementById('invoice-btn').style.display = 'none'; } 
-            else { kb.classList.remove('income-mode'); document.getElementById('invoice-btn').style.display = 'flex'; }
-            
+            if (isIncome) { kb.classList.add('income-mode'); document.getElementById('invoice-btn').style.display = 'none'; } else { kb.classList.remove('income-mode'); document.getElementById('invoice-btn').style.display = 'flex'; }
             document.getElementById('main-container').style.transform = "translateY(-15px) scale(0.98)";
             kb.classList.add('open'); setTimeout(() => document.getElementById('kb-tools').classList.add('show'), 100);
         }
 
-        function closeKeyboard() {
-            if(activeBtn) activeBtn.classList.remove('active'); activeBtn = null;
-            kb.classList.remove('open', 'income-mode'); document.getElementById('kb-tools').classList.remove('show'); subContainer.classList.remove('show');
-            document.getElementById('main-container').style.transform = "translateY(0) scale(1)";
-        }
-
+        function closeKeyboard() { if(activeBtn) activeBtn.classList.remove('active'); activeBtn = null; kb.classList.remove('open', 'income-mode'); document.getElementById('kb-tools').classList.remove('show'); subContainer.classList.remove('show'); document.getElementById('main-container').style.transform = "translateY(0) scale(1)"; }
         function toggleInvoice() { hasInvoice = !hasInvoice; document.getElementById('invoice-btn').classList.toggle('active', hasInvoice); }
         function inputNum(num) { if (currentInput === "0" && num !== "00") currentInput = num.toString(); else if (currentInput.length < 8) currentInput += num.toString(); updateDisplay(); }
         function clearNum() { currentInput = "0"; updateDisplay(); }
 
         function submitEntry() {
-            let amt = Number(currentInput); let cat = activeBtn ? activeBtn.querySelector('span').innerText : '未分類';
-            let sub = currentSubTag || '一般'; let date = document.getElementById('date-str').innerText;
-            if(amt > 0) {
-                appData.transactions.unshift({
-                    id: Date.now(), timestamp: Date.now(), type: isIncomeMode ? 'income' : 'expense',
-                    date: date, cat: cat, sub: sub, amt: amt, memo: currentMemo, invoice: hasInvoice,
-                    color: isIncomeMode ? 'var(--accent-jade)' : (colorMap[cat] || 'var(--cat-other)')
-                });
-                saveData();
-                let balObj = document.getElementById('main-balance'); balObj.style.opacity = 0;
-                setTimeout(() => { balObj.style.opacity = 1; }, 200);
-            }
+            let amt = Number(currentInput); let cat = activeBtn ? activeBtn.querySelector('span').innerText : '未分類'; let sub = currentSubTag || '一般'; let date = document.getElementById('date-str').innerText;
+            if(amt > 0) { appData.transactions.unshift({ id: Date.now(), timestamp: Date.now(), type: isIncomeMode ? 'income' : 'expense', date: date, cat: cat, sub: sub, amt: amt, memo: currentMemo, invoice: hasInvoice, color: isIncomeMode ? 'var(--accent-jade)' : (colorMap[cat] || 'var(--cat-other)') }); saveData(); let balObj = document.getElementById('main-balance'); balObj.style.opacity = 0; setTimeout(() => { balObj.style.opacity = 1; }, 200); }
             closeKeyboard();
         }
     </script>
