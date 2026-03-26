@@ -5,7 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>淨息流 ． 總殿大廳</title>
+    
+    <title> 淨息流是一套？ </title>
+    <meta name="description" content="記？">
+    <meta name="keywords" content="記帳, 記血糖,">
+    <meta name="author" content="妙依居士">
+    
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    
     <style>
         :root {
             /* 淨息流主色系：琉璃淨土風 */
@@ -19,12 +26,7 @@
 
         * { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
         
-        html, body { 
-            margin: 0; padding: 0; width: 100%; height: 100%; 
-            background: var(--bg-gradient); color: var(--text-main); 
-            font-family: -apple-system, sans-serif; overflow-x: hidden; -webkit-user-select: none; user-select: none; 
-            display: flex; flex-direction: column; align-items: center; 
-        }
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg-gradient); color: var(--text-main); font-family: -apple-system, sans-serif; overflow-x: hidden; -webkit-user-select: none; user-select: none; display: flex; flex-direction: column; align-items: center; }
 
         /* --- 頂部導航 --- */
         .top-nav { width: 100%; padding: max(15px, env(safe-area-inset-top)) 20px 15px; display: flex; justify-content: center; background: transparent; z-index: 10; }
@@ -41,12 +43,13 @@
         .taichi-logo { width: 140px; height: 140px; border-radius: 50%; background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.4)); border: 1px solid var(--glass-border); box-shadow: 0 15px 45px rgba(203, 163, 122, 0.15), inset 0 0 20px rgba(203, 163, 122, 0.05); display: flex; justify-content: center; align-items: center; position: relative; margin-bottom: 30px; animation: floatLogo 4s infinite ease-in-out; }
         @keyframes floatLogo { 0%, 100% { transform: translateY(0); box-shadow: 0 15px 45px rgba(203, 163, 122, 0.15); } 50% { transform: translateY(-10px); box-shadow: 0 25px 55px rgba(203, 163, 122, 0.25); } }
         
+        /* 替換：呼吸蓮花 SVG 圖騰 */
         .taichi-logo::after { content: ''; position: absolute; width: 90px; height: 90px; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 90 C 110 70, 100 20, 70 45 C 60 50, 50 65, 50 90' stroke='%23CBA37A' fill='none' stroke-width='1.5'/%3E%3Cpath d='M50 90 C -10 70, 0 20, 30 45 C 40 50, 50 65, 50 90' stroke='%23CBA37A' fill='none' stroke-width='1.5'/%3E%3Cpath d='M50 85 C 80 50, 70 10, 55 30 C 52 40, 50 55, 50 85' stroke='%2382968C' fill='none' stroke-width='2'/%3E%3Cpath d='M50 85 C 20 50, 30 10, 45 30 C 48 40, 50 55, 50 85' stroke='%2382968C' fill='none' stroke-width='2'/%3E%3Cpath d='M50 85 C 65 45, 60 5, 50 20 C 40 5, 35 45, 50 85' stroke='%23CFA4A4' fill='none' stroke-width='2.5'/%3E%3C/svg%3E"); background-size: contain; background-repeat: no-repeat; background-position: center; opacity: 0.8; }
 
         .sys-title { font-size: 2.2rem; font-weight: 300; letter-spacing: 6px; color: var(--text-main); margin-bottom: 10px; text-shadow: 0 2px 10px rgba(0,0,0,0.02); }
         .sys-subtitle { font-size: 0.95rem; color: var(--text-light); letter-spacing: 3px; font-weight: 300; margin-bottom: 30px; }
 
-        /* 【新增】：緣起與指南 ReadMe 按鈕 */
+        /* 緣起與指南 ReadMe 按鈕 */
         .readme-btn { display: flex; align-items: center; gap: 8px; padding: 8px 24px; background: rgba(255,255,255,0.7); border: 1px solid var(--accent-gold); border-radius: 20px; color: var(--accent-gold); font-size: 0.85rem; font-weight: 500; letter-spacing: 2px; cursor: pointer; box-shadow: 0 4px 15px rgba(203, 163, 122, 0.15); transition: all 0.3s; margin-bottom: 30px; }
         .readme-btn:active { transform: scale(0.95); background: var(--accent-gold); color: white; }
         .readme-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
@@ -71,6 +74,8 @@
         .btn-health:active { border-color: var(--accent-jade); box-shadow: 0 8px 25px rgba(130, 150, 140, 0.2); }
         .btn-mom .portal-icon { stroke: var(--accent-rose); }
         .btn-mom:active { border-color: var(--accent-rose); box-shadow: 0 8px 25px rgba(207, 164, 164, 0.2); }
+        
+        /* 修正：首頁毛孩按鈕使用金剛腳印圖騰 */
         .btn-pet .portal-icon { stroke: var(--accent-amber); }
         .btn-pet:active { border-color: var(--accent-amber); box-shadow: 0 8px 25px rgba(193, 165, 131, 0.2); }
 
@@ -143,7 +148,7 @@
         <div class="glass-modal">
             <h2 style="margin-top:0; color:var(--accent-gold); font-size: 1.3rem; letter-spacing: 3px; font-weight: 400;">緣起與指南</h2>
             <p style="font-size: 0.85rem; color: var(--text-light); line-height: 1.6; margin-bottom: 20px;">
-                淨息流是一套無需網路、資料完全保存在您手機內的清淨系統。為了獲得最佳體驗與永久保存功能，強烈建議您進行以下設定：
+                淨息流是一套無需網路、免費無廣告、資料完全保存在您手機內的清淨系統。為了獲得最佳體驗與永久保存功能，強烈建議您進行以下設定：
             </p>
             
             <div class="readme-step">
