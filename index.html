@@ -27,13 +27,19 @@
             --shadow-soft: 0 10px 40px rgba(160, 155, 150, 0.12);
         }
 
-        * { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+        * { 
+            box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; 
+            /* 全局開啟硬體加速層，防止 iOS 玻璃模糊破圖邊界線 */
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+        }
         
-        html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg-gradient); color: var(--text-main); font-family: -apple-system, sans-serif; overflow-x: hidden; -webkit-user-select: none; user-select: none; display: flex; flex-direction: column; align-items: center; }
+        /* 修正 100% 為 100dvh 以完美適應手機動態高度 */
+        html, body { margin: 0; padding: 0; width: 100%; height: 100dvh; background: var(--bg-gradient); color: var(--text-main); font-family: -apple-system, sans-serif; overflow-x: hidden; -webkit-user-select: none; user-select: none; display: flex; flex-direction: column; align-items: center; }
 
         /* --- 頂部導航 --- */
         .top-nav { width: 100%; padding: max(15px, env(safe-area-inset-top)) 20px 15px; display: flex; justify-content: center; background: transparent; z-index: 10; }
-        .nav-content { width: 100%; max-width: 720px; display: flex; justify-content: flex-end; align-items: center; }
+        .nav-content { width: 100%; max-width: 720px; display: flex; justify-content: space-between; align-items: center; }
         .nav-btn { display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%; background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); color: var(--text-main); box-shadow: var(--shadow-soft); cursor: pointer; transition: all 0.2s; }
         .nav-btn:active { transform: scale(0.92); background: rgba(255,255,255,0.9); }
         .nav-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
@@ -59,7 +65,7 @@
 
         /* --- 法界傳送門 (四大模組按鈕) --- */
         .portal-grid { width: 100%; display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        .portal-btn { background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); box-shadow: var(--shadow-soft); border-radius: 24px; padding: 25px 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 12px; cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden; }
+        .portal-btn { background: var(--glass-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid var(--glass-border); box-shadow: var(--shadow-soft); border-radius: 24px; padding: 25px 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 12px; cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
         .portal-btn::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(255,255,255,0.8), transparent); opacity: 0; transition: opacity 0.3s; }
         .portal-btn:active { transform: scale(0.96); }
         .portal-btn:active::before { opacity: 1; }
@@ -86,9 +92,9 @@
         .footer-text:active { color: var(--accent-gold); }
 
         /* --- 彈窗系統 --- */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 3000; opacity: 0; transition: opacity 0.3s; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 3000; opacity: 0; transition: opacity 0.3s; }
         .modal-overlay.show { display: flex; opacity: 1; }
-        .glass-modal { background: rgba(253, 252, 252, 0.95); width: 88%; max-width: 360px; border-radius: 25px; padding: 30px 25px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); border: 1px solid var(--glass-border); text-align: center; position: relative; overflow: hidden; }
+        .glass-modal { background: rgba(253, 252, 252, 0.95); width: 88%; max-width: 360px; border-radius: 25px; padding: 30px 25px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); border: 1px solid var(--glass-border); text-align: center; position: relative; overflow: hidden; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
         
         .m-btn-confirm { background: var(--accent-gold); color: white; border: none; padding: 12px; border-radius: 16px; font-size: 0.95rem; cursor: pointer; box-shadow: 0 4px 15px rgba(203, 163, 122, 0.2); width: 100%; margin-top: 20px; transition: transform 0.2s; letter-spacing: 2px; }
         .m-btn-confirm:active { transform: scale(0.95); }
@@ -103,11 +109,24 @@
 </head>
 <body>
 
-        <div class="top-nav">
-        <div class="nav-content" style="gap: 15px;">
-            <div class="nav-btn" onclick="shareApp()"><svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg></div>
+    <div class="top-nav">
+        <div class="nav-content">
+            <div style="width: 94px; display: flex; justify-content: flex-start;">
+                <div class="nav-btn" onclick="shareApp()">
+                    <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                </div>
+            </div>
             
-            <div class="nav-btn" onclick="window.location.href='dashboard.html'"><svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div>
+            <div style="flex: 1;"></div>
+
+            <div style="width: 94px; display: flex; justify-content: flex-end; gap: 10px;">
+                <div class="nav-btn" onclick="window.location.reload(true)">
+                    <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 1 0 2.13-5.87L21 8"></path></svg>
+                </div>
+                <div class="nav-btn" onclick="window.location.href='dashboard.html'">
+                    <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+                </div>
+            </div>
         </div>
     </div>
 
