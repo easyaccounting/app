@@ -219,7 +219,7 @@
             } else {
                 // 防禦機制：如果是不支援原生分享的環境（例如某些舊版電腦瀏覽器），改為自動複製網址
                 navigator.clipboard.writeText(shareData.url).then(() => {
-                    // 這裡大智用了最簡單的 alert，妳也可以換成系統內建的美觀提示框
+                    // 這裡alert，應換成系統內建的美觀提示框
                     alert("網址已複製！感恩您的法施分享。");
                 }).catch(err => {
                     console.error('複製失敗', err);
