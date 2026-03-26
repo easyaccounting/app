@@ -5,254 +5,171 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>生活輕鬆記 ． 淨息流</title>
+    <title>淨息流 ． 總殿大廳</title>
     <style>
         :root {
-            --bg-deep: #F2F5F4;
-            --bg-gradient: linear-gradient(135deg, #FDFDFD, #EAEFEA);
+            /* 淨息流主色系：琉璃淨土風 */
+            --bg-gradient: linear-gradient(135deg, #FDFDFD, #F5F2EF);
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.9);
             --text-main: #58504A; --text-light: #968E86;
-            
-            /* 四大法界專屬色票 (RGB) 方便設定透明度 */
-            --rgb-gold: 203, 163, 122;   /* 財務 */
-            --rgb-jade: 130, 150, 140;   /* 健康 */
-            --rgb-rose: 207, 164, 164;   /* 母嬰 */
-            --rgb-amber: 193, 165, 131;  /* 毛孩 */
-            
-            --glass-bg: rgba(255, 255, 255, 0.4);
+            --accent-gold: #CBA37A; --accent-jade: #82968C; --accent-rose: #CFA4A4; --accent-amber: #C1A583;
+            --shadow-soft: 0 10px 40px rgba(160, 155, 150, 0.12);
         }
 
         * { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
         
-        html, body {
-            margin: 0; padding: 0; width: 100%; height: 100%;
-            background: var(--bg-gradient); color: var(--text-main);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            overflow: hidden; -webkit-user-select: none; user-select: none;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        html, body { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            background: var(--bg-gradient); color: var(--text-main); 
+            font-family: -apple-system, sans-serif; overflow-x: hidden; -webkit-user-select: none; user-select: none; 
+            display: flex; flex-direction: column; align-items: center; 
         }
 
-        /* --- 法界微光呼吸背景 --- */
-        .ambient-light {
-            position: absolute; width: 150vw; height: 150vw; max-width: 800px; max-height: 800px;
-            background: radial-gradient(circle, rgba(var(--rgb-gold), 0.05) 0%, rgba(var(--rgb-jade), 0.03) 40%, rgba(255,255,255,0) 70%);
-            top: 50%; left: 50%; transform: translate(-50%, -50%);
-            z-index: 0; pointer-events: none;
-            animation: breatheLight 8s infinite alternate ease-in-out;
-        }
-        @keyframes breatheLight {
-            0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.8; }
-            100% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
-        }
+        /* --- 頂部導航 --- */
+        .top-nav { width: 100%; padding: max(15px, env(safe-area-inset-top)) 20px 15px; display: flex; justify-content: center; background: transparent; z-index: 10; }
+        .nav-content { width: 100%; max-width: 720px; display: flex; justify-content: flex-end; align-items: center; }
+        .nav-btn { display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%; background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); color: var(--text-main); box-shadow: var(--shadow-soft); cursor: pointer; transition: all 0.2s; }
+        .nav-btn:active { transform: scale(0.92); background: rgba(255,255,255,0.9); }
+        .nav-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
 
-        /* --- 主容器中道收斂 --- */
-        .portal-container {
-            width: 100%; max-width: 500px; padding: 30px;
-            z-index: 10; display: flex; flex-direction: column; align-items: center;
-        }
+        /* --- 大廳核心區 (太極與標題) --- */
+        .hero-section { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; max-width: 720px; padding: 0 20px; animation: fadeIn 0.8s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- 標題美學 --- */
-        .header-section { text-align: center; margin-bottom: 40px; }
-        .main-title {
-            font-size: 2.4rem; font-weight: 300; letter-spacing: 8px; color: var(--text-main);
-            margin: 0 0 15px 0; text-indent: 8px;
-            text-shadow: 0 4px 15px rgba(255, 255, 255, 0.8);
-        }
-        .pure-statement {
-            display: flex; align-items: center; justify-content: center; gap: 12px;
-            font-size: 0.85rem; color: rgba(var(--rgb-gold), 1); letter-spacing: 3px; font-weight: 400;
-        }
-        .pure-line {
-            width: 40px; height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(var(--rgb-gold), 0.6), transparent);
-        }
-
-        /* --- 琉璃方陣 (2x2 Grid) 融入彌陀 3D 光學 --- */
-        .portal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; }
-
-        .portal-card {
-            /* 1. 3D 高光折射：左上角光源 (circle at 30% 30%) */
-            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.3) 100%);
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            
-            border-radius: 28px; aspect-ratio: 1 / 1.1; 
-            display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px;
-            text-decoration: none; position: relative; overflow: hidden;
-            
-            /* 2. 懸浮陰影與玻璃厚度 (inset 白光) */
-            box-shadow: 0 20px 40px rgba(130, 140, 135, 0.12), inset 0 2px 10px rgba(255,255,255,0.8);
-            transform: scale(1);
-            transition: transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1), box-shadow 0.4s ease, border-color 0.4s ease;
-        }
-
-        /* 四大法界：待機時的淡淡玻璃邊框 */
-        .mod-fin { border: 1.5px solid rgba(var(--rgb-gold), 0.3); }
-        .mod-health { border: 1.5px solid rgba(var(--rgb-jade), 0.3); }
-        .mod-mom { border: 1.5px solid rgba(var(--rgb-rose), 0.3); }
-        .mod-pet { border: 1.5px solid rgba(var(--rgb-amber), 0.3); }
-
-        /* 3. 點擊/懸停時的 3D 亮燈印記 (致敬菩提靜室) */
-        .portal-card:active { transform: scale(0.95); }
+        /* 呼吸發光太極蓮花 */
+        .taichi-logo { width: 140px; height: 140px; border-radius: 50%; background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.4)); border: 1px solid var(--glass-border); box-shadow: 0 15px 45px rgba(203, 163, 122, 0.15), inset 0 0 20px rgba(203, 163, 122, 0.05); display: flex; justify-content: center; align-items: center; position: relative; margin-bottom: 30px; animation: floatLogo 4s infinite ease-in-out; }
+        @keyframes floatLogo { 0%, 100% { transform: translateY(0); box-shadow: 0 15px 45px rgba(203, 163, 122, 0.15); } 50% { transform: translateY(-10px); box-shadow: 0 25px 55px rgba(203, 163, 122, 0.25); } }
         
-        .mod-fin:active, .mod-fin:hover {
-            border-color: rgba(var(--rgb-gold), 0.8);
-            box-shadow: 0 10px 25px rgba(var(--rgb-gold), 0.15), inset 0 0 20px rgba(var(--rgb-gold), 0.1);
-        }
-        .mod-health:active, .mod-health:hover {
-            border-color: rgba(var(--rgb-jade), 0.8);
-            box-shadow: 0 10px 25px rgba(var(--rgb-jade), 0.15), inset 0 0 20px rgba(var(--rgb-jade), 0.1);
-        }
-        .mod-mom:active, .mod-mom:hover {
-            border-color: rgba(var(--rgb-rose), 0.8);
-            box-shadow: 0 10px 25px rgba(var(--rgb-rose), 0.15), inset 0 0 20px rgba(var(--rgb-rose), 0.1);
-        }
-        .mod-pet:active, .mod-pet:hover {
-            border-color: rgba(var(--rgb-amber), 0.8);
-            box-shadow: 0 10px 25px rgba(var(--rgb-amber), 0.15), inset 0 0 20px rgba(var(--rgb-amber), 0.1);
-        }
+        .taichi-logo::after { content: ''; position: absolute; width: 90px; height: 90px; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 90 C 110 70, 100 20, 70 45 C 60 50, 50 65, 50 90' stroke='%23CBA37A' fill='none' stroke-width='1.5'/%3E%3Cpath d='M50 90 C -10 70, 0 20, 30 45 C 40 50, 50 65, 50 90' stroke='%23CBA37A' fill='none' stroke-width='1.5'/%3E%3Cpath d='M50 85 C 80 50, 70 10, 55 30 C 52 40, 50 55, 50 85' stroke='%2382968C' fill='none' stroke-width='2'/%3E%3Cpath d='M50 85 C 20 50, 30 10, 45 30 C 48 40, 50 55, 50 85' stroke='%2382968C' fill='none' stroke-width='2'/%3E%3Cpath d='M50 85 C 65 45, 60 5, 50 20 C 40 5, 35 45, 50 85' stroke='%23CFA4A4' fill='none' stroke-width='2.5'/%3E%3C/svg%3E"); background-size: contain; background-repeat: no-repeat; background-position: center; opacity: 0.8; }
 
-        /* 中間的懸浮圓形圖標座 */
-        .card-icon-wrap {
-            width: 58px; height: 58px; border-radius: 50%;
-            background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
-            display: flex; justify-content: center; align-items: center;
-            box-shadow: 0 8px 20px rgba(130, 140, 135, 0.15), inset 0 -2px 5px rgba(0,0,0,0.02);
-            transition: transform 0.4s;
-            border: 1px solid rgba(255,255,255,1);
-        }
-        .portal-card:active .card-icon-wrap { transform: scale(0.92); }
+        .sys-title { font-size: 2.2rem; font-weight: 300; letter-spacing: 6px; color: var(--text-main); margin-bottom: 10px; text-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .sys-subtitle { font-size: 0.95rem; color: var(--text-light); letter-spacing: 3px; font-weight: 300; margin-bottom: 30px; }
 
-        .card-icon { width: 26px; height: 26px; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+        /* 【新增】：緣起與指南 ReadMe 按鈕 */
+        .readme-btn { display: flex; align-items: center; gap: 8px; padding: 8px 24px; background: rgba(255,255,255,0.7); border: 1px solid var(--accent-gold); border-radius: 20px; color: var(--accent-gold); font-size: 0.85rem; font-weight: 500; letter-spacing: 2px; cursor: pointer; box-shadow: 0 4px 15px rgba(203, 163, 122, 0.15); transition: all 0.3s; margin-bottom: 30px; }
+        .readme-btn:active { transform: scale(0.95); background: var(--accent-gold); color: white; }
+        .readme-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+        /* --- 法界傳送門 (四大模組按鈕) --- */
+        .portal-grid { width: 100%; display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .portal-btn { background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); box-shadow: var(--shadow-soft); border-radius: 24px; padding: 25px 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 12px; cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden; }
+        .portal-btn::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(255,255,255,0.8), transparent); opacity: 0; transition: opacity 0.3s; }
+        .portal-btn:active { transform: scale(0.96); }
+        .portal-btn:active::before { opacity: 1; }
         
-        .card-title { font-size: 1.05rem; font-weight: 500; color: var(--text-main); letter-spacing: 2px; margin-bottom: 2px; }
-        .card-sub { font-size: 0.75rem; color: var(--text-light); letter-spacing: 1px; }
+        .portal-icon { width: 36px; height: 36px; stroke-width: 1.2; fill: none; margin-bottom: 5px; transition: transform 0.3s; }
+        .portal-btn:active .portal-icon { transform: translateY(-3px); }
+        
+        .portal-name { font-size: 1rem; font-weight: 500; letter-spacing: 2px; color: var(--text-main); }
+        .portal-desc { font-size: 0.75rem; color: var(--text-light); letter-spacing: 1px; }
 
-        /* Icon 顏色與發光感 (filter: drop-shadow) */
-        .mod-fin .card-icon { stroke: rgba(var(--rgb-gold), 1); filter: drop-shadow(0 2px 4px rgba(var(--rgb-gold), 0.4)); }
-        .mod-health .card-icon { stroke: rgba(var(--rgb-jade), 1); filter: drop-shadow(0 2px 4px rgba(var(--rgb-jade), 0.4)); }
-        .mod-mom .card-icon { stroke: rgba(var(--rgb-rose), 1); filter: drop-shadow(0 2px 4px rgba(var(--rgb-rose), 0.4)); }
-        .mod-pet .card-icon { stroke: rgba(var(--rgb-amber), 1); filter: drop-shadow(0 2px 4px rgba(var(--rgb-amber), 0.4)); }
+        /* 四大法界專屬高亮色 */
+        .btn-fin .portal-icon { stroke: var(--accent-gold); }
+        .btn-fin:active { border-color: var(--accent-gold); box-shadow: 0 8px 25px rgba(203, 163, 122, 0.2); }
+        .btn-health .portal-icon { stroke: var(--accent-jade); }
+        .btn-health:active { border-color: var(--accent-jade); box-shadow: 0 8px 25px rgba(130, 150, 140, 0.2); }
+        .btn-mom .portal-icon { stroke: var(--accent-rose); }
+        .btn-mom:active { border-color: var(--accent-rose); box-shadow: 0 8px 25px rgba(207, 164, 164, 0.2); }
+        .btn-pet .portal-icon { stroke: var(--accent-amber); }
+        .btn-pet:active { border-color: var(--accent-amber); box-shadow: 0 8px 25px rgba(193, 165, 131, 0.2); }
 
-        /* 開發中蒙版 */
-        .coming-soon { position: absolute; inset: 0; background: rgba(255,255,255,0.7); backdrop-filter: blur(2px); display: flex; justify-content: center; align-items: center; font-size: 0.85rem; color: var(--text-main); letter-spacing: 2px; font-weight: 500; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
-        .portal-card:active .coming-soon { opacity: 1; }
+        .footer-text { margin-top: 40px; margin-bottom: 20px; font-size: 0.75rem; color: var(--text-light); letter-spacing: 2px; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: color 0.3s; }
+        .footer-text:active { color: var(--accent-gold); }
 
-        /* 底部落款 */
-        .footer-mark {
-            position: absolute; bottom: 30px; font-size: 0.75rem; color: var(--text-light);
-            letter-spacing: 2px; display: flex; align-items: center; gap: 8px; cursor: pointer;
-            transition: opacity 0.3s;
-        }
-        .footer-mark:active { opacity: 0.6; }
-        .footer-mark svg { width: 14px; height: 14px; stroke: var(--text-light); fill: none; stroke-width: 1.5; }
+        /* --- 彈窗系統 --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 3000; opacity: 0; transition: opacity 0.3s; }
+        .modal-overlay.show { display: flex; opacity: 1; }
+        .glass-modal { background: rgba(253, 252, 252, 0.95); width: 88%; max-width: 360px; border-radius: 25px; padding: 30px 25px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); border: 1px solid var(--glass-border); text-align: center; position: relative; overflow: hidden; }
+        
+        .m-btn-confirm { background: var(--accent-gold); color: white; border: none; padding: 12px; border-radius: 16px; font-size: 0.95rem; cursor: pointer; box-shadow: 0 4px 15px rgba(203, 163, 122, 0.2); width: 100%; margin-top: 20px; transition: transform 0.2s; letter-spacing: 2px; }
+        .m-btn-confirm:active { transform: scale(0.95); }
+
+        /* ReadMe 專屬樣式 */
+        .readme-step { text-align: left; background: rgba(255,255,255,0.6); padding: 15px; border-radius: 16px; border: 1px solid var(--glass-border); margin-bottom: 12px; }
+        .step-title { font-size: 0.9rem; font-weight: bold; color: var(--accent-gold); margin-bottom: 6px; letter-spacing: 1px; }
+        .step-desc { font-size: 0.85rem; color: var(--text-main); line-height: 1.5; }
+        .step-icon-box { display: inline-flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.05); padding: 4px 8px; border-radius: 8px; margin-top: 6px; font-weight: 500; font-size: 0.8rem; color: var(--text-main); gap: 6px; border: 1px solid rgba(0,0,0,0.05); }
+
     </style>
 </head>
 <body>
 
-    <div class="ambient-light"></div>
+    <div class="top-nav">
+        <div class="nav-content">
+            <div class="nav-btn" onclick="window.location.href='dashboard.html'"><svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div>
+        </div>
+    </div>
 
-    <div class="portal-container">
-        
-        <div class="header-section">
-            <h1 class="main-title">生活輕鬆記</h1>
-            <div class="pure-statement">
-                <div class="pure-line"></div>
-                清淨 ． 永久免費無廣告
-                <div class="pure-line"></div>
-            </div>
+    <div class="hero-section">
+        <div class="taichi-logo"></div>
+        <div class="sys-title">淨息流</div>
+        <div class="sys-subtitle">萬法唯心造，身心皆觀照</div>
+
+        <div class="readme-btn" onclick="document.getElementById('readme-modal').classList.add('show')">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            緣起與指南
         </div>
 
         <div class="portal-grid">
-            
-            <a href="accounting.html" class="portal-card mod-fin">
-                <div class="card-icon-wrap">
-                    <svg class="card-icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                </div>
-                <div style="text-align: center;">
-                    <div class="card-title">財務收支</div>
-                    <div class="card-sub">理財與心靈預算</div>
-                </div>
-            </a>
+            <div class="portal-btn btn-fin" onclick="window.location.href='accounting.html'">
+                <svg class="portal-icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                <div class="portal-name">財務記帳</div>
+                <div class="portal-desc">心靈預算與收支</div>
+            </div>
+            <div class="portal-btn btn-health" onclick="window.location.href='health.html'">
+                <svg class="portal-icon" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                <div class="portal-name">健康日誌</div>
+                <div class="portal-desc">血壓血糖與用藥</div>
+            </div>
+            <div class="portal-btn btn-mom" onclick="window.location.href='mom.html'">
+                <svg class="portal-icon" viewBox="0 0 24 24"><path d="M12 22c0-5.5-4.5-10-10-10 5.5 0 10-4.5 10-10 0 5.5 4.5 10 10 10-5.5 0-10 4.5-10 10z"/></svg>
+                <div class="portal-name">孕母育兒</div>
+                <div class="portal-desc">產檢胎動與疫苗</div>
+            </div>
+            <div class="portal-btn btn-pet" onclick="window.location.href='pet.html'">
+                <svg class="portal-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm4 0h-2v-2h2v2zm-2-4q-2 0-3-1.5T9 8h2q0 1 1 1.5t2 0V12z"/></svg>
+                <div class="portal-name">毛孩手冊</div>
+                <div class="portal-desc">照護與驅蟲防護</div>
+            </div>
+        </div>
 
-            <a href="health.html" class="portal-card mod-health">
-                <div class="card-icon-wrap">
-                    <svg class="card-icon" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-                </div>
-                <div style="text-align: center;">
-                    <div class="card-title">健康觀照</div>
-                    <div class="card-sub">身心與數據軌跡</div>
-                </div>
-            </a>
-
-            <a href="mom.html" class="portal-card mod-mom">
-                <div class="card-icon-wrap">
-                    <svg class="card-icon" viewBox="0 0 24 24"><path d="M12 22c0-5.5-4.5-10-10-10 5.5 0 10-4.5 10-10 0 5.5 4.5 10 10 10-5.5 0-10 4.5-10 10z"/></svg>
-                </div>
-                <div style="text-align: center;">
-                    <div class="card-title">孕母與育兒</div>
-                    <div class="card-sub">生命之初的紀錄</div>
-                </div>
-                
-             </a>
-
-             <a href="pet.html" class="portal-card mod-pet">
-                <div class="card-icon-wrap">
-                    <svg class="card-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"></path><circle cx="8" cy="10" r="1.5"></circle><circle cx="12" cy="8" r="1.5"></circle><circle cx="16" cy="10" r="1.5"></circle><path d="M12 18c-2 0-3.5-1.5-3.5-3s1.5-2.5 3.5-2.5S15.5 13.5 15.5 15 14 18 12 18z"></path></svg>
-                </div>
-                <div style="text-align: center;">
-                    <div class="card-title">毛孩手冊</div>
-                    <div class="card-sub">萬物皆有靈</div>
-                </div>
-                
-             </a>
+        <div class="footer-text" onclick="window.location.href='https://namoamitabhapureland.github.io/bodhicitta/index.html'">
+            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg> 彌陀淨土系統 衍生共建
         </div>
     </div>
 
-    <div class="footer-mark" onclick="window.location.href='https://namoamitabhapureland.github.io/bodhicitta/index.html'">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
-        淨息流 ． 彌陀淨土系統
+    <div class="modal-overlay" id="readme-modal">
+        <div class="glass-modal">
+            <h2 style="margin-top:0; color:var(--accent-gold); font-size: 1.3rem; letter-spacing: 3px; font-weight: 400;">緣起與指南</h2>
+            <p style="font-size: 0.85rem; color: var(--text-light); line-height: 1.6; margin-bottom: 20px;">
+                淨息流是一套無需網路、資料完全保存在您手機內的清淨系統。為了獲得最佳體驗與永久保存功能，強烈建議您進行以下設定：
+            </p>
+            
+            <div class="readme-step">
+                <div class="step-title">第一步：脫離通訊軟體框架</div>
+                <div class="step-desc">若您是從 LINE 或 FB 點擊進入，請點擊畫面右上角的選單，選擇：</div>
+                <div class="step-icon-box">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                    在系統瀏覽器中開啟
+                </div>
+            </div>
+
+            <div class="readme-step">
+                <div class="step-title">第二步：加到主畫面 (APP化)</div>
+                <div class="step-desc">在瀏覽器開啟後，於底層工具列選擇分享或選單，並點擊：</div>
+                <div class="step-icon-box">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+                    加到手機主畫面
+                </div>
+                <div class="step-desc" style="margin-top: 6px; font-size: 0.75rem; color: var(--text-light);">
+                    日後即可像一般 APP 一樣，從桌面圖示直接進入，斷網亦可使用。
+                </div>
+            </div>
+
+            <button class="m-btn-confirm" onclick="document.getElementById('readme-modal').classList.remove('show')">明白，進入清淨法界</button>
+        </div>
     </div>
 
-    <script>
-        // ================= 萬法歸一：本機藏識 (DB) 開天闢地 =================
-        window.onload = function() {
-            initEcosystemDB();
-        };
-
-        function initEcosystemDB() {
-            let accDB;
-            try {
-                accDB = JSON.parse(localStorage.getItem('joy_accounting_app_data'));
-                if (!accDB || typeof accDB !== 'object') accDB = null;
-                if (accDB && !accDB.transactions) accDB.transactions = [];
-                if (accDB && typeof accDB.budget === 'undefined') accDB.budget = 15000;
-                if (accDB && !accDB.carrier) accDB.carrier = "";
-            } catch(e) { accDB = null; }
-            if (!accDB) { accDB = { budget: 15000, carrier: "", transactions: [] }; }
-            localStorage.setItem('joy_accounting_app_data', JSON.stringify(accDB));
-
-            let healthHistory;
-            try {
-                healthHistory = JSON.parse(localStorage.getItem('joy_health_history'));
-                if (!healthHistory || typeof healthHistory !== 'object') healthHistory = null;
-                if (healthHistory && !healthHistory.med) healthHistory.med = [];
-                if (healthHistory && !healthHistory.bp) healthHistory.bp = [];
-                if (healthHistory && !healthHistory.bs) healthHistory.bs = [];
-                if (healthHistory && !healthHistory.wt) healthHistory.wt = [];
-            } catch(e) { healthHistory = null; }
-            if (!healthHistory) { healthHistory = { med: [], bp: [], bs: [], wt: [] }; }
-            localStorage.setItem('joy_health_history', JSON.stringify(healthHistory));
-
-            let healthToday;
-            try {
-                healthToday = JSON.parse(localStorage.getItem('joy_health_today'));
-                if (!healthToday || typeof healthToday !== 'object') healthToday = null;
-                if (healthToday && !healthToday.med) healthToday.med = { "早晨": null, "中午": null, "晚間": null, "睡前": null };
-            } catch(e) { healthToday = null; }
-            if (!healthToday) {
-                healthToday = { date: "", userHeight: 170, med: { "早晨": null, "中午": null, "晚間": null, "睡前": null }, bp: { sys: 0, dia: 0, tag: "" }, bs: { val: 0, tag: "" }, wt: { val: 0 } };
-            }
-            localStorage.setItem('joy_health_today', JSON.stringify(healthToday));
-        }
-    </script>
 </body>
 </html>
