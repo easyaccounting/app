@@ -103,11 +103,14 @@
 </head>
 <body>
 
-    <div class="top-nav">
-        <div class="nav-content">
-            <div class="nav-btn" onclick="window.location.href='dashboard.html'"><svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div>
+        <div class="top-nav">
+        <div class="nav-content" style="gap: 15px;">
+            <div class="nav-btn" onclick="shareApp()"><svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg></div>
+            
+            <div class="nav-btn" onclick="window.location.href='dashboard.html'"><svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div>
         </div>
     </div>
+
 
     <div class="hero-section">
         <div class="taichi-logo"></div>
@@ -198,6 +201,32 @@
             <button class="m-btn-confirm" style="width: 100%; margin-top: 0; background: rgba(255,255,255,0.8); color: var(--text-main); border: 1px solid var(--glass-border); box-shadow: none;" onclick="document.getElementById('copyright-modal').classList.remove('show')">關閉</button>
         </div>
     </div>
+    <script>
+        // ================= 法施分享引擎 =================
+        function shareApp() {
+            // 自動抓取目前的網址，並把後面的 index.html 清理乾淨，保持網址清淨
+            let currentUrl = window.location.href.split('?')[0].replace('index.html', '');
+            
+            const shareData = {
+                title: '淨息流 ． 生活輕鬆記',
+                text: '這是一套無廣告、資料完全保存在手機內的清淨紀錄系統。包含財務、健康、孕母與毛孩四大法界，推薦給您。',
+                url: currentUrl
+            };
+
+            // 喚醒手機原生的分享面板
+            if (navigator.share) {
+                navigator.share(shareData).catch((error) => console.log('分享取消或失敗', error));
+            } else {
+                // 防禦機制：如果是不支援原生分享的環境（例如某些舊版電腦瀏覽器），改為自動複製網址
+                navigator.clipboard.writeText(shareData.url).then(() => {
+                    // 這裡大智用了最簡單的 alert，妳也可以換成系統內建的美觀提示框
+                    alert("網址已複製！感恩您的法施分享。");
+                }).catch(err => {
+                    console.error('複製失敗', err);
+                });
+            }
+        }
+    </script>
 
 </body>
 </html>
