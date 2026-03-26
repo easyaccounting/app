@@ -339,30 +339,8 @@
     </div>
 
     <script>
-        // --- 0. 核心數據處理 ---
-        const STORAGE_KEY = 'joy_accounting_app_data';
-        let appData = { budget: 15000, carrier: "", transactions: [] };
         
-        window.onload = () => {
-            const stored = localStorage.getItem(STORAGE_KEY);
-            if (stored) appData = JSON.parse(stored);
-            let today = new Date();
-            document.getElementById('date-str').innerText = `${today.getMonth()+1}月${today.getDate()}日`;
-            updateSystemUI();
-            setInterval(() => {
-                const now = new Date();
-                const timeEl = document.getElementById('earth-time');
-                if(timeEl) timeEl.innerText = now.toLocaleTimeString();
-            }, 1000);
-        };
-
-        function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); updateSystemUI(); }
-
-        function updateSystemUI() {
-            let bal = appData.transactions.reduce((acc, t) => t.type === 'income' ? acc + t.amt : acc - t.amt, 0);
-            document.getElementById('main-balance').innerText = "$" + bal.toLocaleString();
-            renderTodayList(); 
-        }
+        
 
         // --- [1] 數據核心：加入明細存儲結構 ---
 let db = JSON.parse(localStorage.getItem('PX_EN_V15.0')) || {
