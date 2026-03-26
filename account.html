@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#d4af37">
+    <title>Amitabha Pure Land & Ledger System</title>
+    
+    <style>
+        :root { 
+            --bg: #000; 
+            --gold: #f3e5ab; 
+            --solid-gold: #d4af37; 
+            --cyan: #8ba89c; 
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { 
+            margin: 0; background: var(--bg); color: #eee; 
+            font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; 
+            display: flex; flex-direction: column; align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* 介面容器 */
+        .container { width: 92%; max-width: 450px; display: none; flex-direction: column; align-items: center; padding: 20px 0; }
+        .active { display: flex; }
+        
+        /* 彈窗結界 */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); backdrop-filter: blur(15px); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
+
+        /* 按鈕美學 */
+        .btn-main {
+            width: 100%; background: linear-gradient(145deg, #222, #000); 
+            color: var(--gold); border: 1.5px solid var(--gold);
+            padding: 18px; border-radius: 35px; font-weight: bold; margin: 10px 0; 
+            transition: 0.2s; cursor: pointer; text-align: center; font-size: 1rem;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.6); letter-spacing: 1px;
+        }
+        .btn-main:active { transform: translateY(3px); box-shadow: 0 0 40px var(--solid-gold); background: var(--gold); color: #000; }
+        
+        .gold-btn {
+            border: 1.2px solid var(--gold); color: var(--gold); background: rgba(0,0,0,0.8);
+            padding: 10px 22px; border-radius: 25px; font-size: 0.8rem; font-weight: bold; cursor: pointer;
+        }
+
+        /* 掃描預覽窗口 */
+        #scanner-viewport { width: 100%; aspect-ratio: 1/1; background: #111; border: 1px solid var(--gold); border-radius: 20px; overflow: hidden; position: relative; }
+        #preview-video { width: 100%; height: 100%; object-fit: cover; }
+        .scan-laser { position: absolute; width: 100%; height: 2px; background: var(--gold); top: 0; left: 0; animation: laser 3s infinite linear; box-shadow: 0 0 15px var(--gold); }
+        @keyframes laser { 0% { top: 0% } 100% { top: 100% } }
+
+        /* 修行數據卡片 */
+        .ledger-card { width: 100%; background: var(--glass); border: 1px solid #333; border-radius: 15px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+
+        /* 複製原本的時間顯示美學 */
+        .time-monitor { width: 94%; max-width: 450px; margin: 15px auto; padding: 12px 15px; background: var(--glass); backdrop-filter: blur(20px); border: 1.5px solid var(--gold); border-radius: 12px; display: grid; grid-template-columns: 1fr 1fr; align-items: center; position: sticky; top: 10px; z-index: 1000; }
+    </style>
+</head>
+<body>
+
+<div id="page-transition-curtain"></div>
+
+<div class="time-monitor">
+    <div class="mon-left">
+        <div id="mini-seed" style="display:flex; align-items:center; justify-content:center; width:42px; height:42px;">
+            <svg viewBox="0 0 24 24" fill="var(--gold)"><path d="M12 2L1 21h22L12 2z"/></svg>
+        </div>
+        <div style="display:flex; flex-direction:column;">
+            <span id="rank-title" style="font-size: 0.65rem; color: var(--cyan);">Pure Breath Practitioner</span>
+            <span id="display-name" style="font-weight: bold; font-size: 0.95rem;">Miaoyi</span>
+        </div>
+    </div>
+    <div class="mon-right">
+        <div id="earth-time">Saha: --:--:--</div>
+        <div id="pure-time-display">Merit: --</div>
+    </div>
+</div>
+
+<div id="screen-1" class="container active">
+    <h2 style="color:var(--gold); letter-spacing:4px;">PURITY LEDGER</h2>
+    
+    <div style="width:100%; border: 1.5px solid var(--gold); border-radius: 18px; margin: 20px 0; background: rgba(243,229,171,0.03); padding: 20px; text-align:center;">
+        <div style="font-size:0.8rem; color:#888;">Total Balance</div>
+        <div id="total-balance" style="font-size:2.5rem; color:var(--gold); font-weight:bold;">$ 0.00</div>
+    </div>
+
+    <button class="btn-main" onclick="openScannerPortal()">
+        <svg style="width:20px; vertical-align:middle; margin-right:8px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7V5a2 2 0 0 1 2-2h2m10 0h2a2 2 0 0 1 2 2v2m0 10v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/></svg>
+        SCAN RECEIPT
+    </button>
+
+    <div style="display:flex; gap:12px; width:100%;">
+        <button class="btn-main" style="font-size:0.85rem; flex:1; border-color:var(--cyan); color:var(--cyan);" onclick="openP2PPortal()">
+            P2P SYNC
+        </button>
+        <button class="btn-main" style="font-size:0.85rem; flex:1;" onclick="exportProgress()">BACKUP</button>
+    </div>
+
+    <div id="history-list" style="width:100%; margin-top:20px;">
+        </div>
+</div>
+
+<div id="scanner-modal" class="modal">
+    <div style="width:100%; max-width:400px; text-align:center;">
+        <h3 style="color:var(--gold); margin-bottom:20px;">INVOICE SCANNER</h3>
+        <div id="scanner-viewport">
+            <video id="preview-video" playsinline></video>
+            <div class="scan-laser"></div>
+        </div>
+        <p id="scan-status" style="color:#888; font-size:0.8rem; margin:20px 0;">Align QR Code (Right side of invoice)</p>
+        <button class="btn-main" style="background:#222 !important;" onclick="closeScanner()">CANCEL</button>
+    </div>
+</div>
+
+<div id="p2p-modal" class="modal">
+    <div style="width:100%; max-width:400px; border:1.8px solid var(--gold); background:#000; border-radius:30px; padding:30px; text-align:center;">
+        <h3 style="color:var(--gold); margin-bottom:20px;">DHARMA SYNC</h3>
+        <div id="qr-display" style="background:#fff; padding:15px; border-radius:15px; display:inline-block; margin-bottom:20px;">
+            <div id="qr-output" style="width:200px; height:200px; color:#000; display:flex; align-items:center; justify-content:center; font-size:0.7rem;">Wait for Key...</div>
+        </div>
+        <p id="p2p-msg" style="color:var(--cyan); font-size:0.8rem; margin-bottom:20px;">Ready to link souls.</p>
+        
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <button class="gold-btn" onclick="P2PEngine.start(true)">SENDER</button>
+            <button class="gold-btn" onclick="openScannerForP2P()">RECEIVER</button>
+        </div>
+        <button class="btn-main" style="margin-top:20px; background:#222 !important;" onclick="document.getElementById('p2p-modal').style.display='none'">CLOSE</button>
+    </div>
+</div>
+
+<script>
+// --- [1] 數據核心：記憶與顯化 ---
+let db = JSON.parse(localStorage.getItem('PX_EN_V15.0')) || {
+    name: "Miaoyi",
+    totalNian: 0,
+    points: 0,
+    ledger: [], // 記帳歷史
+    lastDate: new Date().toLocaleDateString()
+};
+
+function save() { localStorage.setItem('PX_EN_V15.0', JSON.stringify(db)); }
+
+function updateUI() {
+    const total = db.ledger.reduce((sum, item) => sum + item.amount, 0);
+    document.getElementById('total-balance').innerText = `$ ${total.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+    
+    const list = document.getElementById('history-list');
+    list.innerHTML = db.ledger.slice(-5).reverse().map(item => `
+        <div class="ledger-card">
+            <div>
+                <div style="color:var(--gold); font-weight:bold;">${item.title}</div>
+                <div style="color:#666; font-size:0.7rem;">${item.date}</div>
+            </div>
+            <div style="color:var(--cyan);">$ ${item.amount}</div>
+        </div>
+    `).join('');
+}
+
+// --- [2] 離線發票解析引擎 ---
+const InvoiceParser = {
+    parse: function(qrStr) {
+        // 台灣電子發票解析邏輯 (極簡版)
+        if (qrStr.length < 50) return null;
+        try {
+            const amountHex = qrStr.substring(29, 37);
+            const amount = parseInt(amountHex, 16);
+            const year = parseInt(qrStr.substring(10, 13)) + 1911;
+            const month = qrStr.substring(13, 15);
+            const day = qrStr.substring(15, 17);
+            return {
+                title: "Receipt: " + qrStr.substring(0, 10),
+                amount: amount,
+                date: `${year}-${month}-${day}`
+            };
+        } catch(e) { return null; }
+    }
+};
+
+// --- [3] 相機掃描邏輯 ---
+let scanActive = false;
+async function openScannerPortal(isP2P = false) {
+    document.getElementById('scanner-modal').style.display = 'flex';
+    const video = document.getElementById('preview-video');
+    const status = document.getElementById('scan-status');
+    
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+        video.srcObject = stream;
+        video.play();
+        scanActive = true;
+        
+        // 使用 2026 原生掃描 API
+        const detector = new BarcodeDetector({ formats: ['qr_code'] });
+        const tick = async () => {
+            if (!scanActive) return;
+            try {
+                const barcodes = await detector.detect(video);
+                if (barcodes.length > 0) {
+                    const raw = barcodes[0].rawValue;
+                    if (isP2P) {
+                        P2PEngine.start(false, raw);
+                    } else {
+                        const result = InvoiceParser.parse(raw);
+                        if (result) {
+                            db.ledger.push(result);
+                            save(); updateUI();
+                            alert(`Success: Recorded $${result.amount}`);
+                        }
+                    }
+                    closeScanner();
+                    return;
+                }
+            } catch(e) {}
+            requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+    } catch(err) {
+        status.innerText = "Camera Access Denied.";
+    }
+}
+
+function closeScanner() {
+    scanActive = false;
+    const video = document.getElementById('preview-video');
+    if (video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
+    document.getElementById('scanner-modal').style.display = 'none';
+}
+
+// --- [4] P2P 隔空同步引擎 (WebRTC) ---
+const P2PEngine = {
+    pc: null,
+    dbKey: 'PX_EN_V15.0',
+    start: async function(isSender, remoteKey = null) {
+        this.pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+        
+        this.pc.onicecandidate = e => {
+            if (!e.candidate && isSender) {
+                const sdp = btoa(JSON.stringify(this.pc.localDescription));
+                // 此處應調用 QR 生成邏輯，暫以文字替代
+                document.getElementById('qr-output').innerText = "SCAN ME";
+                console.log("Connect Key:", sdp);
+            }
+        };
+
+        if (isSender) {
+            const dc = this.pc.createDataChannel("merit");
+            dc.onopen = () => dc.send(localStorage.getItem(this.dbKey));
+            const offer = await this.pc.createOffer();
+            await this.pc.setLocalDescription(offer);
+        } else {
+            this.pc.ondatachannel = e => {
+                e.channel.onmessage = msg => {
+                    localStorage.setItem(this.dbKey, msg.data);
+                    alert("Soul Synchronized!");
+                    location.reload();
+                };
+            };
+            const offer = JSON.parse(atob(remoteKey));
+            await this.pc.setRemoteDescription(offer);
+            const answer = await this.pc.createAnswer();
+            await this.pc.setLocalDescription(answer);
+            // 接收端需要將 Answer 傳回 Sender (此為手動握手之極限，一分留給未來)
+        }
+    }
+};
+
+function openP2PPortal() { document.getElementById('p2p-modal').style.display = 'flex'; }
+function openScannerForP2P() { closeScanner(); openScannerPortal(true); }
+
+// --- [5] 初始化 ---
+window.onload = () => {
+    updateUI();
+    // 時間動態更新
+    setInterval(() => {
+        document.getElementById('earth-time').innerText = "Saha: " + new Date().toLocaleTimeString();
+    }, 1000);
+};
+
+function exportProgress() {
+    const blob = new Blob([JSON.stringify(db)], {type: 'application/json'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = `Merit_Backup.json`; a.click();
+}
+</script>
+</body>
+</html>
