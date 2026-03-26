@@ -68,6 +68,31 @@
         .center-carrier-btn { display: flex; align-items: center; gap: 6px; padding: 6px 16px; background: rgba(255,255,255,0.6); border: 1px solid var(--glass-border); border-radius: 20px; color: var(--accent-gold); font-size: 0.8rem; font-weight: 500; letter-spacing: 1px; cursor: pointer; margin-bottom: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); transition: all 0.2s; }
         .center-carrier-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.9); }
         .center-carrier-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+        /* --- 今日明細與搜尋區塊 --- */
+        .today-section { width: 100%; display: flex; flex-direction: column; gap: 12px; margin-top: -10px; margin-bottom: -5px; transition: all 0.3s; }
+        .today-header { display: flex; justify-content: space-between; align-items: flex-end; padding: 0 5px; }
+        .today-title { font-size: 0.9rem; font-weight: 500; color: var(--text-main); letter-spacing: 1px; display: flex; align-items: baseline; gap: 8px; }
+        .today-title span { font-size: 1.3rem; color: var(--accent-gold); font-weight: 300; }
+        
+        .search-wrap { display: flex; align-items: center; background: rgba(255,255,255,0.5); border: 1px solid var(--glass-border); border-radius: 20px; padding: 6px 12px; width: 130px; transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .search-wrap:focus-within { width: 180px; background: rgba(255,255,255,0.95); border-color: var(--accent-gold); box-shadow: 0 4px 15px rgba(203,163,122,0.15); }
+        .search-wrap svg { width: 14px; height: 14px; stroke: var(--text-light); fill: none; stroke-width: 2; margin-right: 6px; flex-shrink: 0; }
+        .search-input { border: none; background: transparent; width: 100%; font-size: 0.85rem; color: var(--text-main); outline: none; letter-spacing: 0.5px; }
+        .search-input::placeholder { color: var(--text-light); }
+        
+        .today-list { max-height: 160px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 2px; scrollbar-width: none; }
+        .today-list::-webkit-scrollbar { display: none; }
+        .t-item { background: var(--glass-bg); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 18px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.02); animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .t-item-left { display: flex; align-items: center; gap: 12px; }
+        .t-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .t-info { display: flex; flex-direction: column; }
+        .t-cat { font-size: 0.9rem; font-weight: 500; color: var(--text-main); letter-spacing: 0.5px; }
+        .t-memo { font-size: 0.75rem; color: var(--text-light); margin-top: 3px; }
+        .t-amt { font-size: 1.1rem; font-weight: 500; }
+        .t-income { color: var(--accent-jade); }
+        .t-expense { color: var(--text-main); }
         
         /* 分類按鈕網格 */
         .category-grid { width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
@@ -193,6 +218,18 @@
             
             <div class="balance-label">目前結餘</div>
             <div class="balance-amount" id="main-balance">$0</div>
+        </div>
+
+        <div class="today-section">
+            <div class="today-header">
+                <div class="today-title">今日支出 <span id="today-total-amt">$0</span></div>
+                <div class="search-wrap">
+                    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" id="today-search" class="search-input" placeholder="搜尋今日..." onkeyup="renderTodayList()">
+                </div>
+            </div>
+            <div class="today-list" id="today-list-container">
+                </div>
         </div>
 
         <div class="category-grid">
@@ -378,9 +415,11 @@
             document.getElementById('backup-modal').classList.remove('show');
         }
 
+        // 修改：更新UI時，同步渲染今日列表
         function updateSystemUI() {
             let bal = appData.transactions.reduce((acc, t) => t.type === 'income' ? acc + t.amt : acc - t.amt, 0);
             document.getElementById('main-balance').innerText = "$" + bal.toLocaleString();
+            renderTodayList(); 
         }
 
         const categoryData = { '飲食': ['早餐','午餐','晚餐','飲料','便利商店'], '服飾美容': ['衣服','鞋包','保養品','理髮','醫美'], '交通': ['捷運公車','計程車','加油/充電','停車費','車保養'], '居住': ['房租/房貸','水電瓦斯','管理費','網路費','居家用品'], '育樂進修': ['電影展覽','數位訂閱','旅遊','書籍','3C產品'], '其他生活': ['電話費','保險費','醫療','交際孝親','信用卡'], '收入': ['薪水','獎金','投資收益','政府回饋','其他收入'] };
@@ -425,9 +464,73 @@
         function inputNum(num) { if (currentInput === "0" && num !== "00") currentInput = num.toString(); else if (currentInput.length < 8) currentInput += num.toString(); updateDisplay(); }
         function clearNum() { currentInput = "0"; updateDisplay(); }
 
+        // 加入：今日微觀與搜尋渲染核心
+        function renderTodayList() {
+            const listObj = document.getElementById('today-list-container');
+            const totalObj = document.getElementById('today-total-amt');
+            const searchInput = document.getElementById('today-search');
+            if(!listObj || !totalObj) return; 
+            
+            const keyword = searchInput.value.toLowerCase().trim();
+            const todayStr = document.getElementById('date-str').innerText; 
+            
+            let todayTxs = appData.transactions.filter(t => t.date === todayStr);
+            
+            if (keyword) {
+                todayTxs = todayTxs.filter(t => 
+                    t.cat.toLowerCase().includes(keyword) || 
+                    t.sub.toLowerCase().includes(keyword) || 
+                    (t.memo && t.memo.toLowerCase().includes(keyword)) ||
+                    t.amt.toString().includes(keyword)
+                );
+            }
+
+            let dailyExpense = 0;
+            listObj.innerHTML = '';
+            
+            if (todayTxs.length === 0) {
+                listObj.innerHTML = `<div style="text-align:center; font-size:0.85rem; color:var(--text-light); padding:15px;">清淨無痕，尚無紀錄</div>`;
+                totalObj.innerText = "$0";
+                return;
+            }
+
+            todayTxs.forEach(t => {
+                if(t.type === 'expense') dailyExpense += t.amt;
+                let isInc = t.type === 'income';
+                let amtStr = isInc ? `+$${t.amt.toLocaleString()}` : `-$${t.amt.toLocaleString()}`;
+                let amtClass = isInc ? 't-income' : 't-expense';
+                let memoHtml = t.memo ? `<div class="t-memo">${t.memo}</div>` : '';
+                
+                listObj.innerHTML += `
+                    <div class="t-item">
+                        <div class="t-item-left">
+                            <div class="t-dot" style="background: ${t.color}"></div>
+                            <div class="t-info">
+                                <div class="t-cat">${t.cat} - ${t.sub}</div>
+                                ${memoHtml}
+                            </div>
+                        </div>
+                        <div class="t-amt ${amtClass}">${amtStr}</div>
+                    </div>
+                `;
+            });
+            totalObj.innerText = `$${dailyExpense.toLocaleString()}`;
+        }
+
+        // 修改：送出紀錄時，清空搜尋並重新渲染今日列表
         function submitEntry() {
             let amt = Number(currentInput); let cat = activeBtn ? activeBtn.querySelector('span').innerText : '未分類'; let sub = currentSubTag || '一般'; let date = document.getElementById('date-str').innerText;
-            if(amt > 0) { appData.transactions.unshift({ id: Date.now(), timestamp: Date.now(), type: isIncomeMode ? 'income' : 'expense', date: date, cat: cat, sub: sub, amt: amt, memo: currentMemo, invoice: hasInvoice, color: isIncomeMode ? 'var(--accent-jade)' : (colorMap[cat] || 'var(--cat-other)') }); saveData(); let balObj = document.getElementById('main-balance'); balObj.style.opacity = 0; setTimeout(() => { balObj.style.opacity = 1; }, 200); }
+            if(amt > 0) { 
+                appData.transactions.unshift({ id: Date.now(), timestamp: Date.now(), type: isIncomeMode ? 'income' : 'expense', date: date, cat: cat, sub: sub, amt: amt, memo: currentMemo, invoice: hasInvoice, color: isIncomeMode ? 'var(--accent-jade)' : (colorMap[cat] || 'var(--cat-other)') }); 
+                saveData(); 
+                
+                let balObj = document.getElementById('main-balance'); 
+                balObj.style.opacity = 0; 
+                setTimeout(() => { balObj.style.opacity = 1; }, 200); 
+                
+                if(document.getElementById('today-search')) document.getElementById('today-search').value = '';
+                renderTodayList();
+            }
             closeKeyboard();
         }
     </script>
