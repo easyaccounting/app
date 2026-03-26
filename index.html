@@ -139,9 +139,21 @@
             </div>
         </div>
 
-        <div class="footer-text" onclick="window.location.href='https://namoamitabhapureland.github.io/bodhicitta/index.html'">
-            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg> 彌陀淨土系統 衍生共建
+                <div class="footer-text">
+            <span onclick="window.location.href='https://namoamitabhapureland.github.io/bodhicitta/index.html'" style="display: flex; align-items: center; gap: 6px;">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg> 彌陀淨土 衍生共建
+            </span>
+            <span style="margin: 0 10px; opacity: 0.3;">|</span>
+            <span onclick="document.getElementById('copyright-modal').classList.add('show')" style="color: var(--accent-jade);">版權與開源</span>
         </div>
+        <div class="footer-text">
+            <span onclick="window.location.href='https://namoamitabhapureland.github.io/bodhicitta/index.html'" style="display: flex; align-items: center; gap: 6px;">
+                <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg> 彌陀淨土 衍生共建
+            </span>
+            <span style="margin: 0 10px; opacity: 0.3;">|</span>
+            <span onclick="document.getElementById('copyright-modal').classList.add('show')" style="color: var(--accent-jade);">版權與開源</span>
+        </div>
+
     </div>
 
     <div class="modal-overlay" id="readme-modal">
@@ -173,6 +185,20 @@
             </div>
 
             <button class="m-btn-confirm" onclick="document.getElementById('readme-modal').classList.remove('show')">明白，進入清淨法界</button>
+        </div>
+    </div>
+    <div class="modal-overlay" id="copyright-modal">
+        <div class="glass-modal" style="max-width: 340px; padding: 30px 25px; text-align: left;">
+            <h3 style="margin-top:0; color:var(--accent-gold); font-size: 1.15rem; letter-spacing: 2px; font-weight: 500; text-align: center; border-bottom: 1px solid rgba(203, 163, 122, 0.3); padding-bottom: 15px; margin-bottom: 15px;">關於版權與免費開源</h3>
+            
+            <p style="font-size: 0.85rem; color: var(--text-main); line-height: 1.8; margin-bottom: 20px; text-align: justify; letter-spacing: 0.5px;">
+                本系統採 <strong>【創用CC 姓名標示-非商業性-相同方式分享】</strong> 授權，永久免費。任何人皆可分享流通，但絕對嚴禁任何形式之商業牟利、廣告或販售行為，違者必究，以護持法界之清淨。
+            </p>
+            
+            <div style="font-size: 0.85rem; color: var(--accent-jade); font-weight: 500; margin-bottom: 5px; text-align: center; letter-spacing: 1px;">推廣南無阿彌陀佛專社</div>
+            <div style="font-size: 0.8rem; color: var(--text-light); text-align: center; margin-bottom: 20px; letter-spacing: 1px;">妙依居士 開發製作</div>
+            
+            <button class="m-btn-confirm" style="width: 100%; margin-top: 0; background: rgba(255,255,255,0.8); color: var(--text-main); border: 1px solid var(--glass-border); box-shadow: none;" onclick="document.getElementById('copyright-modal').classList.remove('show')">關閉</button>
         </div>
     </div>
 
