@@ -383,7 +383,41 @@
             </div>
             <button class="m-btn m-btn-cancel" style="width: 100%; margin-top: 15px; background: transparent; border: none; font-size: 0.85rem;" onclick="document.getElementById('backup-modal').classList.remove('show')">關閉視窗</button>
         </div>
+        <div class="modal-overlay" id="lottery-modal">
+        <div class="glass-modal" style="max-width: 380px; padding: 25px 20px;">
+            <h3 style="margin-top:0; color:var(--accent-gold); font-weight: 500; letter-spacing: 2px;">本期發票對獎</h3>
+            
+            <div style="font-size: 0.8rem; color: var(--text-light); margin-bottom: 15px; line-height: 1.6;">
+                請參考官方開獎號碼，填入下方欄位。<br>系統將於本地端光速比對您掃描的紀錄。
+            </div>
+            <a href="https://invoice.etax.nat.gov.tw/" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: rgba(255,255,255,0.6); border: 1px solid var(--glass-border); border-radius: 20px; color: var(--accent-jade); font-size: 0.85rem; text-decoration: none; margin-bottom: 20px; transition: all 0.2s;">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                財政部開獎號碼
+            </a>
+
+            <div style="text-align: left; font-size: 0.8rem; color: var(--text-main); margin-left: 5px; margin-bottom: 4px;">特別獎 (1000萬)</div>
+            <input type="number" id="prize-special" class="modal-input" style="letter-spacing: 2px;" placeholder="8位數字" maxlength="8">
+            
+            <div style="text-align: left; font-size: 0.8rem; color: var(--text-main); margin-left: 5px; margin-bottom: 4px;">特獎 (200萬)</div>
+            <input type="number" id="prize-grand" class="modal-input" style="letter-spacing: 2px;" placeholder="8位數字" maxlength="8">
+            
+            <div style="text-align: left; font-size: 0.8rem; color: var(--text-main); margin-left: 5px; margin-bottom: 4px;">頭獎至六獎 (共三組)</div>
+            <div style="display: flex; gap: 8px; margin-bottom: 20px;">
+                <input type="number" id="prize-first-1" class="modal-input" style="margin: 0; padding: 10px 5px; font-size: 0.9rem;" placeholder="第一組">
+                <input type="number" id="prize-first-2" class="modal-input" style="margin: 0; padding: 10px 5px; font-size: 0.9rem;" placeholder="第二組">
+                <input type="number" id="prize-first-3" class="modal-input" style="margin: 0; padding: 10px 5px; font-size: 0.9rem;" placeholder="第三組">
+            </div>
+
+            <div id="lottery-result-area" style="display: none; flex-direction: column; align-items: center; padding: 15px; background: rgba(255,255,255,0.8); border-radius: 16px; border: 1px solid var(--accent-gold); margin-bottom: 15px;">
+                </div>
+
+            <div class="modal-btn-group">
+                <button class="m-btn m-btn-cancel" onclick="document.getElementById('lottery-modal').classList.remove('show'); document.getElementById('lottery-result-area').style.display='none';">關閉</button>
+                <button class="m-btn m-btn-confirm" onclick="runLotteryEngine()">一鍵對獎</button>
+            </div>
+        </div>
     </div>
+
 
     <script>
         const STORAGE_KEY = 'joy_accounting_app_data';
@@ -657,6 +691,89 @@
             }
             document.getElementById('backup-modal').classList.remove('show');
         }
+                // --- 發票對獎光速引擎 ---
+        function openLotteryModal() {
+            document.getElementById('lottery-modal').classList.add('show');
+            document.getElementById('lottery-result-area').style.display = 'none';
+        }
+
+        function runLotteryEngine() {
+            const sp = document.getElementById('prize-special').value.trim();
+            const gp = document.getElementById('prize-grand').value.trim();
+            const fp1 = document.getElementById('prize-first-1').value.trim();
+            const fp2 = document.getElementById('prize-first-2').value.trim();
+            const fp3 = document.getElementById('prize-first-3').value.trim();
+            
+            const firstPrizes = [fp1, fp2, fp3].filter(n => n.length === 8);
+            const resultArea = document.getElementById('lottery-result-area');
+            
+            if (sp.length !== 8 && gp.length !== 8 && firstPrizes.length === 0) {
+                alert("請至少輸入一組完整的8位數獎號。");
+                return;
+            }
+
+            let totalWinAmount = 0;
+            let winCount = 0;
+            
+            // 撈出所有透過掃描建檔的發票 (ID 開頭為 INV_)
+            let scanInvoices = appData.transactions.filter(t => t.id && t.id.toString().startsWith('INV_'));
+
+            scanInvoices.forEach(inv => {
+                let invNum = inv.id.toString().substring(4); // 取得8碼數字
+                if (!invNum || invNum.length !== 8) return;
+
+                let isWin = false;
+
+                // 比對特別獎與特獎
+                if (sp === invNum) { totalWinAmount += 10000000; isWin = true; }
+                else if (gp === invNum) { totalWinAmount += 2000000; isWin = true; }
+
+                // 比對頭獎至六獎
+                if (!isWin) {
+                    for (let fp of firstPrizes) {
+                        if (invNum === fp) { totalWinAmount += 200000; isWin = true; break; }
+                        if (invNum.endsWith(fp.substring(1))) { totalWinAmount += 40000; isWin = true; break; } // 二獎
+                        if (invNum.endsWith(fp.substring(2))) { totalWinAmount += 10000; isWin = true; break; } // 三獎
+                        if (invNum.endsWith(fp.substring(3))) { totalWinAmount += 4000; isWin = true; break; }  // 四獎
+                        if (invNum.endsWith(fp.substring(4))) { totalWinAmount += 1000; isWin = true; break; }  // 五獎
+                        if (invNum.endsWith(fp.substring(5))) { totalWinAmount += 200; isWin = true; break; }   // 六獎
+                    }
+                }
+                if (isWin) winCount++;
+            });
+
+            // 渲染結果與純淨向量動畫
+            resultArea.style.display = 'flex';
+            if (winCount > 0) {
+                // 中獎：琉璃金光
+                resultArea.innerHTML = `
+                    <svg viewBox="0 0 100 100" width="60" height="60" style="margin-bottom: 10px;">
+                        <circle cx="50" cy="50" r="45" fill="none" stroke="var(--accent-gold)" stroke-width="2" stroke-dasharray="4 6">
+                            <animateTransform attributeName="transform" type="rotate" from="0 50 50" to="360 50 50" dur="10s" repeatCount="indefinite"/>
+                        </circle>
+                        <path d="M50 20 L55 45 L80 50 L55 55 L50 80 L45 55 L20 50 L45 45 Z" fill="var(--accent-gold)">
+                            <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/>
+                        </path>
+                    </svg>
+                    <div style="font-size: 1.1rem; color: var(--accent-gold); font-weight: 500; letter-spacing: 1px;">恭喜！中獎 ${winCount} 張</div>
+                    <div style="font-size: 1.5rem; color: var(--text-main); font-weight: bold; margin-top: 5px;">$${totalWinAmount.toLocaleString()}</div>
+                `;
+            } else {
+                // 未中獎：靜心水波落葉
+                resultArea.innerHTML = `
+                    <svg viewBox="0 0 100 100" width="50" height="50" style="margin-bottom: 10px;">
+                        <circle cx="50" cy="50" r="30" fill="none" stroke="var(--accent-jade)" stroke-width="1.5" opacity="0.5">
+                            <animate attributeName="r" values="10;45" dur="2s" repeatCount="indefinite"/>
+                            <animate attributeName="opacity" values="0.8;0" dur="2s" repeatCount="indefinite"/>
+                        </circle>
+                        <path d="M40 60 C 20 40, 50 20, 60 40 C 70 60, 50 70, 40 60 Z" fill="none" stroke="var(--accent-jade)" stroke-width="2"/>
+                    </svg>
+                    <div style="font-size: 1rem; color: var(--accent-jade); letter-spacing: 2px;">福報積累中，隨喜讚嘆</div>
+                    <div style="font-size: 0.75rem; color: var(--text-light); margin-top: 5px;">本次比對了 ${scanInvoices.length} 張發票</div>
+                `;
+            }
+        }
+
     </script>
 </body>
 </html>
