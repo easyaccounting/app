@@ -3,102 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A-Spec v1.8.1 | 勞動審計</title>
+    <title>妙依 · 金剛藏</title>
     <style>
-        :root { --gold: #CBA37A; --bg: #050505; --text: #D1CEC7; --jade: #82968C; }
-        body { background: var(--bg); color: var(--text); font-family: monospace; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .wrapper { width: 100%; max-width: 600px; border: 1px solid rgba(203, 163, 122, 0.3); padding: 20px; box-sizing: border-box; }
-        h1 { font-weight: 200; letter-spacing: 5px; color: var(--gold); text-align: center; font-size: 1.5rem; }
-        
-        .terminal { background: #000; border: 1px solid var(--gold); padding: 15px; margin-bottom: 20px; }
-        textarea { width: 100%; height: 80px; background: transparent; border: none; color: var(--jade); font-family: monospace; font-size: 12px; outline: none; resize: none; }
-        
-        button { background: var(--gold); color: #000; border: none; padding: 15px 0; width: 100%; font-weight: bold; cursor: pointer; letter-spacing: 2px; margin-top: 10px; }
-
-        #result-zone { display: none; margin-top: 20px; border-top: 1px solid var(--gold); padding-top: 20px; width: 100%; }
-        .radar-box { background: #000; text-align: center; padding: 10px; border: 1px solid #222; }
-        .data-table { width: 100%; margin-top: 20px; font-size: 12px; border-collapse: collapse; }
-        .data-table td { padding: 8px; border-bottom: 1px solid #111; }
-        .val { color: #fff; text-align: right; }
-
-        .v-seal { margin-top: 30px; border: 1px solid var(--gold); padding: 15px; text-align: center; }
-        .v-id { font-size: 18px; color: #fff; font-weight: bold; margin: 10px 0; }
+        :root {
+            --bg-color: #fcfcfc;
+            --text-primary: #2c3e50;
+            --accent: #34495e;
+            --border: #dcdde1;
+        }
+        body {
+            font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+            margin: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 480px;
+            border: 1px solid var(--border);
+            padding: 2rem;
+            background: white;
+        }
+        h2 { font-weight: 300; letter-spacing: 2px; text-align: center; }
+        .input-group { margin-bottom: 1.5rem; }
+        label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--accent); }
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            box-sizing: border-box;
+            font-size: 1rem;
+            outline: none;
+            transition: border 0.3s;
+        }
+        input:focus { border-color: var(--accent); }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            cursor: pointer;
+            letter-spacing: 1px;
+            font-size: 1rem;
+            transition: opacity 0.3s;
+        }
+        button:hover { opacity: 0.9; }
+        .svg-icon {
+            width: 24px;
+            height: 24px;
+            display: block;
+            margin: 0 auto 1rem;
+            fill: var(--accent);
+        }
+        .status { margin-top: 1rem; font-size: 0.85rem; color: #7f8c8d; line-height: 1.6; word-break: break-all; }
     </style>
 </head>
 <body>
 
-<div class="wrapper">
-    <h1>識位眾生 ． 勞動審計</h1>
-
-    <div class="terminal">
-        <textarea id="vault-input" placeholder="貼入 A-ID 長串密碼..."></textarea>
-        <button onclick="decodeAndAudit()">執行數據顯化</button>
+<div class="container">
+    <svg class="svg-icon" viewBox="0 0 24 24">
+        <path d="M12 1a5 5 0 0 0-5 5v4H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2h-1V6a5 5 0 0 0-5-5zm-3 5a3 3 0 0 1 6 0v4H9V6zm3 10a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+    </svg>
+    
+    <h2>金剛藏 · 安全核心</h2>
+    
+    <div class="input-group">
+        <label>主密碼 (Master Password)</label>
+        <input type="password" id="masterPwd" placeholder="請輸入主金鑰">
     </div>
 
-    <div id="result-zone">
-        <div class="radar-box" id="radar-svg-wrap"></div>
-        
-        <table class="data-table">
-            <tbody id="audit-body"></tbody>
-        </table>
-
-        <div class="v-seal">
-            <div style="font-size: 9px; color: var(--jade);">UNIVERSAL LABOR CERTIFICATE</div>
-            <div class="v-id" id="v-id-display"></div>
-            <div id="summary-text" style="font-size: 11px; color: var(--gold);"></div>
-        </div>
+    <div class="input-group">
+        <label>明文內容 (Data to Encrypt)</label>
+        <textarea id="plainText" rows="4" placeholder="輸入需要加密的資訊"></textarea>
     </div>
+
+    <button onclick="handleEncrypt()">執行金剛加密</button>
+    
+    <div id="output" class="status"></div>
 </div>
 
 <script>
-function decodeAndAudit() {
-    let input = document.getElementById('vault-input').value.trim();
-    if(!input) return;
+    /**
+     * 安全加密模組 - 妙依專屬版本
+     * 遵循 CC0 協議，無版權爭議
+     */
 
-    // 修正：移除所有可能的干擾字元（如空格、換行）
-    input = input.replace(/\s/g, '');
+    // 生成隨機鹽值與向量
+    const generateSalt = () => window.crypto.getRandomValues(new Uint8Array(16));
+    const generateIV = () => window.crypto.getRandomValues(new Uint8Array(12));
 
-    let json;
-    try {
-        if (input.startsWith('{')) {
-            json = JSON.parse(input);
-        } else {
-            // 強力解碼：處理 Unicode
-            let binary = atob(input);
-            let bytes = new Uint8Array(binary.length);
-            for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-            json = JSON.parse(new TextDecoder().decode(bytes));
-        }
-        renderUI(json);
-    } catch (e) {
-        alert("解碼失敗：請確認貼入的是正確的 A-ID 密碼。");
+    // 從主密碼衍生加密金鑰 (PBKDF2)
+    async function deriveKey(password, salt) {
+        const encoder = new TextEncoder();
+        const baseKey = await window.crypto.subtle.importKey(
+            'raw', encoder.encode(password), 'PBKDF2', false, ['deriveKey']
+        );
+        return window.crypto.subtle.deriveKey(
+            { name: 'PBKDF2', salt, iterations: 600000, hash: 'SHA-256' },
+            baseKey,
+            { name: 'AES-GCM', length: 256 },
+            false,
+            ['encrypt', 'decrypt']
+        );
     }
-}
 
-function renderUI(data) {
-    const p = data.Audit_Payload;
-    document.getElementById('result-zone').style.display = 'block';
-    document.getElementById('v-id-display').innerText = data.Universal_Vajra_Seal;
-    document.getElementById('summary-text').innerText = `人類意志覆蓋率：${p.Evolution_Delta.D_FINAL_Override}`;
+    // 加密函數
+    async function encryptData(password, plainText) {
+        const salt = generateSalt();
+        const iv = generateIV();
+        const key = await deriveKey(password, salt);
+        const encoder = new TextEncoder();
+        
+        const encrypted = await window.crypto.subtle.encrypt(
+            { name: 'AES-GCM', iv },
+            key,
+            encoder.encode(plainText)
+        );
 
-    document.getElementById('audit-body').innerHTML = `
-        <tr><td>指令密度 (I)</td><td class="val">${p.Intent_Density.I_CMD_Valid}</td></tr>
-        <tr><td>機率位移 (P)</td><td class="val">${p.Power_Control.P_Shift_Force}</td></tr>
-        <tr><td>運算耗損 (B)</td><td class="val">${p.Resource_Metrics.B_T_OUT} Tokens</td></tr>
-        <tr><td>推理時長 (T)</td><td class="val">${p.Temporal_Log.T_INF_MS}ms</td></tr>
-    `;
+        // 將 Salt, IV 與 密文 組合併轉為 Base64
+        const result = new Uint8Array(salt.length + iv.length + encrypted.byteLength);
+        result.set(salt, 0);
+        result.set(iv, salt.length);
+        result.set(new Uint8Array(encrypted), salt.length + iv.length);
+        
+        return btoa(String.fromCharCode(...result));
+    }
 
-    // 簡單幾何圖繪製
-    const i = Math.min(p.Intent_Density.I_CMD_Valid * 20, 100);
-    const d = parseFloat(p.Evolution_Delta.D_FINAL_Override) || 50;
-    document.getElementById('radar-svg-wrap').innerHTML = `
-        <svg width="200" height="150" viewBox="0 0 200 150">
-            <circle cx="100" cy="75" r="50" fill="none" stroke="#222" stroke-width="1"/>
-            <rect x="${100-(i/2)}" y="${75-(d/4)}" width="${i}" height="${d/2}" fill="none" stroke="var(--gold)" stroke-width="2" transform="rotate(45 100 75)"/>
-            <circle cx="100" cy="75" r="3" fill="var(--gold)"/>
-        </svg>
-    `;
-}
+    // 介面處理
+    async function handleEncrypt() {
+        const pwd = document.getElementById('masterPwd').value;
+        const text = document.getElementById('plainText').value;
+        const out = document.getElementById('output');
+
+        if (!pwd || !text) {
+            out.innerText = "請完整輸入主密碼與內容。";
+            return;
+        }
+
+        try {
+            out.innerText = "計算中，請稍候...";
+            const encryptedBase64 = await encryptData(pwd, text);
+            out.innerHTML = `<strong>加密完成：</strong><br>${encryptedBase64}`;
+        } catch (e) {
+            out.innerText = "發生錯誤，請檢查系統環境。";
+        }
+    }
 </script>
+
 </body>
 </html>
