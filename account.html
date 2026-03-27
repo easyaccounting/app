@@ -41,7 +41,7 @@
         .menu-subtitle { font-size: 0.75rem; color: var(--accent-gold); letter-spacing: 1px; margin-top: 8px; }
         
         .menu-list { flex: 1; overflow-y: auto; padding: 0 20px 20px; display: flex; flex-direction: column; gap: 12px; }
-        .menu-item { padding: 16px 20px; border-radius: 20px; border: 1px solid var(--glass-border); display: flex; align-items: center; gap: 15px; font-size: 0.95rem; font-weight: 500; cursor: pointer; background: rgba(255,255,255,0.4); box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: all 0.2s; color: var(--text-main); text-decoration: none; }
+        .menu-item { padding: 16px 20px; border-radius: 20px; border: 1px solid var(--glass-border); display: flex; align-items: center; gap: 15px; font-size: 0.95rem; font-weight: 500; cursor: pointer; background: rgba(255,255,255,0.4); box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: all 0.2s; color: var(--text-main); }
         .menu-item:active { transform: scale(0.97); background: rgba(255,255,255,0.9); }
         .menu-item.active { background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(203, 163, 122, 0.12)); border-color: var(--accent-gold); color: var(--accent-gold); box-shadow: 0 4px 15px rgba(203, 163, 122, 0.12); }
         .menu-icon-wrap { width: 32px; height: 32px; border-radius: 50%; background: #fff; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
@@ -142,7 +142,7 @@
         .key-enter { grid-row: span 2; background: var(--accent-gold); color: white; border-radius: 20px; font-size: 1.8rem; border: none; transition: background 0.3s; box-shadow: 0 4px 15px rgba(203, 163, 122, 0.25); }
         .income-mode .key-enter { background: var(--accent-jade); box-shadow: 0 4px 15px rgba(130, 150, 140, 0.25); }
 
-        /* --- [新增] 掃描視窗 (琉璃風格) --- */
+        /* --- 掃描視窗 (琉璃風格) --- */
         .scanner-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(249,250,249,0.85); backdrop-filter: blur(25px); z-index: 3000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; animation: modalFade 0.4s ease; }
         @keyframes modalFade { from { opacity: 0; } to { opacity: 1; } }
         .scanner-viewport { width: 100%; max-width: 400px; aspect-ratio: 1/1; border-radius: 35px; border: 2px solid var(--glass-border); overflow: hidden; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.1); background: #000; }
@@ -150,11 +150,13 @@
         .scan-laser { position: absolute; width: 100%; height: 2px; background: var(--accent-gold); top: 0; left: 0; animation: laser 3s infinite linear; box-shadow: 0 0 15px var(--accent-gold); }
         @keyframes laser { 0% { top: 0% } 100% { top: 100% } }
 
-        /* --- [新增] 掃描進度燈 --- */
+        /* --- 掃描進度燈 --- */
         .scan-guide-wrap { margin-top: 25px; display: flex; gap: 12px; }
         .guide-step { font-size: 0.75rem; padding: 6px 15px; border-radius: 15px; border: 1px solid #ddd; color: #999; transition: 0.3s; }
         .guide-step.active { border-color: var(--accent-gold); color: var(--accent-gold); background: #fff; box-shadow: 0 2px 10px rgba(203, 163, 122, 0.15); font-weight: bold; }
         #scan-status { margin-top: 15px; font-size: 0.85rem; color: var(--accent-gold); letter-spacing: 1px; font-weight: 500; }
+
+        #scan-canvas { display: none; }
 
         /* --- 彈窗 (統一風格) --- */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 3000; opacity: 0; transition: opacity 0.3s; }
@@ -170,8 +172,6 @@
         .m-btn-cancel:active { background: rgba(255,255,255,0.9); }
         .m-btn-confirm { background: var(--accent-gold); color: white; box-shadow: 0 4px 15px rgba(203, 163, 122, 0.2); }
         .m-btn-confirm:active { transform: scale(0.95); }
-
-        #scan-canvas { display: none; }
     </style>
 </head>
 <body>
@@ -189,11 +189,17 @@
             <div class="menu-item active" onclick="toggleMenu()">
                 <div class="menu-icon-wrap"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>財務記帳
             </div>
-            <div class="menu-item" onclick="toggleMenu(); openScannerPortal();" style="border-color: var(--accent-gold); color: var(--accent-gold);">
-                <div class="menu-icon-wrap" style="background: rgba(203, 163, 122, 0.1);"><svg viewBox="0 0 24 24" style="stroke: var(--accent-gold);"><path d="M3 7V5a2 2 0 0 1 2-2h2m10 0h2a2 2 0 0 1 2 2v2m0 10v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M12 12h.01"/></svg></div>發票掃描記帳
-            </div>
             <div class="menu-item" onclick="window.location.href='health.html'">
                 <div class="menu-icon-wrap"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>健康日誌
+            </div>
+            <div class="menu-item" onclick="window.location.href='mom.html'">
+                <div class="menu-icon-wrap"><svg viewBox="0 0 24 24"><path d="M12 22c0-5.5-4.5-10-10-10 5.5 0 10-4.5 10-10 0 5.5 4.5 10 10 10-5.5 0-10 4.5-10 10z"/></svg></div>孕母育兒
+            </div>
+            <div class="menu-item" onclick="window.location.href='pet.html'">
+                <div class="menu-icon-wrap"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm4 0h-2v-2h2v2zm-2-4q-2 0-3-1.5T9 8h2q0 1 1 1.5t2 0V12z"/></svg></div>毛孩手冊
+            </div>
+            <div class="menu-item" onclick="window.location.href='dashboard.html'">
+                <div class="menu-icon-wrap"><svg viewBox="0 0 24 24" stroke="currentColor"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div>大數據統計
             </div>
             <div class="menu-item" onclick="window.location.href='https://namoamitabhapureland.github.io/bodhicitta/index.html'">
                 <div class="menu-icon-wrap"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg></div>彌陀淨土系統
@@ -217,8 +223,13 @@
                 <svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
             </div>
             <div class="page-title" onclick="window.location.href='index.html'">財務記帳</div>
-            <div class="nav-btn" onclick="window.location.href='dashboard.html'">
-                <svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+            <div style="display: flex; gap: 12px;">
+                <div class="nav-btn" onclick="openScanner()">
+                    <svg viewBox="0 0 24 24"><path d="M4 7V5a2 2 0 0 1 2-2h2M20 7V5a2 2 0 0 0-2-2h-2M4 17v2a2 2 0 0 0 2 2h2M20 17v2a2 2 0 0 1-2 2h-2"/><circle cx="12" cy="12" r="3"/></svg>
+                </div>
+                <div class="nav-btn" onclick="window.location.href='dashboard.html'">
+                    <svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+                </div>
             </div>
         </div>
     </div>
@@ -416,7 +427,7 @@
             const listObj = document.getElementById('today-list-container');
             const totalObj = document.getElementById('today-total-amt');
             const keyword = document.getElementById('today-search').value.toLowerCase().trim();
-            const todayStr = (new Date().getMonth()+1) + '月' + new Date().getDate() + '日';
+            const todayStr = document.getElementById('date-str').innerText;
             
             let todayTxs = appData.transactions.filter(t => t.date === todayStr);
             if (keyword) todayTxs = todayTxs.filter(t => t.cat.toLowerCase().includes(keyword) || (t.memo && t.memo.toLowerCase().includes(keyword)));
@@ -429,11 +440,13 @@
                 let isInc = t.type === 'income';
                 let amtStr = isInc ? `+$${t.amt.toLocaleString()}` : `-$${t.amt.toLocaleString()}`;
                 let memoHtml = t.memo ? `<div class="t-memo">${t.memo}</div>` : '';
+                
+                // 結合編輯紀錄功能的觸發區域
                 listObj.innerHTML += `
                     <div class="t-item" onclick="openEditModal('${t.id}')">
                         <div class="t-item-left">
                             <div class="t-dot" style="background: ${t.color}"></div>
-                            <div class="t-info"><div class="t-cat">${t.cat}</div>${memoHtml}</div>
+                            <div class="t-info"><div class="t-cat">${t.cat} ${t.sub ? '- '+t.sub : ''}</div>${memoHtml}</div>
                         </div>
                         <div class="t-amt ${isInc ? 't-income' : 't-expense'}">${amtStr}</div>
                     </div>
@@ -442,7 +455,7 @@
             totalObj.innerText = `$${dailyExpense.toLocaleString()}`;
         }
 
-        // --- [新增] 編輯功能邏輯 ---
+        // --- 編輯功能邏輯 ---
         function openEditModal(id) {
             const t = appData.transactions.find(item => item.id == id);
             if(!t) return;
@@ -451,6 +464,7 @@
             document.getElementById('edit-memo').value = t.memo || "";
             document.getElementById('edit-modal').classList.add('show');
         }
+        
         function saveEdit() {
             const t = appData.transactions.find(item => item.id == editingId);
             if(t) {
@@ -460,6 +474,7 @@
             }
             document.getElementById('edit-modal').classList.remove('show');
         }
+        
         function deleteEntry() {
             if(confirm("確定要刪除這筆紀錄嗎？")) {
                 appData.transactions = appData.transactions.filter(item => item.id != editingId);
@@ -480,6 +495,7 @@
         function updateDisplay() { document.getElementById('input-amt').innerText = Number(currentInput).toLocaleString(); }
         function clearNum() { currentInput = "0"; updateDisplay(); }
         function confirmMemo() { currentMemo = document.getElementById('memo-input').value.trim(); document.getElementById('memo-text-span').innerText = currentMemo || "輸入備註"; document.getElementById('memo-modal').classList.remove('show'); }
+        
         function renderSubTags(cat, isInc) {
             const container = document.getElementById('sub-tags-container'); container.innerHTML = '';
             (categoryData[cat] || []).forEach(tag => {
@@ -487,16 +503,21 @@
                 el.onclick = () => { Array.from(container.children).forEach(t=>t.classList.remove('selected')); el.classList.add('selected'); currentSubTag = tag; };
                 container.appendChild(el);
             });
+            setTimeout(() => container.classList.add('show'), 50);
         }
+        
         function submitEntry() {
-            let amt = Number(currentInput); if(amt > 0) {
-                appData.transactions.unshift({ id: Date.now(), type: isIncomeMode ? 'income' : 'expense', date: document.getElementById('date-str').innerText, cat: activeBtn?activeBtn.querySelector('span').innerText: (isIncomeMode?'收入':'其他生活'), sub: currentSubTag||'一般', amt: amt, memo: currentMemo, color: isIncomeMode ? 'var(--accent-jade)' : (colorMap[activeBtn?activeBtn.querySelector('span').innerText:'其他生活'] || 'var(--cat-other)') });
+            let amt = Number(currentInput); 
+            if(amt > 0) {
+                let cat = activeBtn ? activeBtn.querySelector('span').innerText : (isIncomeMode?'收入':'其他生活');
+                let color = isIncomeMode ? 'var(--accent-jade)' : (colorMap[cat] || 'var(--cat-other)');
+                appData.transactions.unshift({ id: Date.now(), type: isIncomeMode ? 'income' : 'expense', date: document.getElementById('date-str').innerText, cat: cat, sub: currentSubTag||'一般', amt: amt, memo: currentMemo, color: color });
                 saveData();
             }
             closeKeyboard();
         }
 
-        // --- [新增] 掃描引擎 (jsQR 萬用版) ---
+        // --- 掃描引擎 (jsQR 萬用版) ---
         const InvoiceParser = {
             parseSummary: function(data) {
                 if (data.length < 50 || data.startsWith("**")) return null;
@@ -523,8 +544,8 @@
         };
 
         let scanActive = false, videoStream = null;
-        async function openScannerPortal() {
-            if (window.location.protocol === 'http:' && window.location.hostname !== 'localhost') { alert("請在 HTTPS 環境測試。"); return; }
+        async function openScanner() {
+            if (window.location.protocol === 'http:' && window.location.hostname !== 'localhost') { alert("請在 HTTPS 環境測試，以啟用相機權限。"); return; }
             document.getElementById('scanner-modal').style.display = 'flex';
             const video = document.getElementById('preview-video');
             const canvas = document.getElementById('scan-canvas');
@@ -544,14 +565,14 @@
                     requestAnimationFrame(tick);
                 };
                 tick();
-            } catch(e) { alert("相機啟動失敗"); }
+            } catch(e) { alert("相機啟動失敗，請確認是否允許存取鏡頭。"); }
         }
 
         function handleScan(raw) {
             const s = InvoiceParser.parseSummary(raw);
             const d = InvoiceParser.parseDetails(raw);
             const status = document.getElementById('scan-status');
-            const todayStr = (new Date().getMonth()+1) + '月' + new Date().getDate() + '日';
+            const todayStr = document.getElementById('date-str').innerText;
 
             if (s) {
                 const existing = appData.transactions.find(t => t.id === 'INV_' + s.invNum);
@@ -560,7 +581,7 @@
                     saveData();
                     document.getElementById('step-l').classList.remove('active');
                     document.getElementById('step-r').classList.add('active');
-                    status.innerText = `✅ 抓到 $${s.amount}！請掃右側明細...`;
+                    status.innerText = `已讀取 $${s.amount}，請掃描右側明細...`;
                     if (navigator.vibrate) navigator.vibrate(50);
                     scanActive = false; setTimeout(() => { if(document.getElementById('scanner-modal').style.display==='flex') scanActive = true; }, 1500);
                 }
@@ -568,7 +589,7 @@
                 const last = appData.transactions.find(t => t.id.toString().startsWith('INV_'));
                 if (last) {
                     last.memo += " | " + d; saveData();
-                    status.innerText = "✨ 明細注入完成，功德圓滿。";
+                    status.innerText = "明細注入完成，功德圓滿。";
                     if (navigator.vibrate) navigator.vibrate([30, 100]);
                     setTimeout(closeScanner, 1000);
                 }
@@ -583,11 +604,57 @@
             document.getElementById('scan-status').innerText = "對準發票左方 QR 碼";
         }
 
-        function showCarrier() { document.getElementById('carrier-modal').classList.add('show'); }
+        // --- 其他工具 ---
+        const Code39 = {
+            chars: {
+                '0': '000110100', '1': '100100001', '2': '001100001', '3': '101100000', '4': '000110001', '5': '100110000', '6': '001110000', '7': '000100101', '8': '100100100', '9': '001100100', 'A': '100001001', 'B': '001001001', 'C': '101001000', 'D': '000011001', 'E': '100011000', 'F': '001011000', 'G': '000001101', 'H': '100001100', 'I': '001001100', 'J': '000011100', 'K': '100000011', 'L': '001000011', 'M': '101000010', 'N': '000010011', 'O': '100010010', 'P': '001010010', 'Q': '000000111', 'R': '100000110', 'S': '001000110', 'T': '000010110', 'U': '110000001', 'V': '011000001', 'W': '111000000', 'X': '010010001', 'Y': '110010000', 'Z': '011010000', '-': '010000101', '.': '110000100', ' ': '011000100', '*': '010010100', '+': '010001010', '/': '010100010', '%': '000101010', '$': '010101000'
+            },
+            generateSVG: function(text) {
+                text = text.toUpperCase(); let barcodeText = '*' + text + '*'; let svgLines = ''; let xPosition = 0;
+                const narrow = 2; const wide = narrow * 3; const gap = narrow; const height = 60;
+                for (let i = 0; i < barcodeText.length; i++) {
+                    let char = barcodeText[i]; let code = this.chars[char]; if (!code) continue; 
+                    for (let j = 0; j < 9; j++) {
+                        let isBar = (j % 2 === 0); let isWide = (code[j] === '1'); let lineWidth = isWide ? wide : narrow;
+                        if (isBar) { svgLines += `<rect x="${xPosition}" y="0" width="${lineWidth}" height="${height}" fill="#2C2A29" />`; }
+                        xPosition += lineWidth;
+                    }
+                    xPosition += gap; 
+                }
+                return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${xPosition} ${height}" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">${svgLines}</svg>`;
+            }
+        };
+
+        function showCarrier() {
+            const modal = document.getElementById('carrier-modal'); const svgContainer = document.getElementById('barcode-svg-container'); const textContainer = document.getElementById('modal-carrier-txt'); const hintContainer = document.getElementById('carrier-hint');
+            let code = appData.carrier; 
+            if (code) { svgContainer.innerHTML = Code39.generateSVG(code); textContainer.innerText = code; textContainer.style.color = "var(--text-main)"; hintContainer.innerText = "給店員嗶一下，發票存雲端"; } 
+            else { svgContainer.innerHTML = `<svg viewBox="0 0 300 80" style="width: 100%; height: 75px; fill: rgba(150,142,134,0.15);"><rect x="10" y="0" width="6" height="80"></rect><rect x="22" y="0" width="2" height="80"></rect><rect x="30" y="0" width="8" height="80"></rect><rect x="44" y="0" width="2" height="80"></rect><rect x="52" y="0" width="6" height="80"></rect><rect x="64" y="0" width="4" height="80"></rect><rect x="74" y="0" width="8" height="80"></rect></svg>`; textContainer.innerText = "尚未設定"; textContainer.style.color = "var(--accent-gold)"; hintContainer.innerText = "請至左側「偏好設定」綁定載具"; }
+            modal.classList.add('show');
+        }
+
         function exportEcosystemData(type) {
-            let content = JSON.stringify(appData, null, 2);
-            let blob = new Blob([content], { type: 'application/json' });
-            let link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "Ledger_Backup.json"; link.click();
+            let ecoData = { accounting: JSON.parse(localStorage.getItem('joy_accounting_app_data')) || {}, health: JSON.parse(localStorage.getItem('joy_health_history')) || {}, mom: JSON.parse(localStorage.getItem('joy_mom_data')) || {}, pet: JSON.parse(localStorage.getItem('joy_pet_data')) || {} };
+            if (type === 'json') {
+                let content = JSON.stringify(ecoData, null, 2); let filename = `JoyEcosystem_Backup_${new Date().getTime()}.json`; let blob = new Blob([content], { type: 'application/json' }); let link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = filename; document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            } else {
+                let csvContent = "\uFEFF模組,紀錄類型,日期,時間,分類/項目,數值/狀態,備註\n";
+                if(ecoData.accounting.transactions) ecoData.accounting.transactions.forEach(t => csvContent += `財務記帳,${t.type === 'income'?'收入':'支出'},${t.date},,${t.cat}-${t.sub},${t.amt},${t.memo||''}\n`);
+                if(ecoData.health.bp) ecoData.health.bp.forEach(t => csvContent += `健康日誌,血壓,${t.date},,${t.tag||''},${t.sys}/${t.dia},${t.memo||''}\n`);
+                if(ecoData.health.bs) ecoData.health.bs.forEach(t => csvContent += `健康日誌,血糖,${t.date},,${t.tag||''},${t.val},${t.memo||''}\n`);
+                if(ecoData.health.wt) ecoData.health.wt.forEach(t => csvContent += `健康日誌,體重,${t.date},,,${t.val},${t.memo||''}\n`);
+                if(ecoData.health.med) ecoData.health.med.forEach(t => csvContent += `健康日誌,服藥,${t.date},${t.time||''},,${t.status},${t.memo||''}\n`);
+                if(ecoData.health.periods) ecoData.health.periods.forEach(t => csvContent += `健康日誌,一般經期,${t.startDate}~${t.endDate},,週期長度,${t.length}天,\n`);
+                if(ecoData.mom.bp) ecoData.mom.bp.forEach(t => csvContent += `孕母育兒,產檢血壓,${t.date},,,${t.sys}/${t.dia},\n`);
+                if(ecoData.mom.gdm) ecoData.mom.gdm.forEach(t => csvContent += `孕母育兒,妊娠血糖,${t.date},,${t.tag||''},${t.val},${t.memo||''}\n`);
+                if(ecoData.mom.wt) ecoData.mom.wt.forEach(t => csvContent += `孕母育兒,孕期體重,${t.date},,,${t.val},\n`);
+                if(ecoData.mom.periods) ecoData.mom.periods.forEach(t => csvContent += `孕母育兒,備孕經期,${t.startDate}~${t.endDate},,週期長度,${t.length}天,\n`);
+                if(ecoData.pet.wt) ecoData.pet.wt.forEach(t => csvContent += `毛孩手冊,體重,${t.date},,,${t.val},${t.memo||''}\n`);
+                if(ecoData.pet.actions) ecoData.pet.actions.forEach(t => csvContent += `毛孩手冊,日常照護,${t.date},${t.time||''},${t.type},完成,${t.memo||''}\n`);
+                if(ecoData.pet.medical) ecoData.pet.medical.forEach(t => csvContent += `毛孩手冊,醫療防護,${t.date},${t.time||''},${t.type},完成,${t.memo||''}\n`);
+                let filename = `JoyEcosystem_Full_Export_${new Date().getTime()}.csv`; let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' }); let link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = filename; document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            }
+            document.getElementById('backup-modal').classList.remove('show');
         }
     </script>
 </body>
