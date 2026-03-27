@@ -578,7 +578,7 @@
             if (s) {
                 const existing = appData.transactions.find(t => t.id === 'INV_' + s.invNum);
                 if (!existing) {
-                    appData.transactions.unshift({ id: 'INV_' + s.invNum, type: 'expense', date: todayStr, cat: '飲食', amt: s.amount, memo: "發票:" + s.invNum, color: colorMap['飲食'] });
+                    appData.transactions.unshift({ id: 'INV_' + s.invNum, type: 'expense', date: todayStr, cat: '發票掃描', sub: '待分類', amt: s.amount, memo: "號碼:" + s.invNum, color: 'var(--cat-other)' });
                     saveData();
                     document.getElementById('step-l').classList.remove('active');
                     document.getElementById('step-r').classList.add('active');
