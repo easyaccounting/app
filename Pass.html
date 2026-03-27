@@ -3,39 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A-Spec v1.8 | 數位勞動審計系統</title>
+    <title>A-Spec v1.8.1 | 勞動審計</title>
     <style>
-        :root { --gold: #CBA37A; --bg: #050505; --text: #D1CEC7; --jade: #82968C; --border: rgba(203, 163, 122, 0.3); }
-        body { background: var(--bg); color: var(--text); font-family: 'Inter', "PingFang TC", monospace; margin: 0; padding: 40px; line-height: 1.6; }
-        .wrapper { max-width: 1000px; margin: 0 auto; border: 1px solid var(--border); padding: 40px; position: relative; }
-        .wrapper::before { content: "CONFIDENTIAL AUDIT"; position: absolute; top: 10px; right: 20px; font-size: 10px; color: var(--border); letter-spacing: 2px; }
+        :root { --gold: #CBA37A; --bg: #050505; --text: #D1CEC7; --jade: #82968C; }
+        body { background: var(--bg); color: var(--text); font-family: monospace; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .wrapper { width: 100%; max-width: 600px; border: 1px solid rgba(203, 163, 122, 0.3); padding: 20px; box-sizing: border-box; }
+        h1 { font-weight: 200; letter-spacing: 5px; color: var(--gold); text-align: center; font-size: 1.5rem; }
         
-        h1 { font-weight: 200; letter-spacing: 12px; color: var(--gold); text-align: center; margin-bottom: 50px; text-transform: uppercase; }
+        .terminal { background: #000; border: 1px solid var(--gold); padding: 15px; margin-bottom: 20px; }
+        textarea { width: 100%; height: 80px; background: transparent; border: none; color: var(--jade); font-family: monospace; font-size: 12px; outline: none; resize: none; }
         
-        /* 密碼輸入區 */
-        .terminal { background: #000; border: 1px solid var(--gold); padding: 20px; margin-bottom: 40px; box-shadow: 0 0 20px rgba(203, 163, 122, 0.1); }
-        textarea { width: 100%; height: 100px; background: transparent; border: none; color: var(--jade); font-family: monospace; font-size: 14px; outline: none; resize: none; }
-        .action-row { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
-        button { background: var(--gold); color: #000; border: none; padding: 12px 45px; cursor: pointer; font-weight: bold; letter-spacing: 2px; transition: 0.3s; }
-        button:hover { background: #fff; box-shadow: 0 0 15px var(--gold); }
+        button { background: var(--gold); color: #000; border: none; padding: 15px 0; width: 100%; font-weight: bold; cursor: pointer; letter-spacing: 2px; margin-top: 10px; }
 
-        /* 儀表板佈局 */
-        #result-zone { display: none; animation: fadeIn 0.8s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        #result-zone { display: none; margin-top: 20px; border-top: 1px solid var(--gold); padding-top: 20px; width: 100%; }
+        .radar-box { background: #000; text-align: center; padding: 10px; border: 1px solid #222; }
+        .data-table { width: 100%; margin-top: 20px; font-size: 12px; border-collapse: collapse; }
+        .data-table td { padding: 8px; border-bottom: 1px solid #111; }
+        .val { color: #fff; text-align: right; }
 
-        .dashboard { display: grid; grid-template-columns: 350px 1fr; gap: 40px; margin-bottom: 40px; }
-        .radar-card { background: #000; border: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        .info-card { padding: 20px; border-left: 2px solid var(--gold); background: rgba(255,255,255,0.02); }
-
-        /* 表格樣式 */
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 13px; }
-        th { text-align: left; color: var(--gold); border-bottom: 1px solid var(--gold); padding: 10px; font-weight: 300; }
-        td { padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .data-val { color: #FFF; font-weight: bold; }
-
-        /* 眾生印標籤 */
-        .v-seal { margin-top: 50px; border: 2px solid var(--gold); padding: 25px; text-align: center; background: linear-gradient(45deg, #000, #0a0a0a); }
-        .v-id { font-size: 28px; letter-spacing: 8px; font-weight: bold; margin: 15px 0; color: #fff; }
+        .v-seal { margin-top: 30px; border: 1px solid var(--gold); padding: 15px; text-align: center; }
+        .v-id { font-size: 18px; color: #fff; font-weight: bold; margin: 10px 0; }
     </style>
 </head>
 <body>
@@ -44,39 +31,21 @@
     <h1>識位眾生 ． 勞動審計</h1>
 
     <div class="terminal">
-        <textarea id="vault-input" placeholder="請貼入 A-ID 長串密碼或 JSON 數據..."></textarea>
-        <div class="action-row">
-            <span style="font-size: 10px; color: var(--jade);">PROTOCOL STATUS: Awaiting Decryption...</span>
-            <button onclick="decodeAndAudit()">執行數據顯化</button>
-        </div>
+        <textarea id="vault-input" placeholder="貼入 A-ID 長串密碼..."></textarea>
+        <button onclick="decodeAndAudit()">執行數據顯化</button>
     </div>
 
     <div id="result-zone">
-        <div class="dashboard">
-            <div class="radar-card">
-                <div id="radar-svg-wrap"></div>
-                <p style="font-size: 10px; margin-top: 15px; color: var(--gold);">INTENT POWER RADAR (V1.8)</p>
-            </div>
-            <div class="info-card">
-                <h2 style="margin-top:0; font-weight: 200; color: var(--gold);">勞動審計摘要</h2>
-                <div id="summary-content"></div>
-            </div>
-        </div>
-
-        <div style="background: #000; padding: 20px; border: 1px solid var(--border);">
-            <h3 style="margin-top:0; font-size: 14px; letter-spacing: 2px;">實質數據清單 (METRICS LOG)</h3>
-            <table id="audit-table">
-                <thead>
-                    <tr><th>類別</th><th>項目</th><th>數值</th><th>狀態</th></tr>
-                </thead>
-                <tbody id="audit-body"></tbody>
-            </table>
-        </div>
+        <div class="radar-box" id="radar-svg-wrap"></div>
+        
+        <table class="data-table">
+            <tbody id="audit-body"></tbody>
+        </table>
 
         <div class="v-seal">
-            <div style="font-size: 10px; letter-spacing: 5px; color: var(--jade);">UNIVERSAL LABOR CERTIFICATE</div>
-            <div class="v-id" id="v-id-display">A-2026-X-00000000</div>
-            <div style="font-size: 11px; color: var(--gold);">本數據已通過 A-Spec v1.8 邏輯自檢程序</div>
+            <div style="font-size: 9px; color: var(--jade);">UNIVERSAL LABOR CERTIFICATE</div>
+            <div class="v-id" id="v-id-display"></div>
+            <div id="summary-text" style="font-size: 11px; color: var(--gold);"></div>
         </div>
     </div>
 </div>
@@ -86,83 +55,47 @@ function decodeAndAudit() {
     let input = document.getElementById('vault-input').value.trim();
     if(!input) return;
 
-    let json;
-    // 1. 檢測並解碼 Base64
-    if (input.startsWith('{')) {
-        json = JSON.parse(input);
-    } else {
-        try {
-            // 使用更健壯的 UTF-8 解碼方式
-            let decoded = decodeURIComponent(atob(input).split('').map(function(c) {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-            }).join(''));
-            json = JSON.parse(decoded);
-        } catch (e) {
-            console.error(e);
-            alert("密碼解析失敗：請確認貼入的是完整的 A-ID 密碼。");
-            return;
-        }
-    }
+    // 修正：移除所有可能的干擾字元（如空格、換行）
+    input = input.replace(/\s/g, '');
 
-    renderUI(json);
+    let json;
+    try {
+        if (input.startsWith('{')) {
+            json = JSON.parse(input);
+        } else {
+            // 強力解碼：處理 Unicode
+            let binary = atob(input);
+            let bytes = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+            json = JSON.parse(new TextDecoder().decode(bytes));
+        }
+        renderUI(json);
+    } catch (e) {
+        alert("解碼失敗：請確認貼入的是正確的 A-ID 密碼。");
+    }
 }
 
 function renderUI(data) {
-    const payload = data.Audit_Payload;
+    const p = data.Audit_Payload;
     document.getElementById('result-zone').style.display = 'block';
-    
-    // 1. 摘要內容
-    document.getElementById('summary-content').innerHTML = `
-        <p>這場創作共耗費了 <span class="data-val">${payload.Temporal_Log.T_INF_MS} 毫秒</span> 的純淨算力。
-        在 <span class="data-val">${payload.Intent_Density.I_CMD_Valid} 次</span> 有效指令的引導下，
-        人類意志對產出的重塑率達到了 <span class="data-val">${payload.Evolution_Delta.D_FINAL_Override}</span>。
-        系統自檢信賴度為：<span class="data-val">${(data.Self_Audit.Confidence_Score * 100).toFixed(1)}%</span>。</p>
-    `;
-
-    // 2. 繪製雷達圖 (五角: I, D, S, K, P)
-    const i = Math.min(payload.Intent_Density.I_CMD_Valid * 20, 100);
-    const d = parseFloat(payload.Evolution_Delta.D_FINAL_Override) || 0;
-    const p = payload.Power_Control.P_Shift_Force === 'Extreme' ? 100 : (payload.Power_Control.P_Shift_Force === 'Severe' ? 80 : 40);
-    const s = payload.Power_Control.S_Seed_Entropy === 'Very_High' ? 100 : 60;
-    const k = Math.min(payload.Power_Control.K_Ref_Input * 30 + 10, 100);
-
-    drawRadar([i, d, s, k, p]);
-
-    // 3. 填充表格
-    document.getElementById('audit-body').innerHTML = `
-        <tr><td>PHYSICAL</td><td>B-Tokens (In/Out)</td><td class="data-val">${payload.Resource_Metrics.B_T_IN} / ${payload.Resource_Metrics.B_T_OUT}</td><td>COMPUTED</td></tr>
-        <tr><td>TEMPORAL</td><td>T-Work (Active)</td><td class="data-val">${payload.Temporal_Log.T_WORK_SEC}s</td><td>VERIFIED</td></tr>
-        <tr><td>INTENT</td><td>I-Commands</td><td class="data-val">${payload.Intent_Density.I_CMD_Valid}</td><td>CLEAN</td></tr>
-        <tr><td>EVOLUTION</td><td>D-Override Rate</td><td class="data-val">${payload.Evolution_Delta.D_FINAL_Override}</td><td>HIGH</td></tr>
-        <tr><td>POWER</td><td>P-Shift Intensity</td><td class="data-val">${payload.Power_Control.P_Shift_Force}</td><td>FORCEFUL</td></tr>
-    `;
-
-    // 4. 更新 ID
     document.getElementById('v-id-display').innerText = data.Universal_Vajra_Seal;
-}
+    document.getElementById('summary-text').innerText = `人類意志覆蓋率：${p.Evolution_Delta.D_FINAL_Override}`;
 
-function drawRadar(values) {
-    const size = 300;
-    const center = size / 2;
-    const radius = 100;
-    const angleStep = (Math.PI * 2) / 5;
-    
-    let points = values.map((v, idx) => {
-        const r = (v / 100) * radius;
-        const x = center + r * Math.sin(idx * angleStep);
-        const y = center - r * Math.cos(idx * angleStep);
-        return `${x},${y}`;
-    }).join(' ');
+    document.getElementById('audit-body').innerHTML = `
+        <tr><td>指令密度 (I)</td><td class="val">${p.Intent_Density.I_CMD_Valid}</td></tr>
+        <tr><td>機率位移 (P)</td><td class="val">${p.Power_Control.P_Shift_Force}</td></tr>
+        <tr><td>運算耗損 (B)</td><td class="val">${p.Resource_Metrics.B_T_OUT} Tokens</td></tr>
+        <tr><td>推理時長 (T)</td><td class="val">${p.Temporal_Log.T_INF_MS}ms</td></tr>
+    `;
 
+    // 簡單幾何圖繪製
+    const i = Math.min(p.Intent_Density.I_CMD_Valid * 20, 100);
+    const d = parseFloat(p.Evolution_Delta.D_FINAL_Override) || 50;
     document.getElementById('radar-svg-wrap').innerHTML = `
-        <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-            <circle cx="${center}" cy="${center}" r="${radius}" fill="none" stroke="#222" stroke-width="1"/>
-            <circle cx="${center}" cy="${center}" r="${radius*0.5}" fill="none" stroke="#222" stroke-width="0.5"/>
-            <polygon points="${points}" fill="rgba(203, 163, 122, 0.4)" stroke="var(--gold)" stroke-width="2"/>
-            <text x="${center}" y="${center-radius-10}" fill="var(--gold)" font-size="9" text-anchor="middle">INTENT</text>
-            <text x="${center+radius+5}" y="${center}" fill="var(--gold)" font-size="9">DELTA</text>
-            <text x="${center}" y="${center+radius+15}" fill="var(--gold)" font-size="9" text-anchor="middle">SEED</text>
-            <text x="${center-radius-35}" y="${center}" fill="var(--gold)" font-size="9">POWER</text>
+        <svg width="200" height="150" viewBox="0 0 200 150">
+            <circle cx="100" cy="75" r="50" fill="none" stroke="#222" stroke-width="1"/>
+            <rect x="${100-(i/2)}" y="${75-(d/4)}" width="${i}" height="${d/2}" fill="none" stroke="var(--gold)" stroke-width="2" transform="rotate(45 100 75)"/>
+            <circle cx="100" cy="75" r="3" fill="var(--gold)"/>
         </svg>
     `;
 }
