@@ -91,6 +91,31 @@ function runAudit() {
             ● <b>有效指令密度：</b> <span class="val">${m.Intent_Density.I_CMD_Valid} 次</span><br>
             ● <b>自檢信賴度：</b> <span class="val">${data.Self_Audit.Confidence_Score * 100}%</span>
         `;
+function runAudit() {
+    let raw = document.getElementById('json-input').value.trim();
+    
+    // 判斷是否為 Base64 長串密碼，如果是，則自動解碼
+    if (raw && !raw.startsWith('{')) {
+        try {
+            raw = decodeURIComponent(escape(window.atob(raw)));
+        } catch(e) {
+            alert("密碼格式錯誤，請確認貼入的是 A-ID 長串密碼。");
+            return;
+        }
+    }
+
+    try {
+        const data = JSON.parse(raw);
+        const m = data.Audit_Payload;
+        
+        // ... 以下維持原有的顯示與圖表繪製邏輯 ...
+        document.getElementById('audit-result').style.display = 'block';
+        // (此處省略後續繪圖代碼，請延用之前的 runAudit 內容)
+        // ... 原有代碼結束 ...
+    } catch(e) {
+        alert("代碼解析失敗。");
+    }
+}
 
         // 3. 繪製幾何雷達圖 (SVG)
         const iVal = Math.min(m.Intent_Density.I_CMD_Valid * 20, 100);
