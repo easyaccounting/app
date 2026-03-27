@@ -353,17 +353,28 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="carrier-modal">
+        <div class="modal-overlay" id="carrier-modal">
         <div class="glass-modal" style="max-width: 340px; padding: 30px 20px;">
             <h3 style="margin-top:0; color:var(--text-main); font-weight: 500; letter-spacing: 2px;">手機條碼載具</h3>
-            <div style="margin: 20px 0; background: #FFFFFF; padding: 25px 15px 15px; border-radius: 16px; border: 1px solid var(--glass-border); box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+            
+            <div style="margin: 15px 0; background: #FFFFFF; padding: 25px 15px 15px; border-radius: 16px; border: 1px solid var(--glass-border); box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
                 <div id="barcode-svg-container" style="width: 100%; height: 80px; display: flex; justify-content: center; align-items: center;"></div>
                 <div id="modal-carrier-txt" style="font-size: 1.8rem; font-weight: bold; letter-spacing: 3px; color: var(--text-main); margin-top: 10px;">尚未設定</div>
             </div>
-            <div style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 20px;" id="carrier-hint">請至左側「偏好設定」綁定載具</div>
-            <button class="m-btn m-btn-confirm" style="width: 100%;" onclick="document.getElementById('carrier-modal').classList.remove('show')">關閉</button>
+            <div style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 12px;" id="carrier-hint">請至左側「偏好設定」綁定載具</div>
+            
+            <div style="background: rgba(203, 163, 122, 0.08); border: 1px solid rgba(203, 163, 122, 0.2); border-radius: 12px; padding: 12px; margin-bottom: 20px; text-align: left;">
+                <div style="font-size: 0.8rem; color: var(--accent-gold); font-weight: bold; margin-bottom: 6px; letter-spacing: 1px;">💡 觀照提醒</div>
+                <div style="font-size: 0.75rem; color: var(--text-main); line-height: 1.6; letter-spacing: 0.5px;">
+                    本系統為保護隱私之<b>「純單機法界」</b>，免綁定不下載財政部資料庫發票明細。<br>
+                    此條碼僅供結帳出示。嗶完載具後，請順心<b>手動記下花費</b>，保持對金錢流動的覺察與觀照。
+                </div>
+            </div>
+
+            <button class="m-btn m-btn-confirm" style="width: 100%;" onclick="document.getElementById('carrier-modal').classList.remove('show')">明白，關閉</button>
         </div>
     </div>
+
 
     <div class="modal-overlay" id="global-settings-modal">
         <div class="glass-modal" style="max-width: 360px;">
@@ -396,7 +407,7 @@
             <h3 style="margin-top:0; color:var(--accent-gold); font-weight: 500; letter-spacing: 2px;">本期發票對獎</h3>
             
             <div style="font-size: 0.8rem; color: var(--text-light); margin-bottom: 15px; line-height: 1.6;">
-                請參考官方開獎號碼，填入下方欄位。<br>系統將於本地端光速比對您掃描的紀錄。
+                請參考官方開獎號碼，填入下方欄位。<br>系統將於本地端光速比對您曾掃描過的發票紀錄。
             </div>
             <a href="https://invoice.etax.nat.gov.tw/" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: rgba(255,255,255,0.6); border: 1px solid var(--glass-border); border-radius: 20px; color: var(--accent-jade); font-size: 0.85rem; text-decoration: none; margin-bottom: 20px; transition: all 0.2s;">
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
