@@ -658,18 +658,72 @@
         }
         function closeDetail() { document.getElementById('detail-view').classList.remove('open'); document.body.style.overflow = 'auto'; }
 
-        // --- 財務圖表 ---
+                // --- 財務圖表 ---
         function renderFinanceListEngine() {
-            let filteredTxs = getFilteredTransactions(); const list = document.getElementById('history-list-container'); list.innerHTML = '';
-            if(filteredTxs.length === 0) { list.innerHTML = '<div style="text-align:center; color:var(--text-light); padding:20px;">這段期間尚無紀錄</div>'; return; }
+            let filteredTxs = getFilteredTransactions(); 
+            const list = document.getElementById('history-list-container'); 
+            list.innerHTML = '';
+            
+            if(filteredTxs.length === 0) { 
+                list.innerHTML = '<div style="text-align:center; color:var(--text-light); padding:20px;">這段期間尚無紀錄</div>'; 
+                return; 
+            }
+
+            // 1. 將資料按日期分群 (Group by date)
+            let groupedTxs = {};
             filteredTxs.forEach(t => {
-                let amtStr = t.type === 'income' ? `+$${t.amt}` : `-$${t.amt}`;
-                let amtColor = t.type === 'income' ? 'var(--accent-jade)' : 'var(--text-main)';
-                let memoHtml = t.memo ? `<div class="history-memo" style="margin-left:24px; margin-top:5px;">${t.memo}</div>` : '';
-                let color = t.color || colorMap[t.cat] || 'var(--cat-other)';
-                list.innerHTML += `<div class="history-item"><div class="history-top" style="justify-content: flex-start; gap: 12px;"><div class="cat-color-dot" style="background: ${color}"></div><div style="flex:1;"><div style="font-size: 0.95rem; font-weight: 500; color: var(--text-main); display:flex; align-items:center; gap:6px;">${t.cat} - ${t.sub}</div><div style="font-size: 0.75rem; color: var(--text-light);">${t.date}</div></div><div class="history-val" style="color:${amtColor}">${amtStr}</div></div>${memoHtml}</div>`;
+                if (!groupedTxs[t.date]) {
+                    groupedTxs[t.date] = {
+                        transactions: [],
+                        dailyTotal: 0
+                    };
+                }
+                groupedTxs[t.date].transactions.push(t);
+                // 計算單日淨結餘 (可選，若只需顯示紀錄可忽略)
+                groupedTxs[t.date].dailyTotal += (t.type === 'income' ? t.amt : -t.amt);
+            });
+
+            // 2. 確保日期由新到舊排序 (假設你的 date 格式為 'X月Y日')
+            // 若 date 格式統一，此處依賴原本陣列的順序通常也是正確的，因為記帳時通常是由新到舊 unshift。
+            
+            // 3. 渲染分群後的列表
+            Object.keys(groupedTxs).forEach(dateStr => {
+                let dailyGroup = groupedTxs[dateStr];
+                
+                // 渲染日期段落標題 (放大字體，增加對比)
+                let dailyNetStr = dailyGroup.dailyTotal >= 0 ? `+$${dailyGroup.dailyTotal.toLocaleString()}` : `-$${Math.abs(dailyGroup.dailyTotal).toLocaleString()}`;
+                let dailyNetColor = dailyGroup.dailyTotal >= 0 ? 'var(--accent-jade)' : 'var(--text-main)';
+                
+                list.innerHTML += `
+                    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin: 20px 0 10px; padding-bottom: 5px; border-bottom: 2px solid rgba(150,142,134,0.15);">
+                        <div style="font-size: 1.15rem; font-weight: bold; color: var(--accent-gold); letter-spacing: 1px;">${dateStr}</div>
+                        <div style="font-size: 0.85rem; color: ${dailyNetColor};">單日結餘 ${dailyNetStr}</div>
+                    </div>
+                `;
+
+                // 渲染該日底下的明細項目
+                dailyGroup.transactions.forEach(t => {
+                    let amtStr = t.type === 'income' ? `+$${t.amt.toLocaleString()}` : `-$${t.amt.toLocaleString()}`;
+                    let amtColor = t.type === 'income' ? 'var(--accent-jade)' : 'var(--text-main)';
+                    let memoHtml = t.memo ? `<div class="history-memo" style="margin-left:24px; margin-top:5px;">${t.memo}</div>` : '';
+                    let color = t.color || colorMap[t.cat] || 'var(--cat-other)';
+                    
+                    list.innerHTML += `
+                        <div class="history-item" style="border: none; border-radius: 12px; background: rgba(255,255,255,0.6); box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                            <div class="history-top" style="justify-content: flex-start; gap: 12px;">
+                                <div class="cat-color-dot" style="background: ${color}; width: 14px; height: 14px;"></div>
+                                <div style="flex:1;">
+                                    <div style="font-size: 1rem; font-weight: 500; color: var(--text-main); display:flex; align-items:center; gap:6px;">${t.cat} - ${t.sub}</div>
+                                </div>
+                                <div class="history-val" style="color:${amtColor}; font-size: 1.15rem;">${amtStr}</div>
+                            </div>
+                            ${memoHtml}
+                        </div>
+                    `;
+                });
             });
         }
+
         function renderFinanceChartEngine(stage) {
             let filteredTxs = getFilteredTransactions(); let expenseTotal = 0; let catTotals = {};
             filteredTxs.forEach(t => { if(t.type === 'expense') { expenseTotal += t.amt; if(!catTotals[t.cat]) catTotals[t.cat] = { amt: 0, color: t.color || colorMap[t.cat] || 'var(--cat-other)' }; catTotals[t.cat].amt += t.amt; } });
