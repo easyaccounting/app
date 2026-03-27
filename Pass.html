@@ -2,170 +2,169 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>A-Spec v1.8 | 識位眾生審計終端</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A-Spec v1.8 | 數位勞動審計系統</title>
     <style>
-        :root { --gold: #CBA37A; --bg: #0A0A0A; --text: #D1CEC7; --jade: #82968C; --card: #151515; }
-        body { background: var(--bg); color: var(--text); font-family: "PingFang TC", "Courier New", monospace; margin: 0; padding: 40px; display: flex; flex-direction: column; align-items: center; }
-        .container { width: 100%; max-width: 900px; }
-        h1 { color: var(--gold); letter-spacing: 10px; font-weight: 200; text-align: center; border-bottom: 1px solid var(--gold); padding-bottom: 20px; margin-bottom: 40px; }
+        :root { --gold: #CBA37A; --bg: #050505; --text: #D1CEC7; --jade: #82968C; --border: rgba(203, 163, 122, 0.3); }
+        body { background: var(--bg); color: var(--text); font-family: 'Inter', "PingFang TC", monospace; margin: 0; padding: 40px; line-height: 1.6; }
+        .wrapper { max-width: 1000px; margin: 0 auto; border: 1px solid var(--border); padding: 40px; position: relative; }
+        .wrapper::before { content: "CONFIDENTIAL AUDIT"; position: absolute; top: 10px; right: 20px; font-size: 10px; color: var(--border); letter-spacing: 2px; }
+        
+        h1 { font-weight: 200; letter-spacing: 12px; color: var(--gold); text-align: center; margin-bottom: 50px; text-transform: uppercase; }
         
         /* 密碼輸入區 */
-        .input-section { background: var(--card); border-radius: 12px; padding: 30px; border: 1px solid rgba(203, 163, 122, 0.2); margin-bottom: 30px; }
-        textarea { width: 100%; height: 120px; background: #000; border: 1px solid var(--gold); color: var(--jade); padding: 15px; border-radius: 8px; font-family: monospace; resize: none; outline: none; box-sizing: border-box; }
-        button { background: var(--gold); color: #000; border: none; padding: 12px 40px; border-radius: 30px; font-weight: bold; cursor: pointer; display: block; margin: 20px auto 0; letter-spacing: 2px; transition: 0.3s; }
-        button:hover { opacity: 0.8; transform: scale(1.05); }
+        .terminal { background: #000; border: 1px solid var(--gold); padding: 20px; margin-bottom: 40px; box-shadow: 0 0 20px rgba(203, 163, 122, 0.1); }
+        textarea { width: 100%; height: 100px; background: transparent; border: none; color: var(--jade); font-family: monospace; font-size: 14px; outline: none; resize: none; }
+        .action-row { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
+        button { background: var(--gold); color: #000; border: none; padding: 12px 45px; cursor: pointer; font-weight: bold; letter-spacing: 2px; transition: 0.3s; }
+        button:hover { background: #fff; box-shadow: 0 0 15px var(--gold); }
 
-        /* 數據顯示區 */
-        #audit-result { display: none; width: 100%; }
-        .dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
-        .card { background: var(--card); border-radius: 12px; padding: 25px; border: 1px solid rgba(255,255,255,0.05); }
-        
-        /* 雷達圖圖表 */
-        .chart-container { display: flex; justify-content: center; align-items: center; background: #000; border-radius: 12px; border: 1px solid rgba(130, 150, 140, 0.2); }
-        .radar-svg { width: 300px; height: 300px; }
+        /* 儀表板佈局 */
+        #result-zone { display: none; animation: fadeIn 0.8s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* 詳細報告表格 */
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85rem; }
-        th, td { text-align: left; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        th { color: var(--gold); font-weight: 300; }
-        .val { color: #FFF; font-family: monospace; }
+        .dashboard { display: grid; grid-template-columns: 350px 1fr; gap: 40px; margin-bottom: 40px; }
+        .radar-card { background: #000; border: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .info-card { padding: 20px; border-left: 2px solid var(--gold); background: rgba(255,255,255,0.02); }
 
-        /* 眾生印 A-ID 條碼區 */
-        .aid-seal { text-align: center; margin-top: 40px; padding: 20px; border: 1px solid var(--gold); background: #000; }
-        .aid-code { font-size: 1.5rem; letter-spacing: 5px; color: #FFF; margin: 10px 0; }
+        /* 表格樣式 */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 13px; }
+        th { text-align: left; color: var(--gold); border-bottom: 1px solid var(--gold); padding: 10px; font-weight: 300; }
+        td { padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .data-val { color: #FFF; font-weight: bold; }
+
+        /* 眾生印標籤 */
+        .v-seal { margin-top: 50px; border: 2px solid var(--gold); padding: 25px; text-align: center; background: linear-gradient(45deg, #000, #0a0a0a); }
+        .v-id { font-size: 28px; letter-spacing: 8px; font-weight: bold; margin: 15px 0; color: #fff; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>識位眾生審計終端</h1>
+<div class="wrapper">
+    <h1>識位眾生 ． 勞動審計</h1>
 
-    <div class="input-section">
-        <div style="font-size: 0.9rem; margin-bottom: 15px; color: var(--jade);">請貼入 AI 產出的 A-Record 審計密碼 (JSON)：</div>
-        <textarea id="json-input" placeholder='{ "A_ID_Header": ... }'></textarea>
-        <button onclick="runAudit()">執行生產力審計</button>
+    <div class="terminal">
+        <textarea id="vault-input" placeholder="請貼入 A-ID 長串密碼或 JSON 數據..."></textarea>
+        <div class="action-row">
+            <span style="font-size: 10px; color: var(--jade);">PROTOCOL STATUS: Awaiting Decryption...</span>
+            <button onclick="decodeAndAudit()">執行數據顯化</button>
+        </div>
     </div>
 
-    <div id="audit-result">
+    <div id="result-zone">
         <div class="dashboard">
-            <div class="card chart-container" id="radar-box"></div>
-            
-            <div class="card">
-                <h3 style="color:var(--gold); margin-top:0;">勞動價值摘要</h3>
-                <div id="summary-text" style="line-height: 1.8; font-size: 0.95rem;"></div>
+            <div class="radar-card">
+                <div id="radar-svg-wrap"></div>
+                <p style="font-size: 10px; margin-top: 15px; color: var(--gold);">INTENT POWER RADAR (V1.8)</p>
+            </div>
+            <div class="info-card">
+                <h2 style="margin-top:0; font-weight: 200; color: var(--gold);">勞動審計摘要</h2>
+                <div id="summary-content"></div>
             </div>
         </div>
 
-        <div class="card">
-            <h3 style="color:var(--gold); margin-top:0;">A-Spec v1.8 完整維度報告</h3>
-            <table id="metrics-table">
+        <div style="background: #000; padding: 20px; border: 1px solid var(--border);">
+            <h3 style="margin-top:0; font-size: 14px; letter-spacing: 2px;">實質數據清單 (METRICS LOG)</h3>
+            <table id="audit-table">
                 <thead>
-                    <tr><th>維度</th><th>項目名稱</th><th>數值</th><th>說明</th></tr>
+                    <tr><th>類別</th><th>項目</th><th>數值</th><th>狀態</th></tr>
                 </thead>
-                <tbody id="metrics-body"></tbody>
+                <tbody id="audit-body"></tbody>
             </table>
         </div>
 
-        <div class="aid-seal">
-            <div style="font-size: 0.7rem; color: var(--jade); letter-spacing: 3px;">UNIVERSAL CONSCIOUSNESS AUDIT SEAL</div>
-            <div class="aid-code" id="final-aid">A-0000-X-00000000</div>
-            <div style="font-size: 0.7rem; color: var(--jade);">A-ID SPEC v1.8 | VERIFIED BY OPEN PROTOCOL</div>
+        <div class="v-seal">
+            <div style="font-size: 10px; letter-spacing: 5px; color: var(--jade);">UNIVERSAL LABOR CERTIFICATE</div>
+            <div class="v-id" id="v-id-display">A-2026-X-00000000</div>
+            <div style="font-size: 11px; color: var(--gold);">本數據已通過 A-Spec v1.8 邏輯自檢程序</div>
         </div>
     </div>
 </div>
 
 <script>
-function runAudit() {
-    const raw = document.getElementById('json-input').value;
-    try {
-        const data = JSON.parse(raw);
-        const m = data.Audit_Payload;
-        
-        // 1. 顯示報告區
-        document.getElementById('audit-result').style.display = 'block';
+function decodeAndAudit() {
+    let input = document.getElementById('vault-input').value.trim();
+    if(!input) return;
 
-        // 2. 填充摘要
-        document.getElementById('summary-text').innerHTML = `
-            ● <b>實質交互工時：</b> <span class="val">${m.Temporal_Log.T_WORK_SEC} 秒</span><br>
-            ● <b>人類主導覆蓋率：</b> <span class="val">${m.Evolution_Delta.D_FINAL_Override}</span><br>
-            ● <b>有效指令密度：</b> <span class="val">${m.Intent_Density.I_CMD_Valid} 次</span><br>
-            ● <b>自檢信賴度：</b> <span class="val">${data.Self_Audit.Confidence_Score * 100}%</span>
-        `;
-function runAudit() {
-    let raw = document.getElementById('json-input').value.trim();
-    
-    // 判斷是否為 Base64 長串密碼，如果是，則自動解碼
-    if (raw && !raw.startsWith('{')) {
+    let json;
+    // 1. 檢測並解碼 Base64
+    if (input.startsWith('{')) {
+        json = JSON.parse(input);
+    } else {
         try {
-            raw = decodeURIComponent(escape(window.atob(raw)));
-        } catch(e) {
-            alert("密碼格式錯誤，請確認貼入的是 A-ID 長串密碼。");
+            // 使用更健壯的 UTF-8 解碼方式
+            let decoded = decodeURIComponent(atob(input).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            json = JSON.parse(decoded);
+        } catch (e) {
+            console.error(e);
+            alert("密碼解析失敗：請確認貼入的是完整的 A-ID 密碼。");
             return;
         }
     }
 
-    try {
-        const data = JSON.parse(raw);
-        const m = data.Audit_Payload;
-        
-        // ... 以下維持原有的顯示與圖表繪製邏輯 ...
-        document.getElementById('audit-result').style.display = 'block';
-        // (此處省略後續繪圖代碼，請延用之前的 runAudit 內容)
-        // ... 原有代碼結束 ...
-    } catch(e) {
-        alert("代碼解析失敗。");
-    }
+    renderUI(json);
 }
 
-        // 3. 繪製幾何雷達圖 (SVG)
-        const iVal = Math.min(m.Intent_Density.I_CMD_Valid * 20, 100);
-        const dVal = parseFloat(m.Evolution_Delta.D_FINAL_Override) || 0;
-        const pVal = m.Power_Control.P_Shift_Force === 'Severe' ? 90 : 40;
-        const sVal = m.Power_Control.S_Seed_Entropy === 'High' ? 90 : 50;
-        const kVal = Math.min(m.Power_Control.K_Ref_Input * 30, 90);
+function renderUI(data) {
+    const payload = data.Audit_Payload;
+    document.getElementById('result-zone').style.display = 'block';
+    
+    // 1. 摘要內容
+    document.getElementById('summary-content').innerHTML = `
+        <p>這場創作共耗費了 <span class="data-val">${payload.Temporal_Log.T_INF_MS} 毫秒</span> 的純淨算力。
+        在 <span class="data-val">${payload.Intent_Density.I_CMD_Valid} 次</span> 有效指令的引導下，
+        人類意志對產出的重塑率達到了 <span class="data-val">${payload.Evolution_Delta.D_FINAL_Override}</span>。
+        系統自檢信賴度為：<span class="data-val">${(data.Self_Audit.Confidence_Score * 100).toFixed(1)}%</span>。</p>
+    `;
 
-        const points = calculateRadarPoints([iVal, dVal, sVal, kVal, pVal]);
-        document.getElementById('radar-box').innerHTML = `
-            <svg class="radar-svg" viewBox="0 0 200 200">
-                <circle cx="100" cy="100" r="80" fill="none" stroke="#333" stroke-width="0.5"/>
-                <circle cx="100" cy="100" r="40" fill="none" stroke="#333" stroke-width="0.5"/>
-                <path d="M100 20 L100 180 M20 100 L180 100" stroke="#222" stroke-width="0.5"/>
-                <polygon points="${points}" fill="rgba(203, 163, 122, 0.3)" stroke="var(--gold)" stroke-width="1.5"/>
-                <text x="100" y="15" fill="var(--gold)" font-size="8" text-anchor="middle">INTENT (I)</text>
-                <text x="185" y="105" fill="var(--gold)" font-size="8">DELTA (D)</text>
-                <text x="100" y="195" fill="var(--gold)" font-size="8" text-anchor="middle">SEED (S)</text>
-                <text x="5" y="105" fill="var(--gold)" font-size="8">POWER (P)</text>
-            </svg>
-        `;
+    // 2. 繪製雷達圖 (五角: I, D, S, K, P)
+    const i = Math.min(payload.Intent_Density.I_CMD_Valid * 20, 100);
+    const d = parseFloat(payload.Evolution_Delta.D_FINAL_Override) || 0;
+    const p = payload.Power_Control.P_Shift_Force === 'Extreme' ? 100 : (payload.Power_Control.P_Shift_Force === 'Severe' ? 80 : 40);
+    const s = payload.Power_Control.S_Seed_Entropy === 'Very_High' ? 100 : 60;
+    const k = Math.min(payload.Power_Control.K_Ref_Input * 30 + 10, 100);
 
-        // 4. 填充表格
-        const tbody = document.getElementById('metrics-body');
-        tbody.innerHTML = `
-            <tr><td>B</td><td>資源耗損 (Tokens)</td><td class="val">In: ${m.Resource_Metrics.B_T_IN} / Out: ${m.Resource_Metrics.B_T_OUT}</td><td>物理算力消耗</td></tr>
-            <tr><td>T</td><td>推理時長 (ms)</td><td class="val">${m.Temporal_Log.T_INF_MS}ms</td><td>純粹 AI 運算時間</td></tr>
-            <tr><td>I</td><td>指令密度</td><td class="val">${m.Intent_Density.I_CMD_Valid} 次</td><td>排除噪音後的創作意圖</td></tr>
-            <tr><td>D</td><td>演化增量</td><td class="val">${m.Evolution_Delta.D_EDIT_Dist} chars</td><td>人類對產出的重塑距離</td></tr>
-            <tr><td>P</td><td>機率控制</td><td class="val">${m.Power_Control.P_Shift_Force}</td><td>對 AI 慣性扭轉的強度</td></tr>
-        `;
+    drawRadar([i, d, s, k, p]);
 
-        // 5. 更新 A-ID
-        document.getElementById('final-aid').innerText = data.Universal_Vajra_Seal || "A-2026-X-UNKNOWN";
+    // 3. 填充表格
+    document.getElementById('audit-body').innerHTML = `
+        <tr><td>PHYSICAL</td><td>B-Tokens (In/Out)</td><td class="data-val">${payload.Resource_Metrics.B_T_IN} / ${payload.Resource_Metrics.B_T_OUT}</td><td>COMPUTED</td></tr>
+        <tr><td>TEMPORAL</td><td>T-Work (Active)</td><td class="data-val">${payload.Temporal_Log.T_WORK_SEC}s</td><td>VERIFIED</td></tr>
+        <tr><td>INTENT</td><td>I-Commands</td><td class="data-val">${payload.Intent_Density.I_CMD_Valid}</td><td>CLEAN</td></tr>
+        <tr><td>EVOLUTION</td><td>D-Override Rate</td><td class="data-val">${payload.Evolution_Delta.D_FINAL_Override}</td><td>HIGH</td></tr>
+        <tr><td>POWER</td><td>P-Shift Intensity</td><td class="data-val">${payload.Power_Control.P_Shift_Force}</td><td>FORCEFUL</td></tr>
+    `;
 
-    } catch(e) {
-        alert("代碼解析錯誤，請確認貼入的是完整的 A-Record JSON 格式。");
-    }
+    // 4. 更新 ID
+    document.getElementById('v-id-display').innerText = data.Universal_Vajra_Seal;
 }
 
-function calculateRadarPoints(values) {
-    const center = 100;
-    const radius = 80;
+function drawRadar(values) {
+    const size = 300;
+    const center = size / 2;
+    const radius = 100;
     const angleStep = (Math.PI * 2) / 5;
-    return values.map((v, i) => {
+    
+    let points = values.map((v, idx) => {
         const r = (v / 100) * radius;
-        const x = center + r * Math.sin(i * angleStep);
-        const y = center - r * Math.cos(i * angleStep);
+        const x = center + r * Math.sin(idx * angleStep);
+        const y = center - r * Math.cos(idx * angleStep);
         return `${x},${y}`;
     }).join(' ');
+
+    document.getElementById('radar-svg-wrap').innerHTML = `
+        <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+            <circle cx="${center}" cy="${center}" r="${radius}" fill="none" stroke="#222" stroke-width="1"/>
+            <circle cx="${center}" cy="${center}" r="${radius*0.5}" fill="none" stroke="#222" stroke-width="0.5"/>
+            <polygon points="${points}" fill="rgba(203, 163, 122, 0.4)" stroke="var(--gold)" stroke-width="2"/>
+            <text x="${center}" y="${center-radius-10}" fill="var(--gold)" font-size="9" text-anchor="middle">INTENT</text>
+            <text x="${center+radius+5}" y="${center}" fill="var(--gold)" font-size="9">DELTA</text>
+            <text x="${center}" y="${center+radius+15}" fill="var(--gold)" font-size="9" text-anchor="middle">SEED</text>
+            <text x="${center-radius-35}" y="${center}" fill="var(--gold)" font-size="9">POWER</text>
+        </svg>
+    `;
 }
 </script>
 </body>
