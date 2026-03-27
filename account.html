@@ -1,118 +1,92 @@
-// --- [1] 數據核心：加入明細存儲結構 ---
-let db = JSON.parse(localStorage.getItem('PX_EN_V15.0')) || {
-    name: "Miaoyi",
-    totalNian: 0,
-    bodhiLedger: [] // 每筆紀錄包含 {id, amount, items: [], date}
-};
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>發票掃描功能測試</title>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <style>
+        body { background: #111; color: #fff; font-family: sans-serif; text-align: center; padding: 20px; }
+        #preview { width: 100%; max-width: 400px; border: 2px solid #CBA37A; border-radius: 20px; margin-bottom: 20px; }
+        .result-box { background: #222; border: 1px solid #444; padding: 15px; border-radius: 12px; margin-top: 20px; text-align: left; }
+        .success { color: #82968C; font-weight: bold; }
+        button { background: #CBA37A; border: none; color: #000; padding: 15px 30px; border-radius: 30px; font-weight: bold; cursor: pointer; }
+        canvas { display: none; }
+    </style>
+</head>
+<body>
 
-function save() { localStorage.setItem('PX_EN_V15.0', JSON.stringify(db)); }
+    <h2>單機解析測試</h2>
+    <p>請對準發票左側或右側 QR Code</p>
 
-// --- [2] 萬用法門：發票明細解析器 ---
-const InvoiceParser = {
-    // 解析左側碼
-    parseSummary: function(raw) {
-        if (raw.length < 50 || raw.startsWith("**")) return null;
-        try {
-            const amount = parseInt(raw.substring(29, 37), 16);
-            const invNum = raw.substring(0, 10);
-            return { 
-                invNum: invNum, 
-                amount: amount, 
-                date: (parseInt(raw.substring(10, 13)) + 1911) + "-" + raw.substring(13, 15) + "-" + raw.substring(15, 17)
-            };
-        } catch(e) { return null; }
-    },
-    // 解析右側碼 (明細)
-    parseDetails: function(raw) {
-        if (!raw.startsWith("**")) return null;
-        try {
-            // 移除前綴 ** 並根據冒號分割
-            // 格式通常為：品名:數量:單價:品名:數量:單價...
-            const content = raw.substring(2);
-            const parts = content.split(":");
-            let items = [];
-            for (let i = 0; i < parts.length; i += 3) {
-                if (parts[i]) {
-                    items.push({
-                        name: parts[i].trim(),
-                        qty: parts[i+1] || "1",
-                        price: parts[i+2] || "0"
-                    });
+    <video id="video" playsinline></video>
+    <canvas id="canvas"></canvas>
+
+    <div id="status" style="margin: 10px 0; color: #968E86;">等待啟動相機...</div>
+    <button onclick="startCamera()">開啟相機</button>
+
+    <div class="result-box">
+        <div><strong>偵測結果：</strong></div>
+        <div id="parsed-res" class="success">尚未掃描</div>
+        <hr>
+        <div><strong>原始字串 (Debug)：</strong></div>
+        <div id="raw-str" style="font-size: 0.7rem; color: #888; word-break: break-all;">-</div>
+    </div>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const status = document.getElementById('status');
+        const rawStr = document.getElementById('raw-str');
+        const parsedRes = document.getElementById('parsed-res');
+
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+                video.srcObject = stream;
+                video.setAttribute("playsinline", true);
+                video.play();
+                status.innerText = "掃描中，請對準發票...";
+                requestAnimationFrame(tick);
+            } catch (err) {
+                status.innerText = "相機啟動失敗：" + err.name;
+            }
+        }
+
+        function tick() {
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                canvas.height = video.videoHeight;
+                canvas.width = video.videoWidth;
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+                if (code) {
+                    handleResult(code.data);
                 }
             }
-            return items;
-        } catch(e) { return null; }
-    }
-};
-
-// --- [3] 掃描控制中心：兩段式注入 ---
-let lastInvNum = null; // 暫存剛掃到的發票號碼，用來對接明細
-
-async function handleScanResult(raw, status) {
-    // 優先判斷是否為明細 (右側碼)
-    if (raw.startsWith("**")) {
-        const details = InvoiceParser.parseDetails(raw);
-        if (details && db.bodhiLedger.length > 0) {
-            // 尋找最後一筆紀錄（或比對發票號碼）進行注入
-            db.bodhiLedger[0].items = details;
-            save(); updateUI();
-            if (navigator.vibrate) navigator.vibrate([30, 100]);
-            status.innerText = "✨ Details Injected! Record Complete.";
-            setTimeout(closeScanner, 1000); 
-        } else {
-            status.innerText = "Please scan the LEFT QR first.";
+            requestAnimationFrame(tick);
         }
-    } 
-    // 否則判斷是否為總金額 (左側碼)
-    else {
-        const summary = InvoiceParser.parseSummary(raw);
-        if (summary) {
-            // 建立新紀錄，放在最前面
-            db.bodhiLedger.unshift({
-                id: Date.now(),
-                invNum: summary.invNum,
-                amount: summary.amount,
-                date: summary.date,
-                cat: "General",
-                items: [], // 等待右側碼掃描
-                color: "var(--accent-gold)"
-            });
-            save(); updateUI();
-            if (navigator.vibrate) navigator.vibrate(50);
-            status.innerText = `Captured $${summary.amount}! Now scan the RIGHT code.`;
-            status.style.color = "var(--accent-jade)";
+
+        function handleResult(data) {
+            rawStr.innerText = data; // 顯示原始字串
+
+            // 1. 測試左側碼 (長度通常大於 50 且包含金額)
+            if (data.length >= 50 && !data.startsWith("**")) {
+                const amountHex = data.substring(29, 37);
+                const amount = parseInt(amountHex, 16);
+                parsedRes.innerHTML = `✅ [左側總計碼] 金額: $${amount}`;
+                if (navigator.vibrate) navigator.vibrate(50);
+            } 
+            // 2. 測試右側碼 (明細)
+            else if (data.startsWith("**")) {
+                parsedRes.innerHTML = `✅ [右側明細碼] 內容: ${data.substring(0, 30)}...`;
+                if (navigator.vibrate) navigator.vibrate([30, 100]);
+            }
+            else {
+                parsedRes.innerText = "掃到非發票格式內容";
+            }
         }
-    }
-}
-
-// --- [4] UI 顯化：蓮花綻放式清單 ---
-function updateUI() {
-    const total = db.bodhiLedger.reduce((acc, t) => acc + t.amount, 0);
-    const balanceDisplay = document.getElementById('main-balance');
-    if(balanceDisplay) balanceDisplay.innerText = "$" + total.toLocaleString();
-
-    const listObj = document.getElementById('ledger-list');
-    if(!listObj) return;
-    
-    listObj.innerHTML = db.bodhiLedger.slice(0, 10).map(t => `
-        <div class="t-item" style="flex-direction: column; align-items: flex-start; gap: 5px;" onclick="this.querySelector('.details-panel').style.display = this.querySelector('.details-panel').style.display === 'none' ? 'block' : 'none'">
-            <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
-                <div class="t-item-left">
-                    <div class="t-dot" style="background: ${t.color}"></div>
-                    <div class="t-info">
-                        <div class="t-cat">${t.date} ${t.invNum || ''}</div>
-                    </div>
-                </div>
-                <div class="t-amt t-expense">-$${t.amount.toLocaleString()}</div>
-            </div>
-            <div class="details-panel" style="display: none; width: 100%; padding-left: 22px; margin-top: 5px; border-top: 1px dashed rgba(0,0,0,0.05);">
-                ${t.items.length > 0 ? t.items.map(i => `
-                    <div style="font-size: 0.75rem; color: var(--text-light); display: flex; justify-content: space-between; padding: 2px 0;">
-                        <span>${i.name} x${i.qty}</span>
-                        <span>$${i.price}</span>
-                    </div>
-                `).join('') : '<div style="font-size: 0.7rem; color: #ccc;">No details (Scan right QR to add)</div>'}
-            </div>
-        </div>
-    `).join('');
-}
+    </script>
+</body>
+</html>
