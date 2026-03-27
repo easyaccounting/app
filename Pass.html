@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>識位金剛印 ． 客觀紀錄儀</title>
+    <style>
+        :root { --gold: #CBA37A; --bg: #050505; --text: #D1CEC7; }
+        body { background: var(--bg); color: var(--text); font-family: "PingFang TC", sans-serif; padding: 40px; display: flex; flex-direction: column; align-items: center; }
+        .panel { width: 100%; max-width: 700px; background: rgba(255,255,255,0.02); border: 1px solid rgba(203, 163, 122, 0.3); padding: 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
+        textarea { width: 100%; height: 120px; background: rgba(0,0,0,0.4); border: 1px solid var(--gold); color: #fff; padding: 15px; border-radius: 10px; margin-bottom: 20px; font-size: 0.9rem; }
+        button { background: var(--gold); color: #000; border: none; padding: 10px 25px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+        .result-box { margin-top: 25px; padding: 20px; border: 1px dashed var(--gold); border-radius: 10px; word-break: break-all; font-family: monospace; display: none; }
+        .verify-zone { margin-top: 60px; border-top: 1px solid rgba(203, 163, 122, 0.2); padding-top: 40px; width: 100%; max-width: 700px; }
+    </style>
+</head>
+<body>
+
+    <div class="panel">
+        <h2 style="color: var(--gold); text-align: center;">1. 鑄造存證 (Forge)</h2>
+        <p style="font-size: 0.8rem; opacity: 0.7;">貼入完整對話紀錄：</p>
+        <textarea id="f-text"></textarea>
+        <button onclick="mint()">鑄造金剛印</button>
+        <div id="f-res" class="result-box"></div>
+    </div>
+
+    <div class="verify-zone">
+        <h2 style="color: var(--gold); text-align: center;">2. 真實驗證 (Verify)</h2>
+        <p style="font-size: 0.8rem; opacity: 0.7;">貼入作品原文：</p>
+        <textarea id="v-text"></textarea>
+        <p style="font-size: 0.8rem; opacity: 0.7;">貼入金剛印：</p>
+        <input type="text" id="v-seal" style="width: 100%; padding: 10px; background: transparent; border: 1px solid var(--gold); color: #fff; border-radius: 8px; margin-bottom: 20px;">
+        <button onclick="verify()" style="background: #82968C;">執行解碼驗證</button>
+        <div id="v-res" class="result-box"></div>
+    </div>
+
+    <script>
+        async function sha256(m) {
+            const buf = new TextEncoder().encode(m);
+            const hash = await crypto.subtle.digest('SHA-256', buf);
+            return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        async function mint() {
+            const t = document.getElementById('f-text').value.trim();
+            if(!t) return;
+            const h = await sha256(t);
+            // 簡單計算客觀修改比例 (僅供範例)
+            const humanLen = (t.match(/(我[:：]|User:)/g) || []).length;
+            const ratio = Math.min(humanLen * 15, 99); // 簡化邏輯：次數越多比例越高
+            const seal = `MIAOYI_V14|${ratio}%|${h}`;
+            document.getElementById('f-res').innerText = seal;
+            document.getElementById('f-res').style.display = 'block';
+        }
+
+        async function verify() {
+            const t = document.getElementById('v-text').value.trim();
+            const s = document.getElementById('v-seal').value.trim();
+            const res = document.getElementById('v-res');
+            res.style.display = 'block';
+
+            const parts = s.split('|');
+            if(parts.length !== 3) { res.innerHTML = "<span style='color:red;'>無效的格式</span>"; return; }
+
+            const currentH = await sha256(t);
+            if(currentH === parts[2]) {
+                res.innerHTML = `<span style='color:#82968C;'>✅ 驗證成功！這是原始紀錄。</span><br>人類主導比例：${parts[1]}`;
+            } else {
+                res.innerHTML = "<span style='color:red;'>❌ 警告：內容已被竄改！與存證指紋不符。</span>";
+            }
+        }
+    </script>
+</body>
+</html>
