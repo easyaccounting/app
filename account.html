@@ -58,7 +58,8 @@
         .nav-btn { display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%; background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); color: var(--text-main); box-shadow: var(--glass-shadow); cursor: pointer; transition: all 0.2s; }
         .nav-btn:active { transform: scale(0.92); background: rgba(255,255,255,0.9); }
         .nav-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
-        .page-title { font-size: 1.15rem; font-weight: 500; letter-spacing: 3px; color: var(--accent-gold); cursor: pointer; }
+        .page-title { position: absolute; left: 50%; transform: translateX(-50%); font-size: 1.15rem; font-weight: 500; letter-spacing: 3px; color: var(--accent-gold); cursor: pointer; }
+
 
         /* --- 記帳主視圖 --- */
         .main-container { width: 100%; max-width: 720px; margin: 0 auto; padding: calc(85px + env(safe-area-inset-top)) 20px 100px; display: flex; flex-direction: column; align-items: center; gap: 30px; transition: transform 0.4s; }
@@ -281,7 +282,7 @@
             <div class="guide-step" id="step-r">2. 掃右側(明細)</div>
         </div>
         <p id="scan-status">對準發票左方 QR 碼</p>
-        <button class="m-btn m-btn-cancel" style="margin-top: 30px; width: 120px;" onclick="closeScanner()">取消</button>
+        <button class="m-btn m-btn-cancel" style="margin-top: 30px; padding: 12px 40px; border-radius: 25px; width: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.05);" onclick="closeScanner()">取消</button>
     </div>
 
     <div class="modal-overlay" id="edit-modal">
