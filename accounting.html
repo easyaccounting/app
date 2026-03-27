@@ -31,26 +31,26 @@
             font-family: -apple-system, sans-serif; overflow-x: hidden; -webkit-user-select: none; user-select: none; 
         }
 
-        /* --- 側邊選單 --- */
+        /* --- 側邊選單 (全局統一版) --- */
         .side-menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.25); backdrop-filter: blur(5px); z-index: 900; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .side-menu-overlay.open { opacity: 1; pointer-events: auto; }
         .side-menu { position: fixed; top: 0; left: 0; width: 80%; max-width: 320px; height: 100%; background: rgba(252, 251, 249, 0.95); backdrop-filter: blur(20px); border-right: 1px solid var(--glass-border); box-shadow: 10px 0 40px rgba(0,0,0,0.08); transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); z-index: 901; display: flex; flex-direction: column; padding-top: max(40px, env(safe-area-inset-top)); }
         .side-menu.open { transform: translateX(0); }
-        .menu-profile { padding: 0 25px 25px; border-bottom: 1px solid rgba(92,84,78,0.06); margin-bottom: 15px; }
+        .menu-profile { padding: 0 25px 25px; border-bottom: 1px solid rgba(92,84,78,0.06); margin-bottom: 15px; flex-shrink: 0; }
         .menu-title { font-size: 1.6rem; font-weight: 300; letter-spacing: 3px; color: var(--text-main); }
         .menu-subtitle { font-size: 0.75rem; color: var(--accent-gold); letter-spacing: 1px; margin-top: 8px; }
         
         .menu-list { flex: 1; overflow-y: auto; padding: 0 20px 20px; display: flex; flex-direction: column; gap: 12px; }
-        .menu-item { padding: 16px 20px; border-radius: 20px; border: 1px solid var(--glass-border); display: flex; align-items: center; gap: 15px; font-size: 0.95rem; font-weight: 500; cursor: pointer; background: rgba(255,255,255,0.4); box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: all 0.2s; color: var(--text-main); }
+        .menu-item { flex-shrink: 0; padding: 16px 20px; border-radius: 20px; border: 1px solid var(--glass-border); display: flex; align-items: center; gap: 15px; font-size: 0.95rem; font-weight: 500; cursor: pointer; background: rgba(255,255,255,0.4); box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: all 0.2s; color: var(--text-main); text-decoration: none; }
         .menu-item:active { transform: scale(0.97); background: rgba(255,255,255,0.9); }
         .menu-item.active { background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(203, 163, 122, 0.12)); border-color: var(--accent-gold); color: var(--accent-gold); box-shadow: 0 4px 15px rgba(203, 163, 122, 0.12); }
-        .menu-icon-wrap { width: 32px; height: 32px; border-radius: 50%; background: #fff; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
+        .menu-icon-wrap { width: 32px; height: 32px; border-radius: 50%; background: #fff; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.04); flex-shrink: 0; }
         .menu-item svg { stroke: currentColor; fill: none; stroke-width: 1.8; width: 16px; height: 16px; }
         
-        .menu-bottom-links { display: flex; flex-direction: column; gap: 8px; padding: 20px 0; border-top: 1px solid rgba(92,84,78,0.06); }
+        .menu-bottom-links { display: flex; flex-direction: column; gap: 8px; padding: 20px 0; border-top: 1px solid rgba(92,84,78,0.06); flex-shrink: 0; background: rgba(252, 251, 249, 0.95); }
         .menu-sub-link { font-size: 0.85rem; color: var(--text-light); cursor: pointer; padding: 8px 25px; display: flex; align-items: center; justify-content: flex-start; gap: 10px; transition: color 0.2s; }
         .menu-sub-link:active { color: var(--accent-gold); }
-        .menu-sub-link svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+        .menu-sub-link svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; flex-shrink: 0; }
 
         /* --- 頂部導航 --- */
         .top-nav { position: fixed; top: 0; left: 0; width: 100%; z-index: 800; padding: max(15px, env(safe-area-inset-top)) 20px 15px; display: flex; justify-content: center; background: linear-gradient(to bottom, rgba(249,250,249,0.95), rgba(249,250,249,0)); }
@@ -69,7 +69,7 @@
         .balance-amount { font-size: 4rem; font-weight: 300; color: var(--accent-gold); text-shadow: 0 4px 20px rgba(203, 163, 122, 0.15); transition: opacity 0.3s;}
         
         /* 置中專屬載具按鈕 */
-        .center-carrier-btn { display: flex; align-items: center; gap: 6px; padding: 6px 16px; background: rgba(255,255,255,0.6); border: 1px solid var(--glass-border); border-radius: 20px; color: var(--accent-gold); font-size: 0.8rem; font-weight: 500; letter-spacing: 1px; cursor: pointer; margin-bottom: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); transition: all 0.2s; }
+        .center-carrier-btn { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 16px; background: rgba(255,255,255,0.6); border: 1px solid var(--glass-border); border-radius: 20px; color: var(--accent-gold); font-size: 0.8rem; font-weight: 500; letter-spacing: 1px; cursor: pointer; margin-bottom: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); transition: all 0.2s; }
         .center-carrier-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.9); }
         .center-carrier-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
 
@@ -203,7 +203,7 @@
                 <div class="menu-icon-wrap"><svg viewBox="0 0 24 24" stroke="currentColor"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div>大數據統計
             </div>
             <div class="menu-item" onclick="window.location.href='https://namoamitabhapureland.github.io/bodhicitta/index.html'">
-                <div class="menu-icon-wrap"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg></div>彌陀淨土系統（請瀏覽器開啟並新增至主畫面）
+                <div class="menu-icon-wrap"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg></div>彌陀淨土系統
             </div>
         </div>
         <div class="menu-bottom-links">
@@ -237,14 +237,15 @@
 
     <div class="main-container" id="main-container">
         <div class="balance-section">
-            <div class="center-carrier-btn" onclick="showCarrier()">
-                        <div style="display: flex; gap: 12px; margin-bottom: 10px;">
+            
+            <div style="display: flex; gap: 12px; margin-bottom: 10px;">
                 <div class="center-carrier-btn" style="margin-bottom: 0;" onclick="showCarrier()">
                     <svg viewBox="0 0 24 24"><path d="M4 5v14M8 5v14M12 5v14M16 5v14M20 5v14"/></svg> 發票載具
                 </div>
                 <div class="center-carrier-btn" style="margin-bottom: 0; color: var(--accent-jade); border-color: rgba(130, 150, 140, 0.3);" onclick="openLotteryModal()">
                     <svg viewBox="0 0 24 24"><path d="M12 2L14.5 8.5L21 11L14.5 13.5L12 20L9.5 13.5L3 11L9.5 8.5Z"/></svg> 發票對獎
                 </div>
+            </div>
 
             <div class="balance-label">目前結餘</div>
             <div class="balance-amount" id="main-balance">$0</div>
@@ -388,7 +389,9 @@
             </div>
             <button class="m-btn m-btn-cancel" style="width: 100%; margin-top: 15px; background: transparent; border: none; font-size: 0.85rem;" onclick="document.getElementById('backup-modal').classList.remove('show')">關閉視窗</button>
         </div>
-        <div class="modal-overlay" id="lottery-modal">
+    </div>
+
+    <div class="modal-overlay" id="lottery-modal">
         <div class="glass-modal" style="max-width: 380px; padding: 25px 20px;">
             <h3 style="margin-top:0; color:var(--accent-gold); font-weight: 500; letter-spacing: 2px;">本期發票對獎</h3>
             
@@ -401,24 +404,24 @@
             </a>
 
             <div style="text-align: left; font-size: 0.8rem; color: var(--text-main); margin-left: 5px; margin-bottom: 4px;">特別獎 (1000萬)</div>
-            <input type="number" id="prize-special" class="modal-input" style="letter-spacing: 2px;" placeholder="8位數字" maxlength="8">
+            <input type="tel" id="prize-special" class="modal-input" style="letter-spacing: 2px;" placeholder="8位數字" maxlength="8">
             
             <div style="text-align: left; font-size: 0.8rem; color: var(--text-main); margin-left: 5px; margin-bottom: 4px;">特獎 (200萬)</div>
-            <input type="number" id="prize-grand" class="modal-input" style="letter-spacing: 2px;" placeholder="8位數字" maxlength="8">
+            <input type="tel" id="prize-grand" class="modal-input" style="letter-spacing: 2px;" placeholder="8位數字" maxlength="8">
             
             <div style="text-align: left; font-size: 0.8rem; color: var(--text-main); margin-left: 5px; margin-bottom: 4px;">頭獎至六獎 (共三組)</div>
             <div style="display: flex; gap: 8px; margin-bottom: 20px;">
-                <input type="number" id="prize-first-1" class="modal-input" style="margin: 0; padding: 10px 5px; font-size: 0.9rem;" placeholder="第一組">
-                <input type="number" id="prize-first-2" class="modal-input" style="margin: 0; padding: 10px 5px; font-size: 0.9rem;" placeholder="第二組">
-                <input type="number" id="prize-first-3" class="modal-input" style="margin: 0; padding: 10px 5px; font-size: 0.9rem;" placeholder="第三組">
+                <input type="tel" id="prize-first-1" class="modal-input" style="margin: 0; flex: 1; padding: 10px 5px; font-size: 0.9rem;" placeholder="第一組" maxlength="8">
+                <input type="tel" id="prize-first-2" class="modal-input" style="margin: 0; flex: 1; padding: 10px 5px; font-size: 0.9rem;" placeholder="第二組" maxlength="8">
+                <input type="tel" id="prize-first-3" class="modal-input" style="margin: 0; flex: 1; padding: 10px 5px; font-size: 0.9rem;" placeholder="第三組" maxlength="8">
             </div>
 
             <div id="lottery-result-area" style="display: none; flex-direction: column; align-items: center; padding: 15px; background: rgba(255,255,255,0.8); border-radius: 16px; border: 1px solid var(--accent-gold); margin-bottom: 15px;">
-                </div>
+            </div>
 
-            <div class="modal-btn-group">
-                <button class="m-btn m-btn-cancel" onclick="document.getElementById('lottery-modal').classList.remove('show'); document.getElementById('lottery-result-area').style.display='none';">關閉</button>
-                <button class="m-btn m-btn-confirm" onclick="runLotteryEngine()">一鍵對獎</button>
+            <div class="modal-btn-group" style="display: flex; gap: 10px; width: 100%;">
+                <button class="m-btn m-btn-cancel" style="flex: 1; width: auto; margin: 0;" onclick="document.getElementById('lottery-modal').classList.remove('show'); document.getElementById('lottery-result-area').style.display='none';">關閉</button>
+                <button class="m-btn m-btn-confirm" style="flex: 1; width: auto; margin: 0;" onclick="runLotteryEngine()">一鍵對獎</button>
             </div>
         </div>
     </div>
@@ -696,7 +699,8 @@
             }
             document.getElementById('backup-modal').classList.remove('show');
         }
-                // --- 發票對獎光速引擎 ---
+
+        // --- 發票對獎光速引擎 ---
         function openLotteryModal() {
             document.getElementById('lottery-modal').classList.add('show');
             document.getElementById('lottery-result-area').style.display = 'none';
@@ -778,7 +782,6 @@
                 `;
             }
         }
-
     </script>
 </body>
 </html>
