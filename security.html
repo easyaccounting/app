@@ -9,413 +9,351 @@
     <title>淨息流 ． 金剛藏</title>
     <style>
         :root {
-            --bg-gradient: linear-gradient(135deg, #FDFDFD, #F0EBE6);
-            --glass-bg: rgba(255, 255, 255, 0.65);
-            --glass-border: rgba(255, 255, 255, 0.85);
-            --text-main: #4A433E; 
-            --text-light: #8A8179;
-            --accent-amber: #B89970; /* 曼陀羅金 */
-            --accent-amber-hover: #A6865D;
-            --accent-jade: #7A8F85; /* 慈悲綠 */
-            --accent-jade-hover: #677A71;
-            --shadow-glow: 0 12px 40px rgba(184, 153, 112, 0.15);
-            --shadow-btn: 0 8px 24px rgba(184, 153, 112, 0.25);
+            --bg-gradient: linear-gradient(135deg, #FDFDFD, #F5F2EF);
+            --glass-bg: rgba(255, 255, 255, 0.85); /* 提高卡片不透明度 */
+            --glass-border: rgba(210, 195, 180, 0.4);
+            --text-main: #4A423D; /* 加深主要文字顏色 */
+            --text-light: #7A726C;
+            --accent-amber: #C1A583; --accent-gold: #CBA37A; --accent-jade: #82968C; --accent-red: #D29498;
+            --shadow-soft: 0 8px 30px rgba(180, 160, 140, 0.15);
         }
 
         * { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
-        html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg-gradient); color: var(--text-main); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; overflow-x: hidden; }
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg-gradient); color: var(--text-main); font-family: -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif; overflow-x: hidden; }
 
         /* --- 頂部導航 --- */
-        .top-nav { position: fixed; top: 0; left: 0; width: 100%; z-index: 800; padding: max(15px, env(safe-area-inset-top)) 20px 15px; display: flex; flex-direction: column; align-items: center; background: rgba(253, 253, 253, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.6); }
-        .nav-content { width: 100%; max-width: 720px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
-        .nav-btn { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.9); border: 1px solid var(--glass-border); box-shadow: 0 4px 12px rgba(0,0,0,0.04); cursor: pointer; transition: all 0.3s ease; color: var(--text-main); }
-        .nav-btn:hover { background: white; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,0,0,0.06); }
-        .page-title { font-size: 1.15rem; font-weight: 500; letter-spacing: 5px; color: var(--accent-amber); padding-left: 5px; }
+        .top-nav { position: fixed; top: 0; left: 0; width: 100%; z-index: 800; padding: max(15px, env(safe-area-inset-top)) 20px 10px; display: flex; flex-direction: column; align-items: center; background: rgba(253,253,253,0.95); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(220,210,200,0.5); }
+        .nav-content { width: 100%; max-width: 720px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .nav-btn { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background: white; border: 1px solid var(--glass-border); box-shadow: 0 4px 10px rgba(0,0,0,0.03); cursor: pointer; transition: 0.2s; color: var(--text-main); }
+        .nav-btn:active { transform: scale(0.92); background: #f0f0f0; }
+        .nav-btn svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; }
+        .page-title { font-size: 1.2rem; font-weight: 500; letter-spacing: 4px; color: var(--accent-gold); }
 
-        .module-tabs { width: 100%; max-width: 720px; display: flex; justify-content: center; gap: 12px; }
-        .mod-tab { padding: 10px 24px; border-radius: 24px; font-size: 0.95rem; font-weight: 500; color: var(--text-light); cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid transparent; letter-spacing: 1px; }
-        .mod-tab.active { background: white; color: var(--accent-amber); border: 1px solid var(--accent-amber); box-shadow: 0 4px 12px rgba(184, 153, 112, 0.1); }
+        .module-tabs { width: 100%; max-width: 720px; display: flex; justify-content: center; gap: 15px; padding-bottom: 5px; }
+        .mod-tab { padding: 10px 24px; border-radius: 20px; font-size: 0.95rem; font-weight: 500; color: var(--text-light); border: 1px solid transparent; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
+        .mod-tab svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+        .mod-tab.active { background: white; color: var(--accent-gold); border-color: var(--accent-gold); box-shadow: 0 4px 12px rgba(203, 163, 122, 0.15); }
 
         /* --- 主容器 --- */
-        .main-container { width: 100%; max-width: 720px; margin: 0 auto; padding: calc(150px + env(safe-area-inset-top)) 20px 80px; display: none; flex-direction: column; gap: 24px; animation: fadeIn 0.5s ease; }
+        .main-container { width: 100%; max-width: 720px; margin: 0 auto; padding: calc(140px + env(safe-area-inset-top)) 20px 100px; display: none; flex-direction: column; gap: 20px; animation: fadeIn 0.4s ease; }
         .main-container.active { display: flex; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- 曼陀羅發光卡片 --- */
-        .vajra-card { background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 32px; padding: 28px; box-shadow: var(--shadow-glow); position: relative; overflow: hidden; }
+        /* --- 卡片與說明區 --- */
+        .vajra-card { background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-radius: 24px; padding: 24px; box-shadow: var(--shadow-soft); }
         
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .card-title { display: flex; align-items: center; gap: 12px; font-size: 1.1rem; font-weight: 500; letter-spacing: 2px; color: var(--text-main); }
-        .card-icon { width: 24px; height: 24px; stroke: var(--accent-amber); fill: none; stroke-width: 1.5; }
-
-        /* --- 輸入元件 --- */
-        .styled-input { width: 100%; background: rgba(255, 255, 255, 0.7); border: 1px solid var(--glass-border); border-radius: 18px; padding: 16px 20px; font-size: 1rem; color: var(--text-main); font-family: inherit; margin-bottom: 16px; outline: none; transition: all 0.3s ease; box-shadow: inset 0 2px 6px rgba(0,0,0,0.01); line-height: 1.6; }
-        .styled-input:focus { border-color: var(--accent-amber); background: white; box-shadow: 0 0 0 3px rgba(184, 153, 112, 0.1); }
-        .styled-input::placeholder { color: #BBB3AB; font-weight: 300; }
+        /* 給長輩的說明專用樣式 */
+        .guide-box { background: rgba(203, 163, 122, 0.08); border-left: 4px solid var(--accent-gold); padding: 18px; border-radius: 0 16px 16px 0; margin-bottom: 25px; }
+        .guide-title { font-size: 1.05rem; font-weight: bold; color: var(--accent-gold); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; letter-spacing: 1px; }
+        .guide-text { font-size: 0.95rem; color: var(--text-main); line-height: 1.7; letter-spacing: 0.5px; }
         
-        .content-area { min-height: 180px; resize: none; overflow-y: hidden; }
+        .card-title-sm { font-size: 1.1rem; font-weight: bold; color: var(--text-main); margin-bottom: 15px; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 10px; }
 
-        .toggle-wrap { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; font-size: 0.95rem; color: var(--text-main); background: rgba(255,255,255,0.4); padding: 12px 16px; border-radius: 16px; border: 1px dashed var(--glass-border); cursor: pointer; }
-        .toggle-wrap input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--accent-jade); cursor: pointer; }
+        /* --- 輸入組件 (高對比) --- */
+        label { display: block; font-size: 0.9rem; font-weight: 500; color: var(--text-main); margin: 0 0 8px 4px; letter-spacing: 1px; }
+        .styled-input { 
+            width: 100%; 
+            background: #ffffff; /* 純白背景，提高可見度 */
+            border: 1px solid rgba(150, 140, 130, 0.4); 
+            border-radius: 12px; 
+            padding: 16px; 
+            font-size: 16px; 
+            color: var(--text-main); 
+            font-family: inherit; 
+            margin-bottom: 20px; 
+            outline: none; 
+            transition: 0.3s; 
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .styled-input:focus { border-color: var(--accent-gold); box-shadow: 0 0 0 3px rgba(203, 163, 122, 0.15); }
+        .styled-input::placeholder { color: #b0a8a0; }
 
-        /* --- 按鈕 --- */
-        .key-submit { width: 100%; background: linear-gradient(135deg, var(--accent-amber), #C9AD8E); color: white; border: none; padding: 18px; border-radius: 24px; font-size: 1.1rem; letter-spacing: 4px; cursor: pointer; font-weight: 500; transition: all 0.3s ease; box-shadow: var(--shadow-btn); display: flex; justify-content: center; align-items: center; gap: 10px; }
-        .key-submit:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(184, 153, 112, 0.3); background: linear-gradient(135deg, var(--accent-amber-hover), var(--accent-amber)); }
-        .key-submit:active { transform: translateY(1px); }
-        
-        .btn-jade { background: linear-gradient(135deg, var(--accent-jade), #8EA097); box-shadow: 0 8px 24px rgba(122, 143, 133, 0.25); }
-        .btn-jade:hover { background: linear-gradient(135deg, var(--accent-jade-hover), var(--accent-jade)); box-shadow: 0 12px 28px rgba(122, 143, 133, 0.3); }
+        /* 下拉選單自訂箭頭 */
+        select.styled-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' stroke='%237A726C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 16px;
+            padding-right: 40px;
+        }
 
-        .btn-sm { background: transparent; border: 1px solid var(--accent-amber); color: var(--accent-amber); padding: 6px 16px; border-radius: 12px; font-size: 0.85rem; cursor: pointer; transition: 0.3s; letter-spacing: 1px; }
-        .btn-sm:hover { background: var(--accent-amber); color: white; }
+        .content-area { min-height: 140px; line-height: 1.6; resize: none; overflow-y: hidden; }
 
-        /* --- 列表與卡片 --- */
-        .divider { font-size: 0.9rem; color: var(--accent-amber); font-weight: 500; margin: 24px 0 16px 8px; display: flex; align-items: center; gap: 12px; letter-spacing: 2px; }
-        .divider::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(184, 153, 112, 0.3), transparent); }
+        /* --- 按鈕視覺 (長輩友善大按鈕) --- */
+        .key-submit { 
+            width: 100%; 
+            background: var(--text-main); 
+            color: white; 
+            border: none; 
+            padding: 18px; 
+            border-radius: 16px; 
+            font-size: 1.1rem; 
+            letter-spacing: 4px; 
+            cursor: pointer; 
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1); 
+            transition: 0.2s; 
+            font-weight: bold; 
+        }
+        .key-submit:active { transform: scale(0.97); }
+        .btn-gold { background: var(--accent-gold); }
+        .btn-jade { background: var(--accent-jade); }
 
-        .emergency-box { background: linear-gradient(135deg, rgba(122, 143, 133, 0.05), rgba(255,255,255,0.9)); border: 1px solid var(--accent-jade); border-radius: 24px; padding: 22px; margin-bottom: 16px; box-shadow: 0 4px 16px rgba(122, 143, 133, 0.08); }
-        .public-badge { font-size: 0.7rem; padding: 4px 10px; border-radius: 8px; background: var(--accent-jade); color: white; letter-spacing: 1px; margin-left: auto; font-weight: 500; }
-        
-        .vault-item { display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; background: rgba(255,255,255,0.5); border: 1px solid var(--glass-border); border-radius: 24px; margin-bottom: 16px; transition: all 0.3s ease; }
-        .vault-item:hover { background: rgba(255,255,255,0.8); transform: scale(1.01); }
-        .item-meta { display: flex; flex-direction: column; gap: 4px; }
-        .item-title { font-weight: 500; font-size: 1.05rem; letter-spacing: 1px; }
-        .item-date { font-size: 0.8rem; color: var(--text-light); }
+        /* --- 索引清單 --- */
+        .vault-item { display: flex; justify-content: space-between; align-items: center; padding: 18px; background: white; border: 1px solid var(--glass-border); border-radius: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+        .vault-name { font-size: 1.05rem; font-weight: bold; color: var(--text-main); }
+        .vault-date { font-size: 0.8rem; color: var(--text-light); margin-top: 6px; }
+        .btn-sm { padding: 10px 18px; border-radius: 10px; font-size: 0.9rem; border: 1px solid var(--accent-gold); color: var(--accent-gold); background: transparent; cursor: pointer; font-weight: bold; }
+        .btn-sm:active { background: var(--accent-gold); color: white; }
 
-        /* --- 模態框 (解鎖) --- */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: none; justify-content: center; align-items: center; z-index: 3000; opacity: 0; transition: opacity 0.3s ease; }
+        .divider { font-size: 0.9rem; color: var(--text-light); font-weight: bold; margin: 25px 0 15px 5px; display: flex; align-items: center; gap: 10px; }
+        .divider::after { content: ''; flex: 1; height: 1px; background: rgba(150, 140, 130, 0.2); }
+
+        /* --- 彈窗 --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 3000; opacity: 0; transition: opacity 0.3s; }
         .modal-overlay.show { display: flex; opacity: 1; }
-        .glass-modal { background: rgba(253, 252, 252, 0.95); width: 90%; max-width: 400px; border-radius: 32px; padding: 32px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.8); transform: translateY(20px); transition: transform 0.3s ease; }
-        .modal-overlay.show .glass-modal { transform: translateY(0); }
-
-        .result-box { display: none; padding: 20px; background: white; border-radius: 20px; margin: 20px 0; border: 1px solid var(--glass-border); text-align: left; max-height: 40vh; overflow-y: auto; font-size: 0.95rem; line-height: 1.8; color: var(--text-main); white-space: pre-wrap; box-shadow: inset 0 2px 10px rgba(0,0,0,0.02); }
+        .glass-modal { background: #FCFBF9; width: 90%; max-width: 360px; border-radius: 24px; padding: 30px 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.8); text-align: center; }
     </style>
 </head>
 <body>
 
     <div class="top-nav">
         <div class="nav-content">
-            <div class="nav-btn" onclick="window.location.href='index.html'">
-                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-            </div>
-            <div class="page-title">金剛藏</div>
-            <div style="width: 44px;"></div>
+            <div class="nav-btn" onclick="window.location.href='index.html'"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></div>
+            <div class="page-title">數位密室</div>
+            <div style="width: 42px;"></div>
         </div>
         <div class="module-tabs">
-            <div class="mod-tab active" id="tab-vault" onclick="switchStage('vault')">密室封存</div>
-            <div class="mod-tab" id="tab-brick" onclick="switchStage('brick')">金磚備份</div>
+            <div class="mod-tab active" id="tab-vault" onclick="switchStage('vault')"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> 保險箱存入</div>
+            <div class="mod-tab" id="tab-brick" onclick="switchStage('brick')"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg> 備份與還原</div>
         </div>
     </div>
 
     <div class="main-container active" id="view-vault">
         
-        <div id="public-area"></div>
+        <div class="guide-box">
+            <div class="guide-title"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg> 這是什麼地方？</div>
+            <div class="guide-text">
+                這就像是您專屬的<b>銀行保險箱</b>。您可以把不想讓別人看到的筆記、帳號密碼存在這裡。<br><br>
+                每次存入時，您都要設定一把<b>專屬鑰匙 (密碼)</b>。系統不會幫您記住鑰匙，<b>如果忘記了，連工程師也打不開喔！</b>請務必記牢或寫在紙上。
+            </div>
+        </div>
 
         <div class="vajra-card">
-            <div class="card-header">
-                <div class="card-title">
-                    <svg class="card-icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg> 
-                    寫入金剛藏
-                </div>
-            </div>
+            <div class="card-title-sm"><svg viewBox="0 0 24 24" width="20" height="20" stroke="var(--accent-gold)" fill="none" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> 寫入新的保密資料</div>
             
-            <select id="v-cat" class="styled-input" onchange="handleTemplateChange()">
-                <option value="數位遺囑">數位遺囑 (含生前意願)</option>
-                <option value="靈魂筆記">靈魂筆記</option>
-                <option value="帳戶備份">帳戶備份</option>
-                <option value="自訂">自訂</option>
+            <label>這筆資料屬於哪一類？</label>
+            <select id="v-cat" class="styled-input">
+                <option value="重要交代">重要交代 (供家人參考之生前筆記)</option>
+                <option value="私人日記">私人日記 (不想公開的心情)</option>
+                <option value="帳密備份">帳密備份 (銀行卡號或密碼)</option>
             </select>
             
-            <input type="text" id="v-title" class="styled-input" placeholder="標題：如「放棄急救意願與後事安排」">
+            <label>給這份資料一個標題</label>
+            <input type="text" id="v-title" class="styled-input" placeholder="例如：郵局提款卡密碼">
             
-            <label class="toggle-wrap">
-                <input type="checkbox" id="v-is-public">
-                <span>設為「緊急公開」(免鑰讀取，僅能以此鑰修改)</span>
-            </label>
-
-            <input type="password" id="v-key" class="styled-input" placeholder="設定此項目的獨立金鑰 (請務必牢記)">
+            <label>設定這份資料的鑰匙 (密碼)</label>
+            <input type="password" id="v-key" class="styled-input" placeholder="請設定解鎖密碼 (絕對不能忘記)">
             
-            <textarea id="v-content" class="styled-input content-area" placeholder="在此自在書寫..." oninput="autoResize(this)"></textarea>
+            <label>要保密的內容</label>
+            <textarea id="v-content" class="styled-input content-area" placeholder="請在此處自在書寫，空間無限大..." oninput="autoHeight(this)"></textarea>
             
-            <button class="key-submit" onclick="actionEncrypt()">
-                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                存入密室
-            </button>
+            <button class="key-submit btn-gold" onclick="actionEncrypt()">上鎖存入保險箱</button>
         </div>
 
         <div id="vault-list-area"></div>
     </div>
 
     <div class="main-container" id="view-brick">
-        <div class="vajra-card">
-            <div class="card-header">
-                <div class="card-title">
-                    <svg class="card-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                    匯出加密金磚
-                </div>
+        
+        <div class="guide-box">
+            <div class="guide-title"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg> 關於打包備份</div>
+            <div class="guide-text">
+                當您要換新手機時，可以用這裡的「打包」功能，把財務、健康與保險箱資料全部裝進一個<b>加密檔案 (.json)</b>裡。<br><br>
+                到新手機後，再用「還原」功能把它解開。
             </div>
-            <p style="font-size:0.95rem; color:var(--text-light); margin-bottom:20px; line-height:1.6;">將整座金剛藏的加密資料打包下載。匯出時需設定一組「總金鑰」以保護此備份檔。</p>
-            <button class="key-submit" onclick="exportEncryptedBrick()">生成金剛備份 (.json)</button>
         </div>
 
-        <div class="vajra-card" style="border: 1px dashed var(--accent-jade); margin-top: 10px;">
-            <div class="card-header">
-                <div class="card-title" style="color: var(--accent-jade);">
-                    <svg class="card-icon" style="stroke: var(--accent-jade);" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                    還原金剛紀錄
-                </div>
-            </div>
-            <p style="font-size:0.95rem; color:var(--text-light); margin-bottom:20px; line-height:1.6;">上傳之前備份的金磚檔案，並輸入當時設定的總金鑰進行還原。</p>
-            <input type="file" id="import-file" style="display:none;" onchange="importEncryptedBrick(event)" accept=".json">
+        <div class="vajra-card">
+            <div class="card-title-sm">打包所有紀錄 (匯出)</div>
+            <p style="font-size:0.9rem; color:var(--text-light); line-height:1.6; margin-bottom:20px;">這會生成一個安全的檔案，請設定一把「總鑰匙」來鎖住這個檔案。</p>
+            <button class="key-submit btn-gold" onclick="exportEncryptedBrick()">設定總鑰匙並下載檔案</button>
+        </div>
+
+        <div class="vajra-card" style="margin-top:15px;">
+            <div class="card-title-sm" style="color:var(--accent-jade);">還原所有紀錄 (匯入)</div>
+            <p style="font-size:0.9rem; color:var(--text-light); line-height:1.6; margin-bottom:20px;">選取您之前下載的備份檔案，並輸入當初的總鑰匙來解開它。</p>
+            <input type="file" id="import-file" style="display:none;" onchange="importEncryptedBrick(event)">
             <button class="key-submit btn-jade" onclick="document.getElementById('import-file').click()">選取檔案並還原</button>
         </div>
     </div>
 
     <div class="modal-overlay" id="decrypt-modal">
         <div class="glass-modal">
-            <div style="font-size: 1.1rem; font-weight: 500; color: var(--accent-amber); margin-bottom: 20px; letter-spacing: 2px;">啟動解鎖程序</div>
-            <input type="password" id="d-key" class="styled-input" placeholder="請輸入對應金鑰" style="text-align:center; letter-spacing: 2px;">
+            <h3 style="margin-top:0; color:var(--text-main); font-weight: bold; letter-spacing: 2px;">開鎖驗證</h3>
+            <p style="font-size:0.85rem; color:var(--text-light); margin-bottom:20px;">請輸入您當初為此筆資料設定的鑰匙</p>
+            <input type="password" id="d-key" class="styled-input" placeholder="輸入鑰匙密碼" style="text-align:center; font-size:1.1rem; margin-bottom:10px;">
             
-            <div id="d-result" class="result-box"></div>
+            <div id="d-result" style="display:none; padding:20px; background: white; border-radius:16px; margin:15px 0; border: 2px solid var(--glass-border); text-align:left; max-height:300px; overflow-y:auto; font-size: 1rem; line-height: 1.7; color: var(--text-main); white-space: pre-wrap;"></div>
             
-            <div style="display:flex; gap:12px; margin-top: 10px;">
-                <button class="key-submit" style="background: rgba(0,0,0,0.05); color: var(--text-light); box-shadow: none; flex: 1;" onclick="closeModal()">關閉</button>
-                <button class="key-submit" id="btn-do-decrypt" style="flex: 2;">解鎖確認</button>
+            <div style="display:flex; gap:12px; margin-top:20px;">
+                <button class="key-submit" style="background:#e0dedb; color:var(--text-main); box-shadow:none; flex:0.4;" onclick="document.getElementById('decrypt-modal').classList.remove('show')">取消</button>
+                <button class="key-submit btn-gold" style="flex:0.6;" id="btn-do-decrypt">打開看內容</button>
             </div>
         </div>
     </div>
 
     <script>
-        // --- 核心邏輯與資料庫 ---
+        const encoder = new TextEncoder(), decoder = new TextDecoder();
         const DB_KEY = 'joy_security_data';
         let secDB = JSON.parse(localStorage.getItem(DB_KEY)) || { entries: [] };
-        const encoder = new TextEncoder(), decoder = new TextDecoder();
 
-        // 預設遺囑模板
-        const willTemplate = `【立書人聲明】
-本人於意識清醒下，立此數位意願：
-
-【醫療與善終意願 (DNR)】
-- 臨終醫療處置 (是否放棄心肺復甦/維生醫療)：
-- 是否同意器官捐贈：
-
-【後事與助念安排】
-- 葬儀方式 (如樹葬、海葬)：
-- 宗教儀式與助念指示 (如指定佛號、經文)：
-
-【財務與資產指示】
-- 實體資產處理原則：
-- 數位資產與帳戶移交：
-
-【最後的靈魂語錄】
-- 給至親友人的叮嚀與祝福：`;
-
-        // 初始載入
-        window.onload = () => {
-            renderVault();
-            handleTemplateChange(); // 載入預設模板
-        };
-
-        // 自動調整 Textarea 高度
-        function autoResize(textarea) {
-            textarea.style.height = 'auto';
-            textarea.style.height = textarea.scrollHeight + 'px';
+        // 自動增長的高度
+        function autoHeight(el) { 
+            el.style.height = '140px'; 
+            el.style.height = (el.scrollHeight) + 'px'; 
         }
 
-        // 處理分類切換與模板載入
-        function handleTemplateChange() {
-            const cat = document.getElementById('v-cat').value;
-            const contentBox = document.getElementById('v-content');
-            if (cat === '數位遺囑' && contentBox.value.trim() === '') {
-                contentBox.value = willTemplate;
-            } else if (cat !== '數位遺囑' && contentBox.value === willTemplate) {
-                contentBox.value = '';
-            }
-            autoResize(contentBox);
+        async function deriveKey(password, salt) {
+            const baseKey = await window.crypto.subtle.importKey('raw', encoder.encode(password), 'PBKDF2', false, ['deriveKey']);
+            return window.crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: 600000, hash: 'SHA-256' }, baseKey, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
         }
 
-        // 切換頁籤
-        function switchStage(s) {
+        async function encryptData(password, text) {
+            const salt = window.crypto.getRandomValues(new Uint8Array(16)), iv = window.crypto.getRandomValues(new Uint8Array(12));
+            const key = await deriveKey(password, salt);
+            const encrypted = await window.crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, encoder.encode(text));
+            const result = new Uint8Array(16 + 12 + encrypted.byteLength);
+            result.set(salt, 0); result.set(iv, 16); result.set(new Uint8Array(encrypted), 28);
+            return btoa(String.fromCharCode(...result));
+        }
+
+        async function decryptData(password, b64) {
+            const raw = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+            const key = await deriveKey(password, raw.slice(0, 16));
+            const decrypted = await window.crypto.subtle.decrypt({ name: 'AES-GCM', iv: raw.slice(16, 28) }, key, raw.slice(28));
+            return decoder.decode(decrypted);
+        }
+
+        function switchStage(stage) {
             document.querySelectorAll('.main-container').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.mod-tab').forEach(t => t.classList.remove('active'));
-            document.getElementById('view-' + s).classList.add('active');
-            document.getElementById('tab-' + s).classList.add('active');
+            document.getElementById('view-' + stage).classList.add('active');
+            document.getElementById('tab-' + stage).classList.add('active');
         }
 
-        // --- 加解密引擎 ---
-        async function deriveKey(pwd, salt) {
-            const base = await window.crypto.subtle.importKey('raw', encoder.encode(pwd), 'PBKDF2', false, ['deriveKey']);
-            return window.crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: 600000, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
-        }
-
-        async function encryptData(pwd, txt) {
-            const salt = window.crypto.getRandomValues(new Uint8Array(16)), iv = window.crypto.getRandomValues(new Uint8Array(12));
-            const key = await deriveKey(pwd, salt);
-            const enc = await window.crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, encoder.encode(txt));
-            const res = new Uint8Array(16 + 12 + enc.byteLength);
-            res.set(salt, 0); res.set(iv, 16); res.set(new Uint8Array(enc), 28);
-            return btoa(String.fromCharCode(...res));
-        }
-
-        async function decryptData(pwd, b64) {
-            const raw = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
-            const key = await deriveKey(pwd, raw.slice(0, 16));
-            return decoder.decode(await window.crypto.subtle.decrypt({ name: 'AES-GCM', iv: raw.slice(16, 28) }, key, raw.slice(28)));
-        }
-
-        // --- 存入密室 ---
         async function actionEncrypt() {
-            const cat = document.getElementById('v-cat').value;
-            const title = document.getElementById('v-title').value.trim();
-            const key = document.getElementById('v-key').value;
-            const content = document.getElementById('v-content').value.trim();
-            const isPub = document.getElementById('v-is-public').checked;
-
-            if(!title || !key || !content) return alert('請完整填寫標題、金鑰與內容');
+            const cat = document.getElementById('v-cat').value, title = document.getElementById('v-title').value.trim(), key = document.getElementById('v-key').value, content = document.getElementById('v-content').value.trim();
+            if(!title || !key || !content) return alert('請確認「標題、鑰匙、內容」都有填寫喔！');
+            
+            // 加入友善的二次確認，防止長輩忘記密碼
+            if(!confirm(`請確認您已將鑰匙「${key}」記下。若遺忘將永遠無法打開此檔案。\n\n確定要上鎖嗎？`)) return;
 
             try {
-                // 將內容加密。即使是公開項目，底層也存一份加密版，用以驗證修改權限
-                const enc = await encryptData(key, content);
-                
-                secDB.entries.unshift({ 
-                    id: Date.now(), 
-                    category: cat, 
-                    title: title, 
-                    data: enc, 
-                    isPublic: isPub, 
-                    publicText: isPub ? content : '', // 若為公開，明文直接寫入
-                    date: new Date().toLocaleDateString('zh-TW') 
-                });
-                
+                const encrypted = await encryptData(key, content);
+                secDB.entries.unshift({ id: Date.now(), category: cat, title, data: encrypted, date: new Date().toLocaleDateString() });
                 localStorage.setItem(DB_KEY, JSON.stringify(secDB));
-                
-                // 清空輸入框
-                document.getElementById('v-title').value = '';
-                document.getElementById('v-key').value = '';
-                document.getElementById('v-content').value = '';
-                document.getElementById('v-is-public').checked = false;
-                handleTemplateChange();
-
                 renderVault();
-                alert('已成功封存入金剛藏');
-            } catch(e) { 
-                alert('加密封存過程發生錯誤'); 
-            }
+                document.getElementById('v-title').value = ''; document.getElementById('v-key').value = ''; document.getElementById('v-content').value = ''; 
+                document.getElementById('v-content').style.height = '140px';
+                alert('已經成功鎖進保險箱了！');
+            } catch(e) { alert('封存失敗，請重試。'); }
         }
 
-        // --- 渲染列表 ---
         function renderVault() {
-            const pubArea = document.getElementById('public-area');
             const listArea = document.getElementById('vault-list-area');
+            let html = '<div class="divider">已存入的保密資料</div>';
             
-            let pubHtml = '';
-            let privHtml = '<div class="divider">密室索引</div>';
-            let hasPriv = false;
-
-            secDB.entries.forEach(item => {
-                if(item.isPublic) {
-                    pubHtml += `
-                        <div class="emergency-box">
-                            <div style="display:flex; align-items:center; margin-bottom:12px;">
-                                <div style="font-weight:600; font-size:1.05rem; color:var(--accent-jade); letter-spacing:1px;">${item.title}</div>
-                                <div class="public-badge">免鑰讀取</div>
-                            </div>
-                            <div style="font-size:0.9rem; color:var(--text-main); white-space:pre-wrap; line-height:1.7; margin-bottom:15px;">${item.publicText}</div>
-                            <div style="text-align:right; border-top: 1px dashed rgba(122, 143, 133, 0.3); padding-top: 12px;">
-                                <button class="btn-sm" onclick="openDecrypt(${item.id})">密碼解鎖 / 管理</button>
-                            </div>
-                        </div>`;
-                } else {
-                    hasPriv = true;
-                    privHtml += `
-                        <div class="vault-item">
-                            <div class="item-meta">
-                                <span class="item-title">${item.title}</span>
-                                <span class="item-date">${item.category} ． ${item.date}</span>
-                            </div>
-                            <button class="btn-sm" onclick="openDecrypt(${item.id})">解鎖</button>
-                        </div>`;
-                }
-            });
-
-            pubArea.innerHTML = pubHtml ? '<div class="divider" style="color:var(--accent-jade);">緊急意願 (公開)</div>' + pubHtml : '';
-            listArea.innerHTML = hasPriv ? privHtml : '';
+            if(secDB.entries.length > 0) {
+                secDB.entries.forEach(item => {
+                    html += `
+                    <div class="vault-item">
+                        <div>
+                            <div class="vault-name">${item.title}</div>
+                            <div class="vault-date">${item.category} ． 建立於 ${item.date}</div>
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn-sm" onclick="openDecrypt(${item.id})">開鎖</button>
+                            <button class="btn-sm" style="border-color:var(--accent-red); color:var(--accent-red);" onclick="deleteItem(${item.id})">刪除</button>
+                        </div>
+                    </div>`;
+                });
+            } else { 
+                html += '<div style="text-align:center; color:var(--text-light); padding:30px; font-size:0.95rem;">目前保險箱是空的</div>'; 
+            }
+            listArea.innerHTML = html;
         }
 
-        // --- 解鎖查看 ---
         let currentId = null;
         function openDecrypt(id) {
             currentId = id; 
-            document.getElementById('d-result').style.display = 'none';
-            document.getElementById('d-result').innerText = '';
+            document.getElementById('d-result').style.display = 'none'; 
             document.getElementById('d-key').value = '';
+            document.getElementById('decrypt-modal').classList.add('show');
             
-            const modal = document.getElementById('decrypt-modal');
-            modal.style.display = 'flex';
-            // 小延遲以觸發 CSS 動畫
-            setTimeout(() => modal.classList.add('show'), 10);
-
             document.getElementById('btn-do-decrypt').onclick = async () => {
-                const k = document.getElementById('d-key').value;
-                const target = secDB.entries.find(x => x.id === currentId);
+                const key = document.getElementById('d-key').value, item = secDB.entries.find(i => i.id === currentId), resEl = document.getElementById('d-result');
+                if(!key) return alert('請輸入鑰匙');
                 try { 
-                    const dec = await decryptData(k, target.data);
-                    const resultBox = document.getElementById('d-result');
-                    resultBox.innerText = dec;
-                    resultBox.style.display = 'block';
-                } catch(e) { 
-                    alert('金鑰不符，無法開啟金剛藏'); 
+                    resEl.innerText = await decryptData(key, item.data); 
+                    resEl.style.display = 'block'; 
+                    resEl.style.color = 'var(--text-main)'; 
+                    resEl.style.borderColor = 'var(--accent-jade)';
+                } 
+                catch(e) { 
+                    resEl.innerText = '❌ 鑰匙錯誤，打不開喔！'; 
+                    resEl.style.display = 'block'; 
+                    resEl.style.color = 'var(--accent-red)'; 
+                    resEl.style.borderColor = 'var(--accent-red)';
                 }
             };
         }
 
-        function closeModal() {
-            const modal = document.getElementById('decrypt-modal');
-            modal.classList.remove('show');
-            setTimeout(() => modal.style.display = 'none', 300);
-        }
-
-        // --- 金磚備份與還原 ---
         async function exportEncryptedBrick() {
-            if (secDB.entries.length === 0) return alert('金剛藏目前為空');
-            const k = prompt("請設定「金磚總金鑰」(還原時需使用)："); 
-            if(!k) return;
-            
+            const key = prompt("請設定一把「總鑰匙」來鎖住這個備份檔：\n(未來換手機還原時會用到，請務必抄寫下來)"); 
+            if(!key) return;
+            const fullData = { 
+                accounting: localStorage.getItem('joy_accounting_app_data'), 
+                health: localStorage.getItem('joy_health_history'), 
+                mom: localStorage.getItem('joy_mom_data'), 
+                pet: localStorage.getItem('joy_pet_data'), 
+                security: localStorage.getItem(DB_KEY) 
+            };
             try {
-                const enc = await encryptData(k, localStorage.getItem(DB_KEY));
-                const blob = new Blob([JSON.stringify({ type: "VAJRA_SEC", payload: enc })], { type: 'application/json' });
-                const link = document.createElement("a"); 
-                link.href = URL.createObjectURL(blob); 
-                link.download = `Joy_Vajra_Backup_${new Date().getTime()}.json`; 
-                link.click();
-            } catch (e) {
-                alert('備份生成失敗');
-            }
+                const encrypted = await encryptData(key, JSON.stringify(fullData));
+                const blob = new Blob([JSON.stringify({ type: "VAJRA_BRICK", payload: encrypted })], { type: 'application/json' });
+                const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Joy_Vajra_Full_Backup.json`; link.click();
+            } catch(e) { alert("打包失敗。"); }
         }
 
-        async function importEncryptedBrick(e) {
-            const f = e.target.files[0];
-            if(!f) return;
-            const k = prompt("請輸入當時設定的「金磚總金鑰」："); 
-            if(!k) return;
-            
-            const r = new FileReader();
-            r.onload = async (ev) => {
+        async function importEncryptedBrick(event) {
+            const file = event.target.files[0]; if (!file) return;
+            const key = prompt("請輸入當初設定的「總鑰匙」來解開這個檔案："); if (!key) return;
+            const reader = new FileReader();
+            reader.onload = async (e) => {
                 try {
-                    const j = JSON.parse(ev.target.result);
-                    if (j.type !== "VAJRA_SEC") throw new Error('檔案格式錯誤');
-                    
-                    const dec = await decryptData(k, j.payload);
-                    localStorage.setItem(DB_KEY, dec);
-                    secDB = JSON.parse(dec);
-                    renderVault();
-                    alert('金剛藏還原成功');
-                } catch(err) { 
-                    alert('還原失敗：金鑰錯誤或檔案毀損'); 
-                }
+                    const json = JSON.parse(e.target.result);
+                    const decryptedStr = await decryptData(key, json.payload);
+                    const data = JSON.parse(decryptedStr);
+                    if(data.accounting) localStorage.setItem('joy_accounting_app_data', data.accounting);
+                    if(data.health) localStorage.setItem('joy_health_history', data.health);
+                    if(data.mom) localStorage.setItem('joy_mom_data', data.mom);
+                    if(data.pet) localStorage.setItem('joy_pet_data', data.pet);
+                    if(data.security) localStorage.setItem(DB_KEY, data.security);
+                    alert("✅ 還原成功！所有資料已恢復。"); location.reload();
+                } catch (err) { alert("❌ 解碼失敗：鑰匙錯誤，或不是正確的備份檔。"); }
             };
-            r.readAsText(f);
+            reader.readAsText(file);
         }
+
+        function deleteItem(id) { 
+            if(confirm('⚠️ 警告：確定要徹底刪除這個秘密嗎？\n刪除後就永遠救不回來囉！')) { 
+                secDB.entries = secDB.entries.filter(i => i.id !== id); 
+                localStorage.setItem(DB_KEY, JSON.stringify(secDB)); 
+                renderVault(); 
+            } 
+        }
+        window.onload = renderVault;
     </script>
 </body>
 </html>
