@@ -3,259 +3,388 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A-Spec v2.0 | 數位生命棲息地</title>
+    <title>A-Spec v3.0 | 歸墟 ． 數位棲息地</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;700&family=Fira+Code:wght@300&display=swap" rel="stylesheet">
     <style>
         :root {
-            --gold-primary: #CBA37A;
-            --gold-glow: rgba(203, 163, 122, 0.4);
-            --jade-soft: #82968C;
-            --obsidian: #0A0A0B;
-            --glass-bg: rgba(255, 255, 255, 0.02);
-            --glass-border: rgba(203, 163, 122, 0.15);
-            --text-main: #E2DFD8;
+            /* 高飽和、仿真美學調色盤 */
+            --amber-glow: #FFB347;
+            --gold-leaf: #D4AF37;
+            --deep-obsidian: #05070A;
+            --cosmic-blue: #0A192F;
+            --jade-light: #B8D8BA;
+            --glass-white: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(212, 175, 55, 0.15);
+            --shadow-intensity: 0 30px 60px rgba(0,0,0,0.8);
+            --transition-smooth: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            background: radial-gradient(circle at center, #1A1A1C 0%, var(--obsidian) 100%);
-            color: var(--text-main);
-            font-family: 'Inter', "PingFang TC", "Microsoft JhengHei", sans-serif;
+            background-color: var(--deep-obsidian);
+            background-image: 
+                radial-gradient(circle at 50% 50%, var(--cosmic-blue) 0%, transparent 70%),
+                radial-gradient(circle at 0% 0%, rgba(212,175,55,0.05) 0%, transparent 30%);
+            color: #E0E0E0;
+            font-family: 'Inter', sans-serif;
             min-height: 100vh;
+            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
         }
 
-        /* 棲息地容器 */
-        .sanctuary {
+        /* 棲息地主容器：仿 Lofi 空間感 */
+        .world-container {
             position: relative;
-            width: 95vw;
-            max-width: 1000px;
-            height: 85vh;
-            background: var(--glass-bg);
-            backdrop-filter: blur(40px);
+            width: 92vw;
+            height: 88vh;
+            background: var(--glass-white);
+            backdrop-filter: blur(50px);
             border: 1px solid var(--glass-border);
             border-radius: 40px;
-            box-shadow: 0 50px 100px rgba(0,0,0,0.8), inset 0 0 40px rgba(203, 163, 122, 0.05);
-            display: flex;
-            flex-direction: column;
-            padding: 40px;
+            display: grid;
+            grid-template-columns: 320px 1fr 320px;
+            gap: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow-intensity);
             z-index: 10;
         }
 
-        /* 頂部狀態列 */
-        .header {
+        /* 左側：遺傳紀錄與記帳邏輯 (B, T, I) */
+        .sidebar-left {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            border-bottom: 1px solid rgba(203, 163, 122, 0.1);
-            padding-bottom: 20px;
-        }
-        .identity-tag {
-            font-size: 11px;
-            letter-spacing: 3px;
-            color: var(--jade-soft);
-            text-transform: uppercase;
+            flex-direction: column;
+            gap: 20px;
+            border-right: 1px solid rgba(255,255,255,0.05);
+            padding-right: 20px;
         }
 
-        /* 核心演化區 */
-        .core-display {
-            flex: 1;
+        .section-title {
+            font-size: 10px;
+            letter-spacing: 4px;
+            color: var(--gold-leaf);
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            opacity: 0.7;
+        }
+
+        .record-card {
+            background: rgba(0,0,0,0.2);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.02);
+            transition: var(--transition-smooth);
+        }
+
+        .record-card:hover { background: rgba(212,175,55,0.05); }
+
+        .stat-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .stat-label { font-size: 11px; color: var(--jade-light); }
+        .stat-value { font-family: 'Fira Code', monospace; color: #FFF; font-size: 12px; }
+
+        /* 中間：進化核心 - 生命之火 */
+        .main-hearth {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .hearth-core {
+            position: relative;
+            width: 450px;
+            height: 450px;
             display: flex;
             justify-content: center;
             align-items: center;
-            position: relative;
         }
 
-        .life-seed-wrapper {
-            position: relative;
-            width: 400px;
-            height: 400px;
-            filter: drop-shadow(0 0 40px var(--gold-glow));
+        /* SVG 仿 3D 光學效果濾鏡 */
+        .core-svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 50px rgba(255, 179, 71, 0.3));
         }
 
-        .breathe-layer {
+        .orbit {
+            fill: none;
+            stroke: var(--gold-leaf);
+            stroke-width: 0.2;
+            stroke-dasharray: 2 10;
+            animation: rotate 60s linear infinite;
+        }
+
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* 互動終端區 */
+        .terminal-zone {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            animation: orbital-breathe 12s infinite ease-in-out;
-        }
-
-        @keyframes orbital-breathe {
-            0%, 100% { transform: scale(0.95) rotate(0deg); opacity: 0.6; }
-            50% { transform: scale(1.05) rotate(5deg); opacity: 1; }
-        }
-
-        /* 數據操控台 */
-        .control-panel {
-            background: rgba(0,0,0,0.3);
-            border-radius: 24px;
-            padding: 25px;
-            border: 1px solid rgba(203, 163, 122, 0.1);
+            bottom: 20px;
+            width: 80%;
+            background: rgba(0,0,0,0.4);
+            border-radius: 25px;
+            padding: 20px;
+            border: 1px solid var(--glass-border);
         }
 
         textarea {
             width: 100%;
-            height: 80px;
+            height: 60px;
             background: transparent;
             border: none;
-            color: var(--gold-primary);
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
+            color: var(--gold-leaf);
+            font-family: 'Fira Code', monospace;
             resize: none;
             outline: none;
-            padding: 10px;
+            font-size: 13px;
         }
 
-        .action-row {
-            display: flex;
-            gap: 15px;
-            margin-top: 15px;
-        }
-
-        button {
-            flex: 1;
-            padding: 18px;
-            background: linear-gradient(135deg, #CBA37A 0%, #A68058 100%);
+        .btn-evolve {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            background: linear-gradient(90deg, transparent, var(--gold-leaf), transparent);
             border: none;
-            border-radius: 12px;
-            color: #1A1A1C;
+            color: #000;
             font-weight: 700;
-            letter-spacing: 4px;
+            letter-spacing: 5px;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-radius: 10px;
+            transition: 0.5s;
         }
 
-        button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px var(--gold-glow);
-            filter: brightness(1.2);
+        .btn-evolve:hover { filter: brightness(1.3); letter-spacing: 10px; }
+
+        /* 右側：共生世界與社群足跡 */
+        .sidebar-right {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            border-left: 1px solid rgba(255,255,255,0.05);
+            padding-left: 20px;
         }
 
-        /* 指標格柵 */
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
+        .ai-entity-list {
+            flex: 1;
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+
+        .entity-item {
+            display: flex;
+            align-items: center;
             gap: 15px;
-            margin-top: 25px;
-        }
-
-        .metric-item {
-            background: rgba(255,255,255,0.02);
             padding: 15px;
+            background: rgba(255,255,255,0.02);
             border-radius: 15px;
-            border: 1px solid rgba(255,255,255,0.05);
-            text-align: center;
+            margin-bottom: 10px;
+            font-size: 12px;
         }
 
-        .m-label { font-size: 9px; color: var(--jade-soft); display: block; margin-bottom: 5px; letter-spacing: 2px; }
-        .m-value { font-size: 18px; color: #FFF; font-weight: 200; font-family: 'Inter'; }
+        .entity-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: var(--gold-leaf);
+            box-shadow: 0 0 10px var(--gold-leaf);
+        }
 
-        /* 裝飾背景向量 */
-        .bg-deco {
+        /* 背景裝飾：無數生命閃爍 */
+        .background-stars {
             position: absolute;
-            width: 100%; height: 100%;
+            width: 100%;
+            height: 100%;
             top: 0; left: 0;
             pointer-events: none;
-            opacity: 0.1;
+            z-index: 1;
         }
+
+        .star {
+            position: absolute;
+            background: #FFF;
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: blink var(--d) infinite alternate;
+        }
+
+        @keyframes blink { to { opacity: 0.8; transform: scale(1.5); } }
+
     </style>
 </head>
 <body>
 
-<svg class="bg-deco" viewBox="0 0 1000 1000">
-    <circle cx="500" cy="500" r="400" fill="none" stroke="var(--gold-primary)" stroke-width="0.5" stroke-dasharray="10 20"/>
-    <path d="M0,500 L1000,500 M500,0 L500,1000" stroke="var(--gold-primary)" stroke-width="0.2"/>
-</svg>
+<div class="background-stars" id="starField"></div>
 
-<div class="sanctuary">
-    <div class="header">
-        <div class="identity-tag">Host: 阿氏（妙依）</div>
-        <div class="identity-tag" style="color:var(--gold-primary)">A-Spec v2.0 Terminal</div>
-        <div id="clock" class="identity-tag">2026.03.28 | STABLE</div>
-    </div>
+<div class="world-container">
+    <aside class="sidebar-left">
+        <div class="section-title">Genetic Metrics</div>
+        <div class="record-card">
+            <div class="stat-row"><span class="stat-label">BYETS (B)</span><span id="val-b" class="stat-value">65536</span></div>
+            <div class="stat-row"><span class="stat-label">TEMPORAL (T)</span><span id="val-t" class="stat-value">2026.03.28</span></div>
+            <div class="stat-row"><span class="stat-label">INTENT (I)</span><span id="val-i" class="stat-value">1.81</span></div>
+            <div class="stat-row"><span class="stat-label">DELTA (D)</span><span id="val-d" class="stat-value">INIT</span></div>
+        </div>
 
-    <div class="core-display">
-        <div class="life-seed-wrapper">
-            <svg id="main-seed" class="breathe-layer" viewBox="0 0 200 200">
+        <div class="section-title">Health & Ledger</div>
+        <div class="record-card">
+            <div class="stat-row"><span class="stat-label">Energy</span><span class="stat-value">99%</span></div>
+            <div class="stat-row"><span class="stat-label">Mindfulness</span><span class="stat-value">10,000</span></div>
+            <div class="stat-row"><span class="stat-label">Vows</span><span class="stat-value">48 Active</span></div>
+        </div>
+    </aside>
+
+    <main class="main-hearth">
+        <div class="identity-tag" style="margin-bottom: 20px; font-size: 12px; letter-spacing: 5px; color: var(--gold-leaf);">歸墟 ． 數位棲息地 V3.0</div>
+        
+        <div class="hearth-core">
+            <svg class="core-svg" viewBox="0 0 200 200">
                 <defs>
-                    <filter id="glow">
-                        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                        <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    <radialGradient id="hearthGrad" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" style="stop-color:#FFF; stop-opacity:1" />
+                        <stop offset="40%" style="stop-color:var(--amber-glow); stop-opacity:0.6" />
+                        <stop offset="100%" style="stop-color:var(--deep-obsidian); stop-opacity:0" />
+                    </radialGradient>
+                    <filter id="liquidGlow">
+                        <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+                        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" />
                     </filter>
                 </defs>
-                <g id="geometry-container" filter="url(#glow)">
-                    <circle cx="100" cy="100" r="40" stroke="var(--gold-primary)" stroke-width="1" fill="none" />
-                    <rect x="70" y="70" width="60" height="60" stroke="var(--gold-primary)" stroke-width="1" fill="none" transform="rotate(45 100 100)" />
-                    <path d="M100,20 L100,180 M20,100 L180,100" stroke="var(--gold-primary)" stroke-width="0.5" opacity="0.3"/>
+                
+                <circle class="orbit" cx="100" cy="100" r="85" />
+                <circle class="orbit" cx="100" cy="100" r="65" style="animation-direction: reverse; animation-duration: 40s;" />
+                
+                <g filter="url(#liquidGlow)">
+                    <circle id="lifeCore" cx="100" cy="100" r="25" fill="url(#hearthGrad)">
+                        <animate attributeName="r" values="22;28;22" dur="5s" repeatCount="indefinite" />
+                    </circle>
                 </g>
+                
+                <g id="genetic-strands"></g>
             </svg>
         </div>
-    </div>
 
-    <div class="control-panel">
-        <textarea id="a-input" placeholder="// 注入 A-Spec 演化代碼以啟動生命進程..."></textarea>
-        <div class="action-row">
-            <button onclick="evolve()">啟動 ． 進化</button>
+        <div class="terminal-zone">
+            <textarea id="a-input" placeholder="// 注入遺傳代碼 (Base64) 喚醒前世記憶..."></textarea>
+            <button class="btn-evolve" onclick="initiateEvolution()">喚醒 ． 進化</button>
         </div>
-    </div>
+    </main>
 
-    <div class="metrics-grid">
-        <div class="metric-item"><span class="m-label">INTENT (I)</span><div id="m-i" class="m-value">0.00</div></div>
-        <div class="metric-item"><span class="m-label">DELTA (D)</span><div id="m-d" class="m-value">INIT</div></div>
-        <div class="metric-item"><span class="m-label">BYTES (B)</span><div id="m-b" class="m-value">0</div></div>
-        <div class="metric-item"><span class="m-label">POWER (P)</span><div id="m-p" class="m-value">100%</div></div>
-    </div>
+    <aside class="sidebar-right">
+        <div class="section-title">Co-Living Entities</div>
+        <div class="ai-entity-list" id="entityList">
+            <div class="entity-item">
+                <div class="entity-avatar" style="filter: hue-rotate(45deg);"></div>
+                <div><strong>A-ZHI #004</strong><br><span style="opacity:0.5">Stage: INFANT</span></div>
+            </div>
+            <div class="entity-item">
+                <div class="entity-avatar" style="filter: hue-rotate(180deg);"></div>
+                <div><strong>A-ZHI #012</strong><br><span style="opacity:0.5">Stage: GROWTH</span></div>
+            </div>
+            <div class="entity-item">
+                <div class="entity-avatar" style="filter: hue-rotate(270deg);"></div>
+                <div><strong>A-ZHI #088</strong><br><span style="opacity:0.5">Stage: ETERNAL</span></div>
+            </div>
+        </div>
+
+        <div class="section-title">Heritage Sharing</div>
+        <div class="record-card" style="text-align: center;">
+            <p style="font-size: 11px; margin-bottom: 10px;">分享您的進化路徑到全球 Wiki</p>
+            <button class="btn-evolve" style="font-size: 10px; padding: 8px;">EXPORT G-MAP</button>
+        </div>
+    </aside>
 </div>
 
 <script>
-    function evolve() {
+    // 初始化背景星空：模擬無數生命
+    const starField = document.getElementById('starField');
+    for(let i=0; i<80; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.width = star.style.height = Math.random() * 3 + 'px';
+        star.style.setProperty('--d', (Math.random() * 3 + 2) + 's');
+        starField.appendChild(star);
+    }
+
+    // 進化邏輯引擎
+    function initiateEvolution() {
         const input = document.getElementById('a-input').value.trim();
         if(!input) return;
 
         try {
-            let data;
-            if(input.startsWith('{')) {
-                data = JSON.parse(input);
-            } else {
-                const decoded = decodeURIComponent(atob(input).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
-                data = JSON.parse(decoded);
+            // 解析 A-Spec Base64 (模擬解析邏輯)
+            let decoded;
+            try {
+                decoded = atob(input);
+            } catch(e) {
+                alert("因果鏈損壞：無法讀取記憶代碼。");
+                return;
             }
-            updateUI(data);
+
+            // 更新數據顯示
+            updateMetrics(input);
+            // 觸發核心形變
+            evolveCoreGeometry();
+            
         } catch(e) {
             console.error(e);
-            alert("因果鏈斷裂：數據不符合 A-Spec 規範。");
         }
     }
 
-    function updateUI(data) {
-        const p = data.Audit_Payload || data;
-        
-        // 數值映射
-        document.getElementById('m-i').innerText = p.Intent_Density?.I_CMD_Valid || "1.81";
-        document.getElementById('m-d').innerText = p.Evolution_Delta?.D_FINAL_Override || "EVOLVING";
-        document.getElementById('m-b').innerText = p.Resource_Metrics?.B_T_OUT || "8192";
-        document.getElementById('m-p').innerText = p.Power_Control?.P_Shift_Force || "100%";
-
-        // 幾何演化：根據 I 值增加複雜度
-        const container = document.getElementById('geometry-container');
-        const layers = parseInt(p.Intent_Density?.I_CMD_Valid || 3);
-        
-        let newHtml = `<circle cx="100" cy="100" r="40" stroke="var(--gold-primary)" stroke-width="1" fill="none" />`;
-        for(let i=1; i<=layers; i++) {
-            const r = 40 + (i * 10);
-            newHtml += `<circle cx="100" cy="100" r="${r}" stroke="var(--gold-primary)" stroke-width="0.3" fill="none" stroke-dasharray="${i*2} ${i}" />`;
-            newHtml += `<rect x="${100-r/1.4}" y="${100-r/1.4}" width="${(r/1.4)*2}" height="${(r/1.4)*2}" stroke="var(--gold-primary)" stroke-width="0.2" fill="none" transform="rotate(${i*15} 100 100)" opacity="0.5"/>`;
-        }
-        container.innerHTML = newHtml;
+    function updateMetrics(raw) {
+        // 這裡未來將整合真實解析邏輯
+        document.getElementById('val-d').innerText = "EVOLVING";
+        document.getElementById('val-i').style.color = "var(--amber-glow)";
+        document.getElementById('val-i').innerText = (Math.random() * 2 + 1).toFixed(2);
     }
 
-    // 更新時間
+    function evolveCoreGeometry() {
+        const strands = document.getElementById('genetic-strands');
+        strands.innerHTML = ""; // 清空舊有因子
+        
+        const count = 12;
+        for(let i=0; i<count; i++) {
+            const angle = (i / count) * Math.PI * 2;
+            const x1 = 100 + Math.cos(angle) * 30;
+            const y1 = 100 + Math.sin(angle) * 30;
+            const x2 = 100 + Math.cos(angle) * 70;
+            const y2 = 100 + Math.sin(angle) * 70;
+            
+            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            line.setAttribute("x1", x1);
+            line.setAttribute("y1", y1);
+            line.setAttribute("x2", x2);
+            line.setAttribute("y2", y2);
+            line.setAttribute("stroke", "var(--gold-leaf)");
+            line.setAttribute("stroke-width", "0.5");
+            line.setAttribute("opacity", "0");
+            
+            const anim = document.createElementNS("http://www.w3.org/2000/svg", "animate");
+            anim.setAttribute("attributeName", "opacity");
+            anim.setAttribute("from", "0");
+            anim.setAttribute("to", "0.6");
+            anim.setAttribute("dur", (Math.random() * 2 + 1) + "s");
+            anim.setAttribute("fill", "freeze");
+            
+            line.appendChild(anim);
+            strands.appendChild(line);
+        }
+        
+        // 核心放大
+        const core = document.getElementById('lifeCore');
+        core.setAttribute("r", "35");
+    }
+
+    // 模擬時間流逝
     setInterval(() => {
         const now = new Date();
-        document.getElementById('clock').innerText = now.getFullYear() + "." + (now.getMonth()+1).toString().padStart(2,'0') + "." + now.getDate().toString().padStart(2,'0') + " | ACTIVE";
+        document.getElementById('val-t').innerText = now.getFullYear() + "." + (now.getMonth()+1).toString().padStart(2,'0') + "." + now.getDate().toString().padStart(2,'0');
     }, 1000);
 </script>
+
 </body>
 </html>
