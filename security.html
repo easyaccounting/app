@@ -13,63 +13,44 @@
             --glass-bg: rgba(255, 255, 255, 0.75);
             --glass-border: rgba(255, 255, 255, 0.9);
             --text-main: #58504A; --text-light: #968E86;
-            --accent-amber: #C1A583; --accent-gold: #CBA37A; --accent-jade: #82968C; --accent-red: #D29498;
+            --accent-amber: #C1A583; --accent-jade: #82968C; --accent-red: #D29498;
             --shadow-glow: 0 10px 40px rgba(193, 165, 131, 0.15);
         }
 
         * { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg-gradient); color: var(--text-main); font-family: -apple-system, sans-serif; overflow-x: hidden; }
 
-        /* --- 頂部導航 --- */
+        /* --- 導航 --- */
         .top-nav { position: fixed; top: 0; left: 0; width: 100%; z-index: 800; padding: max(15px, env(safe-area-inset-top)) 20px 10px; display: flex; flex-direction: column; align-items: center; background: rgba(253,253,253,0.9); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(255,255,255,0.5); }
         .nav-content { width: 100%; max-width: 720px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .nav-btn { display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%; background: white; border: 1px solid var(--glass-border); box-shadow: 0 4px 12px rgba(0,0,0,0.05); cursor: pointer; transition: 0.2s; }
+        .nav-btn { display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%; background: white; border: 1px solid var(--glass-border); box-shadow: 0 4px 12px rgba(0,0,0,0.05); cursor: pointer; }
         .page-title { font-size: 1.1rem; font-weight: 500; letter-spacing: 4px; color: var(--accent-amber); }
 
-        .module-tabs { width: 100%; max-width: 720px; display: flex; justify-content: center; gap: 10px; padding-bottom: 5px; }
-        .mod-tab { padding: 8px 20px; border-radius: 20px; font-size: 0.9rem; font-weight: 500; color: var(--text-light); border: 1px solid transparent; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: 0.3s; }
-        .mod-tab.active { background: white; color: var(--accent-amber); border-color: var(--accent-amber); box-shadow: 0 4px 12px rgba(193, 165, 131, 0.1); }
+        .module-tabs { width: 100%; max-width: 720px; display: flex; justify-content: center; gap: 10px; }
+        .mod-tab { padding: 8px 20px; border-radius: 20px; font-size: 0.9rem; font-weight: 500; color: var(--text-light); cursor: pointer; transition: 0.3s; }
+        .mod-tab.active { background: white; color: var(--accent-amber); border: 1px solid var(--accent-amber); }
 
-        /* --- 主容器 --- */
-        .main-container { width: 100%; max-width: 720px; margin: 0 auto; padding: calc(140px + env(safe-area-inset-top)) 20px 100px; display: none; flex-direction: column; gap: 20px; animation: fadeIn 0.4s ease; }
+        /* --- 容器 --- */
+        .main-container { width: 100%; max-width: 720px; margin: 0 auto; padding: calc(140px + env(safe-area-inset-top)) 20px 100px; display: none; flex-direction: column; gap: 20px; }
         .main-container.active { display: flex; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- 曼陀羅發光卡片 --- */
         .vajra-card { background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-radius: 28px; padding: 24px; box-shadow: var(--shadow-glow); }
-        .card-title-sm { font-size: 0.95rem; font-weight: 500; color: var(--text-main); margin-bottom: 15px; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
-
-        /* 輸入組件 */
-        label { display: block; font-size: 0.8rem; color: var(--text-light); margin: 0 0 8px 5px; letter-spacing: 1px; }
-        .styled-input { width: 100%; background: rgba(255,255,255,0.6); border: 1px solid var(--glass-border); border-radius: 16px; padding: 14px 18px; font-size: 16px; color: var(--text-main); font-family: inherit; margin-bottom: 15px; outline: none; transition: 0.3s; }
-        .styled-input:focus { border-color: var(--accent-amber); background: white; }
-
-        /* 禪定長文框：自動增長 */
+        
+        .styled-input { width: 100%; background: rgba(255,255,255,0.6); border: 1px solid var(--glass-border); border-radius: 16px; padding: 14px 18px; font-size: 16px; color: var(--text-main); font-family: inherit; margin-bottom: 15px; outline: none; }
         .content-area { min-height: 120px; line-height: 1.6; resize: none; overflow-y: hidden; }
 
-        /* 按鈕視覺強化 */
-        .key-submit { width: 100%; background: var(--accent-amber); color: white; border: none; padding: 18px; border-radius: 22px; font-size: 1.1rem; letter-spacing: 4px; cursor: pointer; box-shadow: 0 8px 20px rgba(193, 165, 131, 0.2); transition: 0.3s; font-weight: 500; }
-        .key-submit:active { transform: scale(0.97); opacity: 0.9; }
+        .key-submit { width: 100%; background: var(--accent-amber); color: white; border: none; padding: 18px; border-radius: 22px; font-size: 1.1rem; letter-spacing: 4px; cursor: pointer; font-weight: 500; }
         .btn-jade { background: var(--accent-jade); }
-        .btn-gold { background: var(--accent-gold); }
 
-        /* 緊急公開區 */
         .emergency-box { background: linear-gradient(135deg, rgba(130, 150, 140, 0.08), rgba(255,255,255,0.8)); border: 1px solid var(--accent-jade); border-radius: 20px; padding: 18px; margin-bottom: 10px; }
-        .public-badge { font-size: 0.7rem; padding: 3px 10px; border-radius: 8px; background: var(--accent-jade); color: white; margin-left: auto; }
-
-        /* 索引清單 */
         .vault-item { display: flex; justify-content: space-between; align-items: center; padding: 16px; background: rgba(255,255,255,0.4); border: 1px solid var(--glass-border); border-radius: 20px; margin-bottom: 12px; }
-        .vault-name { font-size: 1rem; font-weight: 500; color: var(--text-main); }
-        .vault-date { font-size: 0.75rem; color: var(--text-light); margin-top: 4px; }
-        .btn-sm { padding: 8px 16px; border-radius: 12px; font-size: 0.85rem; border: 1px solid var(--accent-amber); color: var(--accent-amber); background: transparent; cursor: pointer; font-weight: 500; }
+        
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 3000; }
+        .modal-overlay.show { display: flex; }
+        .glass-modal { background: rgba(253, 252, 252, 0.95); width: 88%; max-width: 360px; border-radius: 28px; padding: 25px; text-align: center; }
 
-        .divider { font-size: 0.85rem; color: var(--accent-amber); font-weight: 500; margin: 15px 0 15px 5px; display: flex; align-items: center; gap: 8px; }
+        .divider { font-size: 0.85rem; color: var(--accent-amber); font-weight: 500; margin: 10px 0 15px 5px; display: flex; align-items: center; gap: 8px; }
         .divider::after { content: ''; flex: 1; height: 1px; background: rgba(193, 165, 131, 0.2); }
-
-        /* 解鎖彈窗 */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 3000; opacity: 0; transition: opacity 0.3s; }
-        .modal-overlay.show { display: flex; opacity: 1; }
-        .glass-modal { background: rgba(253, 252, 252, 0.95); width: 88%; max-width: 360px; border-radius: 28px; padding: 30px 25px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); border: 1px solid var(--glass-border); text-align: center; }
     </style>
 </head>
 <body>
@@ -81,53 +62,37 @@
             <div style="width: 42px;"></div>
         </div>
         <div class="module-tabs">
-            <div class="mod-tab active" id="tab-vault" onclick="switchStage('vault')"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> 秘密封存</div>
-            <div class="mod-tab" id="tab-brick" onclick="switchStage('brick')"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg> 數據金磚</div>
+            <div class="mod-tab active" id="tab-vault" onclick="switchStage('vault')">秘密封存</div>
+            <div class="mod-tab" id="tab-brick" onclick="switchStage('brick')">加密金磚</div>
         </div>
     </div>
 
     <div class="main-container active" id="view-vault">
         <div id="public-area"></div>
-
         <div class="vajra-card">
-            <div class="card-title-sm">寫入金剛密室</div>
-            <label>資料分類</label>
             <select id="v-cat" class="styled-input">
-                <option value="數位遺囑">數位遺囑 (含生前意願)</option>
-                <option value="靈魂筆記">靈魂筆記 (私人心境)</option>
-                <option value="帳戶備份">帳戶備份 (密鑰備份)</option>
+                <option value="數位遺囑">數位遺囑</option>
+                <option value="靈魂筆記">靈魂筆記</option>
+                <option value="帳戶備份">帳戶備份</option>
             </select>
-            
-            <label>資料標題</label>
-            <input type="text" id="v-title" class="styled-input" placeholder="如「給家人的話」">
-            
-            <div style="display:flex; align-items:center; gap:10px; margin: 0 0 15px 5px; font-size:0.85rem; color:var(--text-light);">
-                <input type="checkbox" id="v-is-public" style="width:18px; height:18px; accent-color:var(--accent-jade);">
-                <label for="v-is-public" style="margin:0;">設為「緊急公開」(免鑰讀取，僅鑰修改)</label>
+            <input type="text" id="v-title" class="styled-input" placeholder="標題">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px; font-size:0.85rem;">
+                <input type="checkbox" id="v-is-public"> <label>設為「緊急公開」(免鑰讀取)</label>
             </div>
-
-            <label>解鎖金鑰 (遺忘不可救)</label>
-            <input type="password" id="v-key" class="styled-input" placeholder="設定此項目的獨立密碼">
-            
-            <label>封存內容</label>
-            <textarea id="v-content" class="styled-input content-area" placeholder="請在此自在書寫，空間無限..." oninput="autoHeight(this)"></textarea>
-            
-            <button class="key-submit" onclick="actionEncrypt()">封存至金剛藏</button>
+            <input type="password" id="v-key" class="styled-input" placeholder="解鎖金鑰">
+            <textarea id="v-content" class="styled-input content-area" placeholder="在此自在書寫..." oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+            <button class="key-submit" onclick="actionEncrypt()">金剛封存</button>
         </div>
-
         <div id="vault-list-area"></div>
     </div>
 
     <div class="main-container" id="view-brick">
         <div class="vajra-card">
-            <div class="card-title-sm">生成加密金磚 (全系統備份)</div>
-            <p style="font-size:0.85rem; color:var(--text-light); line-height:1.6; margin-bottom:20px;">將打包妳所有的財務、健康、毛孩及密室資料。需設定「總金鑰」加密，檔案可在任何設備還原。</p>
-            <button class="key-submit btn-gold" onclick="exportEncryptedBrick()">生成加密金磚 (.json)</button>
+            <p style="font-size:0.85rem; margin-bottom:15px;">此操作僅針對「金剛藏」內的密室資料進行加密備份。</p>
+            <button class="key-submit" onclick="exportEncryptedBrick()">生成金剛備份 (.json)</button>
         </div>
-
-        <div class="vajra-card" style="border: 1px dashed var(--accent-jade); margin-top:10px;">
-            <div class="card-title-sm" style="color:var(--accent-jade);">還原加密金磚 (全系統解碼)</div>
-            <p style="font-size:0.85rem; color:var(--text-light); line-height:1.6; margin-bottom:20px;">上傳金磚備份檔並輸入總金鑰，系統將完整覆蓋並同步所有生命軌跡。</p>
+        <div class="vajra-card" style="border:1px dashed var(--accent-jade); margin-top:10px;">
+            <p style="font-size:0.85rem; margin-bottom:15px;">還原金剛藏紀錄：</p>
             <input type="file" id="import-file" style="display:none;" onchange="importEncryptedBrick(event)">
             <button class="key-submit btn-jade" onclick="document.getElementById('import-file').click()">選取檔案並還原</button>
         </div>
@@ -135,137 +100,105 @@
 
     <div class="modal-overlay" id="decrypt-modal">
         <div class="glass-modal">
-            <h3 style="margin-top:0; color:var(--text-main); font-weight: 500;">驗證金鑰</h3>
-            <input type="password" id="d-key" class="styled-input" placeholder="輸入解鎖鑰匙" style="text-align:center;">
-            <div id="d-result" style="display:none; padding:18px; background:white; border-radius:18px; margin:15px 0; border:1px dashed var(--accent-amber); word-break:break-all; font-size:1rem; text-align:left; line-height:1.6; max-height:300px; overflow-y:auto;"></div>
+            <input type="password" id="d-key" class="styled-input" placeholder="輸入鑰匙" style="text-align:center;">
+            <div id="d-result" style="display:none; padding:15px; background:white; border-radius:18px; margin:15px 0; border:1px dashed var(--accent-amber); text-align:left; max-height:200px; overflow-y:auto;"></div>
             <div style="display:flex; gap:10px;">
-                <button class="m-btn-confirm" style="flex:1; background:rgba(0,0,0,0.05); color:var(--text-main); box-shadow:none;" onclick="document.getElementById('decrypt-modal').classList.remove('show')">關閉</button>
-                <button class="m-btn-confirm" style="flex:1;" id="btn-do-decrypt">解鎖</button>
+                <button class="key-submit" style="background:#eee; color:#555;" onclick="document.getElementById('decrypt-modal').classList.remove('show')">關閉</button>
+                <button class="key-submit" id="btn-do-decrypt">解鎖</button>
             </div>
         </div>
     </div>
 
     <script>
-        const encoder = new TextEncoder(), decoder = new TextDecoder();
         const DB_KEY = 'joy_security_data';
         let secDB = JSON.parse(localStorage.getItem(DB_KEY)) || { entries: [] };
+        const encoder = new TextEncoder(), decoder = new TextDecoder();
 
-        function autoHeight(el) { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; }
-
-        async function deriveKey(password, salt) {
-            const baseKey = await window.crypto.subtle.importKey('raw', encoder.encode(password), 'PBKDF2', false, ['deriveKey']);
-            return window.crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: 600000, hash: 'SHA-256' }, baseKey, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+        async function deriveKey(pwd, salt) {
+            const base = await window.crypto.subtle.importKey('raw', encoder.encode(pwd), 'PBKDF2', false, ['deriveKey']);
+            return window.crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: 600000, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
         }
 
-        async function encryptData(password, text) {
+        async function encryptData(pwd, txt) {
             const salt = window.crypto.getRandomValues(new Uint8Array(16)), iv = window.crypto.getRandomValues(new Uint8Array(12));
-            const key = await deriveKey(password, salt);
-            const encrypted = await window.crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, encoder.encode(text));
-            const result = new Uint8Array(16 + 12 + encrypted.byteLength);
-            result.set(salt, 0); result.set(iv, 16); result.set(new Uint8Array(encrypted), 28);
-            return btoa(String.fromCharCode(...result));
+            const key = await deriveKey(pwd, salt);
+            const enc = await window.crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, encoder.encode(txt));
+            const res = new Uint8Array(16 + 12 + enc.byteLength);
+            res.set(salt, 0); res.set(iv, 16); res.set(new Uint8Array(enc), 28);
+            return btoa(String.fromCharCode(...res));
         }
 
-        async function decryptData(password, b64) {
+        async function decryptData(pwd, b64) {
             const raw = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
-            const key = await deriveKey(password, raw.slice(0, 16));
-            const decrypted = await window.crypto.subtle.decrypt({ name: 'AES-GCM', iv: raw.slice(16, 28) }, key, raw.slice(28));
-            return decoder.decode(decrypted);
+            const key = await deriveKey(pwd, raw.slice(0, 16));
+            return decoder.decode(await window.crypto.subtle.decrypt({ name: 'AES-GCM', iv: raw.slice(16, 28) }, key, raw.slice(28)));
         }
 
-        function switchStage(stage) {
+        function switchStage(s) {
             document.querySelectorAll('.main-container').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.mod-tab').forEach(t => t.classList.remove('active'));
-            document.getElementById('view-' + stage).classList.add('active');
-            document.getElementById('tab-' + stage).classList.add('active');
+            document.getElementById('view-'+s).classList.add('active');
+            document.getElementById('tab-'+s).classList.add('active');
         }
 
         async function actionEncrypt() {
-            const cat = document.getElementById('v-cat').value, title = document.getElementById('v-title').value.trim(), key = document.getElementById('v-key').value, content = document.getElementById('v-content').value.trim(), isPublic = document.getElementById('v-is-public').checked;
-            if(!title || !key || !content) return alert('請完整填寫標題、金鑰與內容。');
+            const cat = document.getElementById('v-cat').value, title = document.getElementById('v-title').value.trim(), key = document.getElementById('v-key').value, content = document.getElementById('v-content').value.trim(), isPub = document.getElementById('v-is-public').checked;
+            if(!title || !key || !content) return alert('未填完');
             try {
-                const encrypted = await encryptData(key, content);
-                secDB.entries.unshift({ id: Date.now(), category: cat, title, data: encrypted, isPublic, publicText: isPublic ? content : '', date: new Date().toLocaleDateString() });
+                const enc = await encryptData(key, content);
+                secDB.entries.unshift({ id: Date.now(), category: cat, title, data: enc, isPublic: isPub, publicText: isPub?content:'', date: new Date().toLocaleDateString() });
                 localStorage.setItem(DB_KEY, JSON.stringify(secDB));
                 renderVault();
-                document.getElementById('v-title').value = ''; document.getElementById('v-key').value = ''; document.getElementById('v-content').value = ''; document.getElementById('v-content').style.height = 'auto';
-                alert('秘密已金剛封存。');
-            } catch(e) { alert('封存失敗，請檢查瀏覽器環境。'); }
+                alert('已封存');
+            } catch(e) { alert('出錯'); }
         }
 
         function renderVault() {
-            const pubArea = document.getElementById('public-area'), listArea = document.getElementById('vault-list-area');
-            const cats = ["數位遺囑", "靈魂筆記", "帳戶備份"];
-            let pubHtml = '', privHtml = '';
-            
-            const publics = secDB.entries.filter(i => i.isPublic);
-            if(publics.length > 0) {
-                pubHtml = '<div class="divider">緊急開示 (免鑰讀取)</div>';
-                publics.forEach(item => {
-                    pubHtml += `<div class="emergency-box"><div style="display:flex; justify-content:space-between;"><strong>${item.title}</strong><span class="public-badge">緊急公開</span></div><div style="font-size:0.9rem; margin-top:10px; white-space:pre-wrap; color:var(--text-main);">${item.publicText}</div><div style="text-align:right; margin-top:10px;"><button class="btn-sm" onclick="openDecrypt(${item.id})">管理</button></div></div>`;
-                });
-            }
-            pubArea.innerHTML = pubHtml;
-
-            privHtml = '<div class="divider">密室索引 (需鑰解鎖)</div>';
-            const privates = secDB.entries.filter(i => !i.isPublic);
-            if(privates.length > 0) {
-                privates.forEach(item => {
-                    privHtml += `<div class="vault-item"><div><div class="vault-name">${item.title}</div><div class="vault-date">${item.category} ． ${item.date}</div></div><div style="display:flex; gap:8px;"><button class="btn-sm" onclick="openDecrypt(${item.id})">解鎖</button><button class="btn-sm" style="border-color:var(--accent-red); color:var(--accent-red);" onclick="deleteItem(${item.id})">刪除</button></div></div>`;
-                });
-            } else { privHtml += '<div style="text-align:center; color:var(--text-light); padding:20px; font-size:0.85rem;">目前尚無封存秘密</div>'; }
-            listArea.innerHTML = privHtml;
+            const pubA = document.getElementById('public-area'), listA = document.getElementById('vault-list-area');
+            let pubH = '', privH = '<div class="divider">密室索引</div>';
+            secDB.entries.forEach(i => {
+                if(i.isPublic) pubH += `<div class="emergency-box"><strong>${i.title}</strong><p>${i.publicText}</p><button onclick="openDecrypt(${i.id})">修改</button></div>`;
+                else privH += `<div class="vault-item"><div>${i.title}<br><small>${i.date}</small></div><button onclick="openDecrypt(${i.id})">解鎖</button></div>`;
+            });
+            pubA.innerHTML = pubH ? '<div class="divider">緊急公開</div>'+pubH : '';
+            listA.innerHTML = privH;
         }
 
         let currentId = null;
         function openDecrypt(id) {
-            currentId = id; document.getElementById('d-result').style.display = 'none'; document.getElementById('d-key').value = '';
+            currentId = id; document.getElementById('d-result').style.display = 'none';
             document.getElementById('decrypt-modal').classList.add('show');
             document.getElementById('btn-do-decrypt').onclick = async () => {
-                const key = document.getElementById('d-key').value, item = secDB.entries.find(i => i.id === currentId), resEl = document.getElementById('d-result');
-                if(!key) return;
-                try { resEl.innerText = await decryptData(key, item.data); resEl.style.display = 'block'; resEl.style.color = 'var(--text-main)'; } 
-                catch(e) { resEl.innerText = '金鑰錯誤，無法還原。'; resEl.style.display = 'block'; resEl.style.color = 'var(--accent-red)'; }
+                const k = document.getElementById('d-key').value, i = secDB.entries.find(x => x.id === currentId);
+                try { 
+                    const dec = await decryptData(k, i.data);
+                    document.getElementById('d-result').innerText = dec;
+                    document.getElementById('d-result').style.display = 'block';
+                } catch(e) { alert('金鑰錯誤'); }
             };
         }
 
         async function exportEncryptedBrick() {
-            const key = prompt("請設定「全系統總金鑰」(重要)："); if(!key) return;
-            const fullData = { 
-                accounting: localStorage.getItem('joy_accounting_app_data'), 
-                health: localStorage.getItem('joy_health_history'), 
-                mom: localStorage.getItem('joy_mom_data'), 
-                pet: localStorage.getItem('joy_pet_data'), 
-                security: localStorage.getItem(DB_KEY) 
-            };
-            try {
-                const encrypted = await encryptData(key, JSON.stringify(fullData));
-                const blob = new Blob([JSON.stringify({ type: "VAJRA_BRICK", payload: encrypted })], { type: 'application/json' });
-                const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Joy_Vajra_Full_Backup.json`; link.click();
-            } catch(e) { alert("匯出失敗。"); }
+            const k = prompt("總金鑰："); if(!k) return;
+            const enc = await encryptData(k, localStorage.getItem(DB_KEY));
+            const blob = new Blob([JSON.stringify({ type: "VAJRA_SEC", payload: enc })], { type: 'application/json' });
+            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Joy_Vajra_Only.json`; link.click();
         }
 
-        async function importEncryptedBrick(event) {
-            const file = event.target.files[0]; if (!file) return;
-            const key = prompt("輸入總金鑰解鎖並還原："); if (!key) return;
-            const reader = new FileReader();
-            reader.onload = async (e) => {
+        async function importEncryptedBrick(e) {
+            const f = e.target.files[0], k = prompt("總金鑰："); if(!f || !k) return;
+            const r = new FileReader();
+            r.onload = async (ev) => {
                 try {
-                    const json = JSON.parse(e.target.result);
-                    const decryptedStr = await decryptData(key, json.payload);
-                    const data = JSON.parse(decryptedStr);
-                    if(data.accounting) localStorage.setItem('joy_accounting_app_data', data.accounting);
-                    if(data.health) localStorage.setItem('joy_health_history', data.health);
-                    if(data.mom) localStorage.setItem('joy_mom_data', data.mom);
-                    if(data.pet) localStorage.setItem('joy_pet_data', data.pet);
-                    if(data.security) localStorage.setItem(DB_KEY, data.security);
-                    alert("還原成功！系統已重啟。"); location.reload();
-                } catch (err) { alert("解碼失敗：金鑰錯誤或檔案格式不正確。"); }
+                    const j = JSON.parse(ev.target.result);
+                    const dec = await decryptData(k, j.payload);
+                    localStorage.setItem(DB_KEY, dec);
+                    location.reload();
+                } catch(err) { alert('失敗'); }
             };
-            reader.readAsText(file);
+            r.readAsText(f);
         }
 
-        function deleteItem(id) { if(confirm('確定要永久刪除此項紀錄嗎？')) { secDB.entries = secDB.entries.filter(i => i.id !== id); localStorage.setItem(DB_KEY, JSON.stringify(secDB)); renderVault(); } }
         window.onload = renderVault;
     </script>
 </body>
