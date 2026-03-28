@@ -206,9 +206,15 @@
             </div>
             <div class="clean-guide">
                 這將把您密室內的所有資料打包成一個加密的 JSON 檔案。請設定一把「總金鑰」來保護它，未來換設備時即可還原。
-                <div style="margin-top: 10px; color: var(--accent-gold); font-weight: 500; cursor: pointer; text-decoration: underline; text-underline-offset: 4px;" onclick="document.getElementById('backup-guide-modal').classList.add('show')">
-                    💡 為什麼需要備份？資料不是都在手機裡嗎？
-                </div>
+                <div style="margin-top: 15px; color: var(--accent-gold); font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; text-decoration: underline; text-underline-offset: 4px;" onclick="document.getElementById('backup-guide-modal').classList.add('show')">
+    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.9 1.2 1.5 1.5 2.5"></path>
+        <path d="M9 18h6"></path>
+        <path d="M10 22h4"></path>
+    </svg>
+    為什麼需要備份？資料不是都在手機裡嗎？
+</div>
+
             </div>
             <button class="key-submit btn-gold" onclick="exportEncryptedBrick()">設定總金鑰並打包</button>
         </div>
