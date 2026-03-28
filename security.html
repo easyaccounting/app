@@ -195,7 +195,7 @@
         <div id="vault-list-area"></div>
     </div>
 
-    <div class="main-container" id="view-brick">
+       <div class="main-container" id="view-brick">
         
         <div class="glass-card">
             <div class="card-header">
@@ -206,9 +206,13 @@
             </div>
             <div class="clean-guide">
                 這將把您密室內的所有資料打包成一個加密的 JSON 檔案。請設定一把「總金鑰」來保護它，未來換設備時即可還原。
+                <div style="margin-top: 10px; color: var(--accent-gold); font-weight: 500; cursor: pointer; text-decoration: underline; text-underline-offset: 4px;" onclick="document.getElementById('backup-guide-modal').classList.add('show')">
+                    💡 為什麼需要備份？資料不是都在手機裡嗎？
+                </div>
             </div>
             <button class="key-submit btn-gold" onclick="exportEncryptedBrick()">設定總金鑰並打包</button>
         </div>
+
 
         <div class="glass-card">
             <div class="card-header">
@@ -388,5 +392,30 @@
         }
         window.onload = renderVault;
     </script>
+        <div class="modal-overlay" id="backup-guide-modal">
+        <div class="glass-modal" style="max-height: 80dvh; overflow-y: auto; padding: 30px 20px;">
+            <h3 style="margin-top:0; color:var(--accent-gold); font-weight: 500; letter-spacing: 2px;">數位無常與備份指南</h3>
+            <p style="font-size:0.9rem; color:var(--text-main); text-align:left; line-height:1.8; margin-bottom:15px;">
+                本系統為了保護您的絕對隱私，資料「完全不上傳雲端」，僅保存在您手機的記憶體中。日常使用時不需要天天備份。
+            </p>
+            <p style="font-size:0.9rem; color:var(--text-main); text-align:left; line-height:1.8; margin-bottom:15px;">
+                但若發生以下四種「數位無常」，資料將會瞬間消失：
+            </p>
+            
+            <div style="text-align:left; background: rgba(255,255,255,0.6); padding: 15px; border-radius: 12px; margin-bottom: 20px; font-size: 0.85rem; line-height: 1.6; color: var(--text-main); border: 1px solid var(--glass-border);">
+                <span style="color:var(--accent-red); font-weight:bold;">1. 清除瀏覽紀錄：</span>若您使用了手機清理軟體，或清除了瀏覽器的 Cookie。<br><br>
+                <span style="color:var(--accent-red); font-weight:bold;">2. 刪除桌面圖示：</span>不小心把手機桌面上「淨息流」的圖示刪除。<br><br>
+                <span style="color:var(--accent-red); font-weight:bold;">3. 手機空間不足：</span>手機容量全滿時，系統可能會自動刪除暫存檔自保。<br><br>
+                <span style="color:var(--accent-red); font-weight:bold;">4. 手機損壞或換新機：</span>因為沒有雲端，舊手機裡的資料帶不走。
+            </div>
+
+            <p style="font-size:0.9rem; color:var(--text-main); text-align:left; line-height:1.8; margin-bottom:20px;">
+                <b>備份建議：</b>每個月或記下重要密碼後，按一次「打包匯出」。這會把您的紀錄變成一個實體的檔案存進手機。未來只要用「還原」功能，就能把心血全部找回來。
+            </p>
+            
+            <button class="key-submit btn-amber" onclick="document.getElementById('backup-guide-modal').classList.remove('show')">我明白了</button>
+        </div>
+    </div>
+
 </body>
 </html>
