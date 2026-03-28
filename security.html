@@ -10,9 +10,9 @@
     <style>
         :root {
             --bg-gradient: linear-gradient(135deg, #FDFDFD, #F5F2EF);
-            --glass-bg: rgba(255, 255, 255, 0.85); /* 提高卡片不透明度 */
+            --glass-bg: rgba(255, 255, 255, 0.85); 
             --glass-border: rgba(210, 195, 180, 0.4);
-            --text-main: #4A423D; /* 加深主要文字顏色 */
+            --text-main: #4A423D; 
             --text-light: #7A726C;
             --accent-amber: #C1A583; --accent-gold: #CBA37A; --accent-jade: #82968C; --accent-red: #D29498;
             --shadow-soft: 0 8px 30px rgba(180, 160, 140, 0.15);
@@ -39,21 +39,20 @@
         .main-container.active { display: flex; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- 卡片與說明區 --- */
+        /* --- 高價值感說明區 --- */
         .vajra-card { background: var(--glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-radius: 24px; padding: 24px; box-shadow: var(--shadow-soft); }
         
-        /* 給長輩的說明專用樣式 */
-        .guide-box { background: rgba(203, 163, 122, 0.08); border-left: 4px solid var(--accent-gold); padding: 18px; border-radius: 0 16px 16px 0; margin-bottom: 25px; }
-        .guide-title { font-size: 1.05rem; font-weight: bold; color: var(--accent-gold); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; letter-spacing: 1px; }
-        .guide-text { font-size: 0.95rem; color: var(--text-main); line-height: 1.7; letter-spacing: 0.5px; }
+        .guide-box { background: rgba(203, 163, 122, 0.08); border-left: 4px solid var(--accent-gold); padding: 20px; border-radius: 0 16px 16px 0; margin-bottom: 25px; }
+        .guide-title { font-size: 1.1rem; font-weight: bold; color: var(--accent-gold); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; letter-spacing: 1px; }
+        .guide-text { font-size: 0.95rem; color: var(--text-main); line-height: 1.8; letter-spacing: 0.5px; }
         
         .card-title-sm { font-size: 1.1rem; font-weight: bold; color: var(--text-main); margin-bottom: 15px; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 10px; }
 
-        /* --- 輸入組件 (高對比) --- */
+        /* --- 輸入組件 (高對比白底) --- */
         label { display: block; font-size: 0.9rem; font-weight: 500; color: var(--text-main); margin: 0 0 8px 4px; letter-spacing: 1px; }
         .styled-input { 
             width: 100%; 
-            background: #ffffff; /* 純白背景，提高可見度 */
+            background: #ffffff; 
             border: 1px solid rgba(150, 140, 130, 0.4); 
             border-radius: 12px; 
             padding: 16px; 
@@ -68,7 +67,6 @@
         .styled-input:focus { border-color: var(--accent-gold); box-shadow: 0 0 0 3px rgba(203, 163, 122, 0.15); }
         .styled-input::placeholder { color: #b0a8a0; }
 
-        /* 下拉選單自訂箭頭 */
         select.styled-input {
             appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' stroke='%237A726C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
@@ -80,7 +78,7 @@
 
         .content-area { min-height: 140px; line-height: 1.6; resize: none; overflow-y: hidden; }
 
-        /* --- 按鈕視覺 (長輩友善大按鈕) --- */
+        /* --- 按鈕視覺 (厚實莊嚴) --- */
         .key-submit { 
             width: 100%; 
             background: var(--text-main); 
@@ -119,28 +117,40 @@
 
     <div class="top-nav">
         <div class="nav-content">
-            <div class="nav-btn" onclick="window.location.href='index.html'"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></div>
+            <div class="nav-btn" onclick="window.location.href='index.html'">
+                <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            </div>
             <div class="page-title">數位密室</div>
             <div style="width: 42px;"></div>
         </div>
         <div class="module-tabs">
-            <div class="mod-tab active" id="tab-vault" onclick="switchStage('vault')"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> 保險箱存入</div>
-            <div class="mod-tab" id="tab-brick" onclick="switchStage('brick')"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg> 備份與還原</div>
+            <div class="mod-tab active" id="tab-vault" onclick="switchStage('vault')">
+                <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> 保險箱存入
+            </div>
+            <div class="mod-tab" id="tab-brick" onclick="switchStage('brick')">
+                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg> 備份與還原
+            </div>
         </div>
     </div>
 
     <div class="main-container active" id="view-vault">
         
         <div class="guide-box">
-            <div class="guide-title"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg> 這是什麼地方？</div>
+            <div class="guide-title">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg> 價值千元的軍規級數位密室
+            </div>
             <div class="guide-text">
-                這就像是您專屬的<b>銀行保險箱</b>。您可以把不想讓別人看到的筆記、帳號密碼存在這裡。<br><br>
-                每次存入時，您都要設定一把<b>專屬鑰匙 (密碼)</b>。系統不會幫您記住鑰匙，<b>如果忘記了，連工程師也打不開喔！</b>請務必記牢或寫在紙上。
+                市面上的密碼管理軟體每年需繳納高額訂閱費，且資料存於雲端，隨時有被駭客竊取的風險。<br><br>
+                本系統為<b>永久免費</b>的公益發心，卻採用超越商用的 <b>AES-GCM 256位元軍規加密</b> 與 <b>60萬次雜湊運算</b>。最重要的是：<b>【拒絕雲端】</b>。<br><br>
+                您的筆記與解鎖金鑰，從頭到尾都只存在這台手機的晶片裡。沒有網路傳輸，連工程師都無法窺視。<br><br>
+                <span style="color:var(--accent-red); font-weight:bold;">※ 絕對安全也意味著絕對的責任：系統不會記住您的密碼，遺忘金鑰將永遠無法救回內容。</span>
             </div>
         </div>
 
         <div class="vajra-card">
-            <div class="card-title-sm"><svg viewBox="0 0 24 24" width="20" height="20" stroke="var(--accent-gold)" fill="none" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> 寫入新的保密資料</div>
+            <div class="card-title-sm">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="var(--accent-gold)" fill="none" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> 寫入新的保密資料
+            </div>
             
             <label>這筆資料屬於哪一類？</label>
             <select id="v-cat" class="styled-input">
@@ -152,10 +162,10 @@
             <label>給這份資料一個標題</label>
             <input type="text" id="v-title" class="styled-input" placeholder="例如：郵局提款卡密碼">
             
-            <label>設定這份資料的鑰匙 (密碼)</label>
+            <label>設定這份資料的專屬鑰匙 (密碼)</label>
             <input type="password" id="v-key" class="styled-input" placeholder="請設定解鎖密碼 (絕對不能忘記)">
             
-            <label>要保密的內容</label>
+            <label>要絕對保密的內容</label>
             <textarea id="v-content" class="styled-input content-area" placeholder="請在此處自在書寫，空間無限大..." oninput="autoHeight(this)"></textarea>
             
             <button class="key-submit btn-gold" onclick="actionEncrypt()">上鎖存入保險箱</button>
@@ -167,22 +177,24 @@
     <div class="main-container" id="view-brick">
         
         <div class="guide-box">
-            <div class="guide-title"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg> 關於打包備份</div>
+            <div class="guide-title">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> 關於密室備份
+            </div>
             <div class="guide-text">
-                當您要換新手機時，可以用這裡的「打包」功能，把財務、健康與保險箱資料全部裝進一個<b>加密檔案 (.json)</b>裡。<br><br>
-                到新手機後，再用「還原」功能把它解開。
+                當您要換新手機時，可以用這裡的「打包」功能，將整個金剛藏密室的資料打包成一個<b>加密的實體檔案 (.json)</b>。<br><br>
+                這份檔案即使被人撿到，沒有您的「總鑰匙」也是一堆亂碼。到新手機後，再用「還原」功能把它解開即可。
             </div>
         </div>
 
         <div class="vajra-card">
-            <div class="card-title-sm">打包所有紀錄 (匯出)</div>
+            <div class="card-title-sm">打包密室紀錄 (匯出)</div>
             <p style="font-size:0.9rem; color:var(--text-light); line-height:1.6; margin-bottom:20px;">這會生成一個安全的檔案，請設定一把「總鑰匙」來鎖住這個檔案。</p>
             <button class="key-submit btn-gold" onclick="exportEncryptedBrick()">設定總鑰匙並下載檔案</button>
         </div>
 
-        <div class="vajra-card" style="margin-top:15px;">
-            <div class="card-title-sm" style="color:var(--accent-jade);">還原所有紀錄 (匯入)</div>
-            <p style="font-size:0.9rem; color:var(--text-light); line-height:1.6; margin-bottom:20px;">選取您之前下載的備份檔案，並輸入當初的總鑰匙來解開它。</p>
+        <div class="vajra-card" style="margin-top:15px; border-color: rgba(130, 150, 140, 0.4);">
+            <div class="card-title-sm" style="color:var(--accent-jade);">還原密室紀錄 (匯入)</div>
+            <p style="font-size:0.9rem; color:var(--text-light); line-height:1.6; margin-bottom:20px;">選取您之前下載的備份檔案，並輸入當初設定的總鑰匙來解開它。</p>
             <input type="file" id="import-file" style="display:none;" onchange="importEncryptedBrick(event)">
             <button class="key-submit btn-jade" onclick="document.getElementById('import-file').click()">選取檔案並還原</button>
         </div>
@@ -204,11 +216,11 @@
     </div>
 
     <script>
+        // 核心加解密引擎 (純淨無污染)
         const encoder = new TextEncoder(), decoder = new TextDecoder();
         const DB_KEY = 'joy_security_data';
         let secDB = JSON.parse(localStorage.getItem(DB_KEY)) || { entries: [] };
 
-        // 自動增長的高度
         function autoHeight(el) { 
             el.style.height = '140px'; 
             el.style.height = (el.scrollHeight) + 'px'; 
@@ -244,10 +256,9 @@
 
         async function actionEncrypt() {
             const cat = document.getElementById('v-cat').value, title = document.getElementById('v-title').value.trim(), key = document.getElementById('v-key').value, content = document.getElementById('v-content').value.trim();
-            if(!title || !key || !content) return alert('請確認「標題、鑰匙、內容」都有填寫喔！');
+            if(!title || !key || !content) return alert('請確認「標題、鑰匙、內容」都有填寫。');
             
-            // 加入友善的二次確認，防止長輩忘記密碼
-            if(!confirm(`請確認您已將鑰匙「${key}」記下。若遺忘將永遠無法打開此檔案。\n\n確定要上鎖嗎？`)) return;
+            if(!confirm(`請確認您已將鑰匙「${key}」記下。\n若遺忘將永遠無法打開此檔案，確定要上鎖嗎？`)) return;
 
             try {
                 const encrypted = await encryptData(key, content);
@@ -256,7 +267,7 @@
                 renderVault();
                 document.getElementById('v-title').value = ''; document.getElementById('v-key').value = ''; document.getElementById('v-content').value = ''; 
                 document.getElementById('v-content').style.height = '140px';
-                alert('已經成功鎖進保險箱了！');
+                alert('資料已經成功鎖進保險箱了。');
             } catch(e) { alert('封存失敗，請重試。'); }
         }
 
@@ -301,7 +312,7 @@
                     resEl.style.borderColor = 'var(--accent-jade)';
                 } 
                 catch(e) { 
-                    resEl.innerText = '❌ 鑰匙錯誤，打不開喔！'; 
+                    resEl.innerText = '鑰匙錯誤，無法開啟。'; 
                     resEl.style.display = 'block'; 
                     resEl.style.color = 'var(--accent-red)'; 
                     resEl.style.borderColor = 'var(--accent-red)';
@@ -309,23 +320,20 @@
             };
         }
 
+        // 打包範圍修正：僅打包金剛藏，不動其他資料庫
         async function exportEncryptedBrick() {
             const key = prompt("請設定一把「總鑰匙」來鎖住這個備份檔：\n(未來換手機還原時會用到，請務必抄寫下來)"); 
             if(!key) return;
-            const fullData = { 
-                accounting: localStorage.getItem('joy_accounting_app_data'), 
-                health: localStorage.getItem('joy_health_history'), 
-                mom: localStorage.getItem('joy_mom_data'), 
-                pet: localStorage.getItem('joy_pet_data'), 
-                security: localStorage.getItem(DB_KEY) 
-            };
+            const vaultData = { security: localStorage.getItem(DB_KEY) || JSON.stringify({ entries: [] }) };
+            
             try {
-                const encrypted = await encryptData(key, JSON.stringify(fullData));
+                const encrypted = await encryptData(key, JSON.stringify(vaultData));
                 const blob = new Blob([JSON.stringify({ type: "VAJRA_BRICK", payload: encrypted })], { type: 'application/json' });
-                const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Joy_Vajra_Full_Backup.json`; link.click();
-            } catch(e) { alert("打包失敗。"); }
+                const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Joy_Vajra_Backup_${new Date().getTime()}.json`; link.click();
+            } catch(e) { alert("打包失敗，請檢查系統環境。"); }
         }
 
+        // 還原範圍修正：僅還原金剛藏，不動其他資料庫
         async function importEncryptedBrick(event) {
             const file = event.target.files[0]; if (!file) return;
             const key = prompt("請輸入當初設定的「總鑰匙」來解開這個檔案："); if (!key) return;
@@ -333,21 +341,24 @@
             reader.onload = async (e) => {
                 try {
                     const json = JSON.parse(e.target.result);
+                    if (json.type !== "VAJRA_BRICK") throw new Error("檔案格式不符");
+                    
                     const decryptedStr = await decryptData(key, json.payload);
                     const data = JSON.parse(decryptedStr);
-                    if(data.accounting) localStorage.setItem('joy_accounting_app_data', data.accounting);
-                    if(data.health) localStorage.setItem('joy_health_history', data.health);
-                    if(data.mom) localStorage.setItem('joy_mom_data', data.mom);
-                    if(data.pet) localStorage.setItem('joy_pet_data', data.pet);
-                    if(data.security) localStorage.setItem(DB_KEY, data.security);
-                    alert("✅ 還原成功！所有資料已恢復。"); location.reload();
-                } catch (err) { alert("❌ 解碼失敗：鑰匙錯誤，或不是正確的備份檔。"); }
+                    
+                    if(data.security) {
+                        localStorage.setItem(DB_KEY, data.security);
+                        secDB = JSON.parse(data.security);
+                        alert("還原成功！密室資料已恢復。"); 
+                        renderVault();
+                    }
+                } catch (err) { alert("解碼失敗：鑰匙錯誤，或不是正確的備份檔。"); }
             };
             reader.readAsText(file);
         }
 
         function deleteItem(id) { 
-            if(confirm('⚠️ 警告：確定要徹底刪除這個秘密嗎？\n刪除後就永遠救不回來囉！')) { 
+            if(confirm('警告：確定要徹底刪除這個秘密嗎？\n刪除後將永遠無法救回。')) { 
                 secDB.entries = secDB.entries.filter(i => i.id !== id); 
                 localStorage.setItem(DB_KEY, JSON.stringify(secDB)); 
                 renderVault(); 
