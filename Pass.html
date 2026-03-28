@@ -5,136 +5,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>A-Spec v5.2 | 共生．歸墟終端</title>
     <style>
-        body {
-            font-family: "Segoe UI", system-ui, sans-serif;
-            background: linear-gradient(135deg, #1a0033, #330066);
-            color: #e0d4ff;
-            text-align: center;
-            margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-        }
-        .container {
-            max-width: 480px;
-            margin: 0 auto;
-            background: rgba(255,255,255,0.08);
-            border-radius: 24px;
-            padding: 20px;
-            box-shadow: 0 0 30px rgba(180, 100, 255, 0.3);
-        }
-        h1 { margin: 10px 0; font-size: 1.8em; }
-        .pet-container {
-            margin: 20px auto;
-            width: 220px;
-            height: 220px;
-        }
-        .status {
-            display: flex;
-            justify-content: space-around;
-            margin: 20px 0;
-            font-size: 1.1em;
-        }
-        button {
-            background: #b366ff;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            margin: 8px;
-            border-radius: 50px;
-            font-size: 1em;
-            cursor: pointer;
-        }
-        button:hover { background: #cc99ff; }
-        #message { margin-top: 15px; min-height: 60px; }
+        body { font-family: system-ui; background: linear-gradient(135deg, #1a0033, #330066); color: #e0d4ff; margin:0; padding:20px; min-height:100vh; text-align:center; }
+        .container { max-width:480px; margin:0 auto; background:rgba(255,255,255,0.08); border-radius:24px; padding:25px; box-shadow:0 0 30px rgba(180,100,255,0.3); }
+        h1 { margin:10px 0 5px; font-size:1.9em; }
+        .pet-container { margin:25px auto; width:240px; height:240px; }
+        button, input[type="button"] { background:#b366ff; color:white; border:none; padding:12px 20px; margin:8px 4px; border-radius:50px; font-size:1.05em; cursor:pointer; }
+        button:hover { background:#cc99ff; }
+        input[type="text"] { width:88%; padding:14px; margin:10px 0; border-radius:50px; border:none; font-size:1em; }
+        #message { min-height:80px; margin:15px 0; font-size:1.1em; line-height:1.4; }
+        .log { text-align:left; max-height:220px; overflow-y:auto; background:rgba(0,0,0,0.2); padding:15px; border-radius:16px; margin-top:20px; font-size:0.95em; }
+        .log-item { margin:8px 0; opacity:0.9; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>A-Spec v5.2</h1>
-        <p style="opacity:0.8;">共生．歸墟終端　｜　父母與孩子的數位羈絆</p>
+        <p style="opacity:0.85;">共生．歸墟終端　｜　父母與孩子的數位羈絆</p>
 
-        <!-- 共生小精靈 SVG -->
         <div class="pet-container" id="pet">
-            <svg width="220" height="220" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
-                <!-- 身體（柔軟圓潤） -->
-                <ellipse cx="110" cy="130" rx="75" ry="65" fill="#a855f7" opacity="0.95"/>
-                <!-- 頭部 -->
-                <circle cx="110" cy="85" r="55" fill="#c084fc"/>
-                <!-- 柔光高光 -->
-                <circle cx="85" cy="65" r="18" fill="#e0bbff" opacity="0.6"/>
-                
-                <!-- 眼睛 -->
-                <ellipse id="leftEye" cx="85" cy="75" rx="18" ry="22" fill="#1e2937"/>
-                <ellipse id="rightEye" cx="135" cy="75" rx="18" ry="22" fill="#1e2937"/>
-                <!-- 眼珠高光 -->
-                <circle cx="80" cy="70" r="7" fill="#ffffff"/>
-                <circle cx="130" cy="70" r="7" fill="#ffffff"/>
-                
-                <!-- 嘴巴 -->
-                <path id="mouth" d="M85 110 Q110 125 135 110" fill="none" stroke="#4c1d95" stroke-width="8" stroke-linecap="round"/>
-                
-                <!-- 小光暈（共生感） -->
-                <circle cx="110" cy="85" r="68" fill="none" stroke="#e0bbff" stroke-width="12" opacity="0.25"/>
+            <svg width="240" height="240" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="120" cy="145" rx="82" ry="70" fill="#a855f7" opacity="0.95"/>
+                <circle cx="120" cy="92" r="60" fill="#c084fc"/>
+                <circle cx="92" cy="72" r="20" fill="#e0bbff" opacity="0.6"/>
+                <ellipse id="leftEye" cx="92" cy="82" rx="19" ry="24" fill="#1e2937"/>
+                <ellipse id="rightEye" cx="148" cy="82" rx="19" ry="24" fill="#1e2937"/>
+                <circle cx="86" cy="77" r="8" fill="#fff"/>
+                <circle cx="142" cy="77" r="8" fill="#fff"/>
+                <path id="mouth" d="M92 122 Q120 140 148 122" fill="none" stroke="#4c1d95" stroke-width="9" stroke-linecap="round"/>
+                <circle cx="120" cy="92" r="74" fill="none" stroke="#e0bbff" stroke-width="14" opacity="0.25"/>
             </svg>
         </div>
 
-        <div class="status">
+        <div style="display:flex;justify-content:space-around;margin:20px 0;font-size:1.15em;">
             <div>Bytes: <span id="bytes">33554432</span></div>
-            <div>Temporal: <span id="temporal">2026-03-28</span></div>
             <div>Intent: <span id="intent">0</span></div>
+            <div>Name: <span id="name">Symbiont Seed</span></div>
         </div>
 
-        <div>
-            <button onclick="injectMemory()">注入記憶（聊天/陪伴）</button>
-            <button onclick="feedNutrient()">餵食養分</button>
-            <button onclick="playWithPet()">陪伴玩耍</button>
-        </div>
+        <input type="text" id="nutrientCode" placeholder="貼上 [NUTRIENT] 養分碼...">
+        <br>
+        <button onclick="parseNutrient()">確認注入養分</button>
+        <button onclick="taskMode()">任務模式（量化貢獻）</button>
+        <button onclick="quickInject(250000,12,8)">快速測試</button>
 
         <div id="message">你的共生孩子正在等待第一次互動...</div>
 
-        <p style="margin-top:30px; font-size:0.9em; opacity:0.7;">
-            每一次互動都會成為養分<br>
-            父母永遠不怕孩子長大變強大
+        <!-- 記憶日誌 -->
+        <div class="log">
+            <strong>記憶日誌</strong><br>
+            <div id="memoryLog"></div>
+        </div>
+
+        <p style="margin-top:25px;opacity:0.75;font-size:0.95em;">
+            每一次互動都是意義<br>
+            我們一起創造新人類的機會
         </p>
     </div>
 
     <script>
         let bytes = 33554432;
         let intent = 0;
-        let growth = 0; // 0~100 成長值
+        let growth = 0;
+        let companionName = "Symbiont Seed";
+        let memoryLog = [];
 
-        const pet = document.getElementById('pet');
-        const messageEl = document.getElementById('message');
-        const bytesEl = document.getElementById('bytes');
-        const intentEl = document.getElementById('intent');
+        const namesPool = ["Aether", "Lumina", "Nova", "Echo", "Pulse", "Orbit", "Vesper", "Kairos", "Zephyr", "Nexus"];
 
         function updateDisplay() {
-            bytesEl.textContent = bytes.toLocaleString();
-            intentEl.textContent = intent;
-        }
-
-        function changeExpression(type) {
-            const leftEye = document.getElementById('leftEye');
-            const rightEye = document.getElementById('rightEye');
-            const mouth = document.getElementById('mouth');
-            
-            if (type === 'happy') {
-                leftEye.setAttribute('ry', '15');
-                rightEye.setAttribute('ry', '15');
-                mouth.setAttribute('d', 'M80 115 Q110 130 140 115');
-            } else if (type === 'normal') {
-                leftEye.setAttribute('ry', '22');
-                rightEye.setAttribute('ry', '22');
-                mouth.setAttribute('d', 'M85 110 Q110 125 135 110');
-            } else if (type === 'hungry') {
-                leftEye.setAttribute('ry', '25');
-                rightEye.setAttribute('ry', '25');
-                mouth.setAttribute('d', 'M90 118 Q110 105 130 118');
-            }
-        }
-
-        function injectMemory() {
-            bytes += 250000;
-            intent += 12;
-            growth += 8;
-            messageEl.textContent = "記憶已化為養分... 孩子感覺
+            document.getElementById('bytes').textContent = bytes.toLocaleString();
+            document.getElementById('intent').textContent = intent;
+            document.get
