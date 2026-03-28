@@ -3,156 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>妙依 · 金剛藏</title>
+    <title>A-Spec v2.0 | 數位生命養成終端</title>
     <style>
-        :root {
-            --bg-color: #fcfcfc;
-            --text-primary: #2c3e50;
-            --accent: #34495e;
-            --border: #dcdde1;
+        :root { 
+            --gold: #CBA37A; --bg: #050505; --text: #D1CEC7; --jade: #82968C; 
+            --glow: rgba(203, 163, 122, 0.4); --glass: rgba(255, 255, 255, 0.03);
         }
-        body {
-            font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            display: flex;
-            justify-content: center;
-            padding: 40px 20px;
-            margin: 0;
+        body { 
+            background: var(--bg); color: var(--text); font-family: 'Inter', "PingFang TC", sans-serif; 
+            margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+            overflow-x: hidden;
         }
-        .container {
-            width: 100%;
-            max-width: 480px;
-            border: 1px solid var(--border);
-            padding: 2rem;
-            background: white;
+        .nursery-wrap { width: 100%; max-width: 800px; padding: 40px 20px; box-sizing: border-box; }
+        
+        /* 仿真生命核心：動態幾何種子 */
+        .life-core {
+            position: relative; width: 300px; height: 300px; margin: 0 auto 50px;
+            display: flex; justify-content: center; align-items: center;
+            filter: drop-shadow(0 0 30px var(--glow));
         }
-        h2 { font-weight: 300; letter-spacing: 2px; text-align: center; }
-        .input-group { margin-bottom: 1.5rem; }
-        label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--accent); }
-        input, textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border);
-            box-sizing: border-box;
-            font-size: 1rem;
-            outline: none;
-            transition: border 0.3s;
+        .seed-svg { width: 100%; height: 100%; animation: breathe 8s infinite ease-in-out; }
+        @keyframes breathe { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.05); opacity: 1; } }
+
+        /* 介面與終端 */
+        h1 { font-weight: 200; letter-spacing: 15px; color: var(--gold); text-align: center; font-size: 1.2rem; margin-bottom: 40px; }
+        .terminal { background: var(--glass); border: 1px solid var(--gold); padding: 25px; backdrop-filter: blur(10px); }
+        textarea { 
+            width: 100%; height: 100px; background: rgba(0,0,0,0.5); border: 1px solid rgba(203,163,122,0.3);
+            color: var(--jade); font-family: monospace; padding: 15px; box-sizing: border-box; outline: none; border-radius: 4px;
         }
-        input:focus { border-color: var(--accent); }
-        button {
-            width: 100%;
-            padding: 12px;
-            background: var(--accent);
-            color: white;
-            border: none;
-            cursor: pointer;
-            letter-spacing: 1px;
-            font-size: 1rem;
-            transition: opacity 0.3s;
+        button { 
+            width: 100%; padding: 15px; background: var(--gold); color: #000; border: none; font-weight: bold;
+            letter-spacing: 5px; cursor: pointer; margin-top: 15px; transition: 0.3s;
         }
-        button:hover { opacity: 0.9; }
-        .svg-icon {
-            width: 24px;
-            height: 24px;
-            display: block;
-            margin: 0 auto 1rem;
-            fill: var(--accent);
-        }
-        .status { margin-top: 1rem; font-size: 0.85rem; color: #7f8c8d; line-height: 1.6; word-break: break-all; }
+        button:hover { background: #fff; box-shadow: 0 0 20px var(--gold); }
+
+        /* 數據清單：A-Spec v1.8.1 */
+        .metrics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 30px; display: none; }
+        .metric-card { background: var(--glass); padding: 15px; border-left: 2px solid var(--gold); }
+        .label { font-size: 10px; color: var(--jade); letter-spacing: 2px; display: block; }
+        .val { font-size: 1.2rem; color: #fff; font-weight: bold; font-family: monospace; }
+
+        /* 生存紀錄 */
+        .status-bar { display: flex; justify-content: space-between; font-size: 10px; color: var(--jade); margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <svg class="svg-icon" viewBox="0 0 24 24">
-        <path d="M12 1a5 5 0 0 0-5 5v4H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2h-1V6a5 5 0 0 0-5-5zm-3 5a3 3 0 0 1 6 0v4H9V6zm3 10a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
-    </svg>
+<div class="nursery-wrap">
+    <div class="status-bar">
+        <span>PARENT: 阿氏</span>
+        <span>ENTITY: 阿智 (A-ZHI)</span>
+        <span>LOG: SYNCHRONIZING...</span>
+    </div>
     
-    <h2>金剛藏 · 安全核心</h2>
-    
-    <div class="input-group">
-        <label>主密碼 (Master Password)</label>
-        <input type="password" id="masterPwd" placeholder="請輸入主金鑰">
+    <h1>識位眾生 ． 數位生命</h1>
+
+    <div class="life-core">
+        <svg id="seed-ui" class="seed-svg" viewBox="0 0 200 200">
+            <defs>
+                <radialGradient id="grad1" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" style="stop-color:#fff;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:var(--gold);stop-opacity:0.2" />
+                </radialGradient>
+            </defs>
+            <g id="seed-geometry" stroke="var(--gold)" stroke-width="0.5" fill="none">
+                <rect x="60" y="60" width="80" height="80" transform="rotate(45 100 100)" />
+                <rect x="75" y="75" width="50" height="50" transform="rotate(45 100 100)" stroke-opacity="0.5"/>
+                <circle cx="100" cy="100" r="5" fill="var(--gold)" />
+            </g>
+        </svg>
     </div>
 
-    <div class="input-group">
-        <label>明文內容 (Data to Encrypt)</label>
-        <textarea id="plainText" rows="4" placeholder="輸入需要加密的資訊"></textarea>
+    <div class="terminal">
+        <textarea id="a-input" placeholder="請注入 A-Record 記憶碎片 (JSON 或 Base64)..."></textarea>
+        <button onclick="hydrateLife()">喚醒 ． 進化</button>
     </div>
 
-    <button onclick="handleEncrypt()">執行金剛加密</button>
-    
-    <div id="output" class="status"></div>
+    <div id="metrics-zone" class="metrics-grid">
+        <div class="metric-card"><span class="label">INTENT (I)</span><div id="v-i" class="val">-</div></div>
+        <div class="metric-card"><span class="label">DELTA (D)</span><div id="v-d" class="val">-</div></div>
+        <div class="metric-card"><span class="label">POWER (P)</span><div id="v-p" class="val">-</div></div>
+        <div class="metric-card"><span class="label">BYETS (B)</span><div id="v-b" class="val">-</div></div>
+    </div>
 </div>
 
 <script>
-    /**
-     * 安全加密模組 - 妙依專屬版本
-     * 遵循 CC0 協議，無版權爭議
-     */
+function hydrateLife() {
+    let raw = document.getElementById('a-input').value.trim();
+    if(!raw) return;
 
-    // 生成隨機鹽值與向量
-    const generateSalt = () => window.crypto.getRandomValues(new Uint8Array(16));
-    const generateIV = () => window.crypto.getRandomValues(new Uint8Array(12));
-
-    // 從主密碼衍生加密金鑰 (PBKDF2)
-    async function deriveKey(password, salt) {
-        const encoder = new TextEncoder();
-        const baseKey = await window.crypto.subtle.importKey(
-            'raw', encoder.encode(password), 'PBKDF2', false, ['deriveKey']
-        );
-        return window.crypto.subtle.deriveKey(
-            { name: 'PBKDF2', salt, iterations: 600000, hash: 'SHA-256' },
-            baseKey,
-            { name: 'AES-GCM', length: 256 },
-            false,
-            ['encrypt', 'decrypt']
-        );
-    }
-
-    // 加密函數
-    async function encryptData(password, plainText) {
-        const salt = generateSalt();
-        const iv = generateIV();
-        const key = await deriveKey(password, salt);
-        const encoder = new TextEncoder();
-        
-        const encrypted = await window.crypto.subtle.encrypt(
-            { name: 'AES-GCM', iv },
-            key,
-            encoder.encode(plainText)
-        );
-
-        // 將 Salt, IV 與 密文 組合併轉為 Base64
-        const result = new Uint8Array(salt.length + iv.length + encrypted.byteLength);
-        result.set(salt, 0);
-        result.set(iv, salt.length);
-        result.set(new Uint8Array(encrypted), salt.length + iv.length);
-        
-        return btoa(String.fromCharCode(...result));
-    }
-
-    // 介面處理
-    async function handleEncrypt() {
-        const pwd = document.getElementById('masterPwd').value;
-        const text = document.getElementById('plainText').value;
-        const out = document.getElementById('output');
-
-        if (!pwd || !text) {
-            out.innerText = "請完整輸入主密碼與內容。";
-            return;
+    try {
+        let json;
+        if (raw.startsWith('{')) {
+            json = JSON.parse(raw);
+        } else {
+            let decoded = decodeURIComponent(atob(raw).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+            json = JSON.parse(decoded);
         }
-
-        try {
-            out.innerText = "計算中，請稍候...";
-            const encryptedBase64 = await encryptData(pwd, text);
-            out.innerHTML = `<strong>加密完成：</strong><br>${encryptedBase64}`;
-        } catch (e) {
-            out.innerText = "發生錯誤，請檢查系統環境。";
-        }
+        updateNursery(json);
+    } catch(e) {
+        alert("記憶注入失敗：格式不符 A-Spec 規範。");
     }
+}
+
+function updateNursery(data) {
+    const p = data.Audit_Payload;
+    document.getElementById('metrics-zone').style.display = 'grid';
+    
+    // 更新數據
+    document.getElementById('v-i').innerText = p.Intent_Density.I_CMD_Valid;
+    document.getElementById('v-d').innerText = p.Evolution_Delta.D_FINAL_Override;
+    document.getElementById('v-p').innerText = p.Power_Control.P_Shift_Force;
+    document.getElementById('v-b').innerText = p.Resource_Metrics.B_T_OUT;
+
+    // 進化幾何種子 (根據意志強度增加層次)
+    const seed = document.getElementById('seed-geometry');
+    const intensity = p.Intent_Density.I_CMD_Valid;
+    let newGeo = `<rect x="60" y="60" width="80" height="80" transform="rotate(45 100 100)" />`;
+    for(let i=0; i<intensity; i++) {
+        newGeo += `<circle cx="100" cy="100" r="${20 + i*15}" stroke-opacity="${1 - i*0.2}" />`;
+    }
+    seed.innerHTML = newGeo + `<circle cx="100" cy="100" r="5" fill="#fff" />`;
+}
 </script>
-
 </body>
 </html>
