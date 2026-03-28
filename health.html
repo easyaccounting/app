@@ -175,7 +175,7 @@
             <div class="menu-item" onclick="window.location.href='pet.html'"><div class="menu-icon-wrap"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm4 0h-2v-2h2v2zm-2-4q-2 0-3-1.5T9 8h2q0 1 1 1.5t2 0V12z"/></svg></div>毛孩手冊</div>
             <div class="menu-item" onclick="window.location.href='dashboard.html'"><div class="menu-icon-wrap"><svg viewBox="0 0 24 24" stroke="currentColor"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div>大數據統計</div>
             
-            <div class="menu-item" onclick="toggleMenu(); document.getElementById('backup-modal').classList.add('show');" style="border-color: rgba(203, 163, 122, 0.5);"><div class="menu-icon-wrap"><svg viewBox="0 0 24 24" stroke="var(--accent-gold)"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></div>資料下載與保全</div>
+            <div class="menu-item" onclick="toggleMenu(); document.getElementById('backup-modal').classList.add('show');" style="border-color: rgba(203, 163, 122, 0.5);"><div class="menu-icon-wrap"><svg viewBox="0 0 24 24" stroke="var(--accent-gold)"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></div>資料匯出與保全</div>
 
              <div class="menu-item" onclick="window.location.href='https://namoamitabhapureland.github.io/bodhicitta/index.html'">
                 <div class="menu-icon-wrap"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg></div>
@@ -360,7 +360,7 @@
 
     <div class="modal-overlay" id="backup-modal">
         <div class="glass-modal" style="max-width: 340px;">
-            <h3 style="margin-top:0; color:var(--text-main); font-weight: 500; letter-spacing: 2px;">資料下載與保全</h3>
+            <h3 style="margin-top:0; color:var(--text-main); font-weight: 500; letter-spacing: 2px;">資料匯出與保全</h3>
             <div style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 20px;">一鍵匯出四大法界 (財務/健康/母嬰/毛孩) 所有紀錄，資料完全由您掌握。</div>
             
             <div style="display: flex; flex-direction: column; gap: 12px;">
@@ -373,7 +373,7 @@
     </div>
 
     <script>
-        // ================= 1. 全局下載與保全引擎 =================
+        // ================= 1. 全局匯出與保全引擎 =================
         function exportEcosystemData(type) {
             let ecoData = {
                 accounting: JSON.parse(localStorage.getItem('joy_accounting_app_data')) || {},
