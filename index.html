@@ -105,57 +105,89 @@
         .step-desc { font-size: 0.85rem; color: var(--text-main); line-height: 1.5; }
         .step-icon-box { display: inline-flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.05); padding: 4px 8px; border-radius: 8px; margin-top: 6px; font-weight: 500; font-size: 0.8rem; color: var(--text-main); gap: 6px; border: 1px solid rgba(0,0,0,0.05); }
 
-/* 金剛藏神祕入口樣式 */
-.vajra-entrance {
+/* 橫向長方形容器 */
+.vajra-wide-entrance {
     width: 100%;
-    margin-top: 5px;
-    padding: 25px;
-    border-radius: 24px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(193, 165, 131, 0.2));
+    max-width: 720px; /* 這裡請對應上方矩陣的總寬度 */
+    margin: 15px auto 0;
+    padding: 22px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(193, 165, 131, 0.15));
     border: 1px solid rgba(193, 165, 131, 0.3);
+    border-radius: 24px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    box-shadow: var(--shadow-soft);
+}
+
+.vajra-inner {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 15px;
-    cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    gap: 20px;
     position: relative;
-    overflow: hidden;
-    /* 神祕發光感 */
-    box-shadow: 0 10px 30px rgba(193, 165, 131, 0.1), 
-                inset 0 0 15px rgba(255, 255, 255, 0.5);
+    z-index: 2;
 }
 
-.vajra-entrance:active {
-    transform: scale(0.97);
-    box-shadow: 0 5px 15px rgba(193, 165, 131, 0.2);
-}
-
-/* 呼吸燈效果 */
-@keyframes glow {
-    0% { box-shadow: 0 0 5px rgba(193, 165, 131, 0.2); }
-    50% { box-shadow: 0 0 20px rgba(193, 165, 131, 0.4); }
-    100% { box-shadow: 0 0 5px rgba(193, 165, 131, 0.2); }
-}
-
-.vajra-glow {
-    animation: glow 3s infinite ease-in-out;
-}
-
-.vajra-title {
-    font-size: 1.1rem;
-    font-weight: 300;
-    letter-spacing: 6px;
-    color: var(--text-main);
-    margin: 0;
-}
-
-.vajra-icon {
-    width: 24px;
-    height: 24px;
-    stroke: var(--accent-amber);
+.vajra-svg {
+    width: 28px;
+    height: 28px;
     fill: none;
+    stroke: var(--accent-amber);
     stroke-width: 1.5;
+}
+
+.vajra-text-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.vajra-main-title {
+    font-size: 1.1rem;
+    font-weight: 500;
+    letter-spacing: 4px;
+    color: var(--text-main);
+}
+
+.vajra-sub-title {
+    font-size: 0.75rem;
+    color: var(--text-light);
+    letter-spacing: 1px;
+}
+
+/* 神祕呼吸發光效果 */
+@keyframes vajra-breathe {
+    0% { box-shadow: 0 10px 30px rgba(193, 165, 131, 0.1); border-color: rgba(193, 165, 131, 0.3); }
+    50% { box-shadow: 0 10px 40px rgba(193, 165, 131, 0.3); border-color: rgba(193, 165, 131, 0.6); }
+    100% { box-shadow: 0 10px 30px rgba(193, 165, 131, 0.1); border-color: rgba(193, 165, 131, 0.3); }
+}
+
+.vajra-glow-effect {
+    animation: vajra-breathe 4s infinite ease-in-out;
+}
+
+/* 掃光效果 - 增加神祕乾淨的質感 */
+.vajra-light-sweep {
+    position: absolute;
+    top: 0; left: -100%;
+    width: 50%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: 0.5s;
+    transform: skewX(-25deg);
+    z-index: 1;
+}
+
+.vajra-wide-entrance:hover .vajra-light-sweep {
+    left: 150%;
+    transition: 0.8s;
+}
+
+.vajra-wide-entrance:active {
+    transform: scale(0.98);
 }
 
     </style>
@@ -215,14 +247,21 @@
                 <div class="portal-name">毛孩手冊</div>
                 <div class="portal-desc">照護與驅蟲防護</div>
             </div>
-            <div class="vajra-entrance vajra-glow" onclick="window.location.href='security.html'">
-    <svg class="vajra-icon" viewBox="0 0 24 24">
-        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-        <circle cx="12" cy="16" r="1"></circle>
-    </svg>
-    <h3 class="vajra-title">進入 · 金剛藏密室</h3>
+            <div class="vajra-wide-entrance vajra-glow-effect" onclick="window.location.href='security.html'">
+    <div class="vajra-inner">
+        <svg class="vajra-svg" viewBox="0 0 24 24">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            <circle cx="12" cy="16" r="1.5"></circle>
+        </svg>
+        <div class="vajra-text-group">
+            <div class="vajra-main-title">進入 ． 金剛藏密室</div>
+            <div class="vajra-sub-title">本地加密封存 ． 絕無痕跡</div>
+        </div>
+    </div>
+    <div class="vajra-light-sweep"></div>
 </div>
+
 
         </div>
 
