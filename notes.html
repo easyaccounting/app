@@ -3,14 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>淨息流 ． 琉璃方便貼</title>
+    <title>淨息流 ． 琉璃百寶箱</title>
     <style>
         :root {
             --bg-gradient: linear-gradient(135deg, #FDFDFD, #F5F2EF);
-            --note-bg: rgba(255, 255, 255, 0.85);
-            --note-border: rgba(193, 165, 131, 0.3);
             --accent-amber: #C1A583;
             --text-main: #58504A;
+            /* 琉璃五色 */
+            --color-white: rgba(255, 255, 255, 0.85);
+            --color-amber: rgba(251, 243, 219, 0.85);
+            --color-jade: rgba(225, 238, 230, 0.85);
+            --color-rose: rgba(246, 227, 227, 0.85);
+            --color-slate: rgba(220, 225, 230, 0.85);
         }
 
         * { box-sizing: border-box; touch-action: none; }
@@ -20,150 +24,193 @@
             font-family: -apple-system, sans-serif;
         }
 
-        /* --- 頂部控制欄 --- */
+        /* --- 控制面板 --- */
         .controls {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            display: flex; gap: 15px; z-index: 1000;
+            display: flex; gap: 15px; z-index: 1000; transition: 0.3s;
         }
-        .btn-add {
-            width: 50px; height: 50px; background: var(--text-main); color: white;
-            border-radius: 50%; border: none; font-size: 1.5rem; cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center;
+
+        .btn-circle {
+            width: 50px; height: 50px; border-radius: 50%; border: none;
+            background: var(--text-main); color: white; font-size: 1.2rem;
+            cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: flex; align-items: center; justify-content: center;
         }
 
         /* --- 方便貼樣式 --- */
         .note {
-            position: absolute; width: 220px; min-height: 220px;
-            background: var(--note-bg); backdrop-filter: blur(10px);
-            border: 1px solid var(--note-border); border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(160, 155, 150, 0.1);
+            position: absolute; width: 250px; min-height: 250px;
+            background: var(--color-white); backdrop-filter: blur(10px);
+            border: 1px solid rgba(0,0,0,0.05); border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
             padding: 15px; cursor: move; display: flex; flex-direction: column;
-            animation: popIn 0.3s ease;
+            transition: transform 0.3s, opacity 0.3s;
         }
-        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        .note-header { 
-            display: flex; justify-content: space-between; margin-bottom: 10px; 
-            border-bottom: 0.5px solid rgba(0,0,0,0.05); padding-bottom: 5px;
-        }
-        .note-close { cursor: pointer; color: var(--accent-amber); font-size: 0.8rem; }
+        .note-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .color-dot { width: 12px; height: 12px; border-radius: 50%; cursor: pointer; border: 1px solid rgba(0,0,0,0.1); }
 
-        /* 打字區域 */
         .note-text { 
             width: 100%; border: none; outline: none; background: transparent;
-            font-size: 0.95rem; color: var(--text-main); line-height: 1.5;
-            min-height: 50px; margin-bottom: 10px;
+            font-size: 1rem; color: var(--text-main); min-height: 60px;
         }
 
-        /* 手寫繪圖區域 */
-        .note-canvas {
-            width: 100%; height: 120px; background: rgba(255,255,255,0.3);
-            border-radius: 8px; cursor: crosshair; touch-action: none;
+        /* 鬧鐘與語音工具列 */
+        .note-tools { display: flex; align-items: center; gap: 10px; margin-top: auto; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.03); }
+        .time-input { font-size: 0.7rem; border: none; background: rgba(0,0,0,0.05); border-radius: 5px; padding: 2px 5px; color: var(--text-main); }
+        .tool-btn { background: none; border: none; cursor: pointer; font-size: 0.9rem; opacity: 0.5; }
+        .tool-btn:hover { opacity: 1; }
+
+        /* --- 右下角收納資料夾 --- */
+        .folder-icon {
+            position: fixed; bottom: 30px; right: 30px;
+            width: 65px; height: 65px; background: var(--accent-amber);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 1.5rem; cursor: pointer; z-index: 2000;
+            box-shadow: 0 10px 30px rgba(193, 165, 131, 0.3);
         }
 
-        .hint { position: fixed; bottom: 20px; width: 100%; text-align: center; font-size: 0.7rem; color: #CCC; letter-spacing: 2px; }
+        /* 縮小狀態 */
+        .minimized { transform: scale(0) !important; opacity: 0 !important; pointer-events: none; }
+
+        /* 鬧鐘閃爍動畫 */
+        @keyframes alarm-flash { 0% { background-color: var(--color-rose); } 50% { background-color: white; } 100% { background-color: var(--color-rose); } }
+        .alarm-active { animation: alarm-flash 0.5s infinite; border: 2px solid var(--accent-amber); }
     </style>
 </head>
 <body>
 
-    <div class="controls">
-        <button class="btn-add" onclick="createNote()">+</button>
+    <div class="controls" id="main-controls">
+        <button class="btn-circle" onclick="createNote()">+</button>
     </div>
 
     <div id="board" style="width: 100%; height: 100%;"></div>
 
-    <div class="hint">識智合一 ． 隨手即法 ． 2026</div>
+    <div class="folder-icon" onclick="toggleMinimize()">
+        <span id="folder-label">藏</span>
+    </div>
+
+    <audio id="alarm-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
 
     <script>
         const board = document.getElementById('board');
-        let noteCounter = 0;
+        const alarmSound = document.getElementById('alarm-sound');
+        let isAllMinimized = false;
 
-        // --- 創建方便貼 ---
+        // --- 創建貼紙 ---
         function createNote(x = 100, y = 100, savedData = null) {
-            noteCounter++;
             const note = document.createElement('div');
             note.className = 'note';
-            note.id = `note-${Date.now()}`;
-            note.style.left = savedData ? savedData.x + 'px' : (x + (noteCounter * 20)) + 'px';
-            note.style.top = savedData ? savedData.y + 'px' : (y + (noteCounter * 20)) + 'px';
+            const noteId = savedData ? savedData.id : `note-${Date.now()}`;
+            note.id = noteId;
+            note.style.left = savedData ? savedData.x + 'px' : x + 'px';
+            note.style.top = savedData ? savedData.y + 'px' : y + 'px';
+            if(savedData) note.style.backgroundColor = savedData.color;
 
             note.innerHTML = `
                 <div class="note-header">
-                    <span style="font-size:0.6rem; color:#AAA;">#${noteCounter}</span>
-                    <span class="note-close" onclick="this.parentElement.parentElement.remove(); saveAll();">✕</span>
+                    <div style="display:flex; gap:5px;">
+                        <div class="color-dot" style="background:var(--color-white)" onclick="changeColor('${noteId}', 'var(--color-white)')"></div>
+                        <div class="color-dot" style="background:var(--color-amber)" onclick="changeColor('${noteId}', 'var(--color-amber)')"></div>
+                        <div class="color-dot" style="background:var(--color-jade)" onclick="changeColor('${noteId}', 'var(--color-jade)')"></div>
+                        <div class="color-dot" style="background:var(--color-rose)" onclick="changeColor('${noteId}', 'var(--color-rose)')"></div>
+                    </div>
+                    <span style="cursor:pointer; opacity:0.3" onclick="removeNote('${noteId}')">✕</span>
                 </div>
-                <div class="note-text" contenteditable="true" oninput="saveAll()">${savedData ? savedData.text : '點擊打字...'}</div>
-                <canvas class="note-canvas"></canvas>
+                <div class="note-text" contenteditable="true" oninput="saveAll()">${savedData ? savedData.text : '寫點什麼...'}</div>
+                <div class="note-tools">
+                    <button class="tool-btn" onclick="startVoice('${noteId}')">🎤</button>
+                    <input type="time" class="time-input" value="${savedData?.alarm || ''}" onchange="saveAll()">
+                    <span style="font-size:0.6rem; color:#CCC">提醒</span>
+                </div>
             `;
 
             board.appendChild(note);
-            initCanvas(note.querySelector('canvas'), savedData ? savedData.drawing : null);
             makeDraggable(note);
             saveAll();
         }
 
-        // --- 手寫邏輯 (Canvas) ---
-        function initCanvas(canvas, savedDrawing) {
-            const ctx = canvas.getContext('2d');
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
-            ctx.strokeStyle = '#C1A583'; // 流金色
-            ctx.lineWidth = 1.5;
-            ctx.lineCap = 'round';
-
-            if (savedDrawing) {
-                const img = new Image();
-                img.src = savedDrawing;
-                img.onload = () => ctx.drawImage(img, 0, 0);
-            }
-
-            let drawing = false;
-            canvas.onpointerdown = (e) => { drawing = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); };
-            canvas.onpointermove = (e) => { if (drawing) { ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); } };
-            canvas.onpointerup = () => { drawing = false; saveAll(); };
+        // --- 變色邏輯 ---
+        function changeColor(id, color) {
+            document.getElementById(id).style.backgroundColor = color;
+            saveAll();
         }
 
-        // --- 拖動邏輯 ---
-        function makeDraggable(el) {
-            let offsetX, offsetY;
-            el.onpointerdown = (e) => {
-                if (e.target.className === 'note-canvas' || e.target.contentEditable === 'true') return;
-                offsetX = e.clientX - el.offsetLeft;
-                offsetY = e.clientY - el.offsetTop;
-                el.style.zIndex = 1000;
-                
-                document.onpointermove = (ev) => {
-                    el.style.left = (ev.clientX - offsetX) + 'px';
-                    el.style.top = (ev.clientY - offsetY) + 'px';
-                };
-                document.onpointerup = () => {
-                    document.onpointermove = null;
-                    el.style.zIndex = 1;
-                    saveAll();
-                };
+        // --- 語音輸入 (Web Speech API) ---
+        function startVoice(id) {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'zh-TW';
+            recognition.start();
+            recognition.onresult = (event) => {
+                const text = event.results[0][0].transcript;
+                document.getElementById(id).querySelector('.note-text').innerText += text;
+                saveAll();
             };
         }
 
-        // --- 本地保存 (金剛藏邏輯) ---
-        function saveAll() {
-            const notesData = [];
+        // --- 收納邏輯 ---
+        function toggleMinimize() {
+            isAllMinimized = !isAllMinimized;
+            const notes = document.querySelectorAll('.note');
+            const controls = document.getElementById('main-controls');
+            
+            notes.forEach(n => {
+                if(isAllMinimized) n.classList.add('minimized');
+                else n.classList.remove('minimized');
+            });
+            
+            controls.style.opacity = isAllMinimized ? "0" : "1";
+            document.getElementById('folder-label').innerText = isAllMinimized ? "現" : "藏";
+        }
+
+        // --- 鬧鐘檢查輪詢 (每秒檢查一次) ---
+        setInterval(() => {
+            const now = new Date();
+            const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            
             document.querySelectorAll('.note').forEach(n => {
-                notesData.push({
+                const alarmTime = n.querySelector('.time-input').value;
+                if(alarmTime === currentTime && !n.classList.contains('alarm-active')) {
+                    n.classList.add('alarm-active');
+                    alarmSound.play();
+                    // 即使縮小了也強制顯示
+                    if(isAllMinimized) toggleMinimize(); 
+                    alert(`提醒：${n.querySelector('.note-text').innerText}`);
+                }
+            });
+        }, 1000);
+
+        // --- 基礎邏輯 (拖動與保存) ---
+        function makeDraggable(el) {
+            let ox, oy;
+            el.onpointerdown = (e) => {
+                if(e.target.contentEditable === 'true' || e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
+                ox = e.clientX - el.offsetLeft; oy = e.clientY - el.offsetTop;
+                document.onpointermove = (ev) => { el.style.left = (ev.clientX - ox) + 'px'; el.style.top = (ev.clientY - oy) + 'px'; };
+                document.onpointerup = () => { document.onpointermove = null; saveAll(); };
+            };
+        }
+
+        function removeNote(id) { document.getElementById(id).remove(); saveAll(); }
+
+        function saveAll() {
+            const data = [];
+            document.querySelectorAll('.note').forEach(n => {
+                data.push({
+                    id: n.id,
                     x: parseInt(n.style.left),
                     y: parseInt(n.style.top),
                     text: n.querySelector('.note-text').innerText,
-                    drawing: n.querySelector('canvas').toDataURL()
+                    color: n.style.backgroundColor,
+                    alarm: n.querySelector('.time-input').value
                 });
             });
-            localStorage.setItem('prajna_sticky_notes', JSON.stringify(notesData));
+            localStorage.setItem('vajra_box_v2', JSON.stringify(data));
         }
 
-        // --- 載入歷史 ---
         window.onload = () => {
-            const saved = JSON.parse(localStorage.getItem('prajna_sticky_notes'));
-            if (saved && saved.length > 0) {
-                saved.forEach(data => createNote(0, 0, data));
-            }
+            const saved = JSON.parse(localStorage.getItem('vajra_box_v2'));
+            if(saved) saved.forEach(d => createNote(0, 0, d));
         };
     </script>
 </body>
