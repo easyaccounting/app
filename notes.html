@@ -3,213 +3,225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>淨息流 ． 琉璃百寶箱</title>
     <style>
         :root {
             --bg-gradient: linear-gradient(135deg, #FDFDFD, #F5F2EF);
-            --accent-amber: #C1A583;
-            --text-main: #58504A;
-            /* 琉璃五色 */
-            --color-white: rgba(255, 255, 255, 0.85);
-            --color-amber: rgba(251, 243, 219, 0.85);
-            --color-jade: rgba(225, 238, 230, 0.85);
-            --color-rose: rgba(246, 227, 227, 0.85);
-            --color-slate: rgba(220, 225, 230, 0.85);
+            --accent-amber: #C1A583; --accent-jade: #82968C;
+            --text-main: #58504A; --text-light: #968E86;
+            --color-white: rgba(255, 255, 255, 0.9);
+            --color-amber: rgba(251, 243, 219, 0.9);
+            --color-jade: rgba(225, 238, 230, 0.9);
+            --color-rose: rgba(246, 227, 227, 0.9);
         }
 
         * { box-sizing: border-box; touch-action: none; }
-        body { 
-            margin: 0; padding: 0; width: 100vw; height: 100vh; 
-            background: var(--bg-gradient); overflow: hidden; 
-            font-family: -apple-system, sans-serif;
+        body { margin: 0; padding: 0; width: 100vw; height: 100vh; background: var(--bg-gradient); overflow: hidden; font-family: -apple-system, sans-serif; }
+
+        /* --- 頂部控制 --- */
+        .controls { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; }
+        .btn-add { width: 50px; height: 50px; border-radius: 50%; background: var(--text-main); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+
+        /* --- 貼紙容器 --- */
+        .note { 
+            position: absolute; width: 280px; background: var(--color-white); border-radius: 24px; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.05); padding: 18px; cursor: move;
+            display: flex; flex-direction: column; transition: transform 0.3s, opacity 0.3s;
         }
 
-        /* --- 控制面板 --- */
-        .controls {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            display: flex; gap: 15px; z-index: 1000; transition: 0.3s;
+        .note-header { display: flex; justify-content: space-between; margin-bottom: 12px; }
+        .dot-group { display: flex; gap: 6px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.05); cursor: pointer; }
+
+        .note-text { width: 100%; border: none; outline: none; background: transparent; font-size: 1rem; color: var(--text-main); margin-bottom: 10px; min-height: 40px; }
+        
+        /* 手繪區域 */
+        .note-canvas { width: 100%; height: 100px; background: rgba(255,255,255,0.3); border-radius: 12px; margin-bottom: 10px; cursor: crosshair; }
+
+        /* 錄音與鬧鐘工具 */
+        .note-tools { display: flex; align-items: center; gap: 12px; border-top: 1px solid rgba(0,0,0,0.03); padding-top: 10px; }
+        .btn-tool { background: none; border: none; cursor: pointer; padding: 0; display: flex; align-items: center; }
+        .time-input { font-size: 0.75rem; border: none; background: rgba(0,0,0,0.04); border-radius: 4px; color: var(--text-main); padding: 2px 4px; }
+
+        /* --- 收納資料夾 --- */
+        .folder-btn { 
+            position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; 
+            background: var(--accent-amber); border-radius: 50%; z-index: 2000;
+            display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 25px rgba(193, 165, 131, 0.4);
         }
 
-        .btn-circle {
-            width: 50px; height: 50px; border-radius: 50%; border: none;
-            background: var(--text-main); color: white; font-size: 1.2rem;
-            cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            display: flex; align-items: center; justify-content: center;
-        }
-
-        /* --- 方便貼樣式 --- */
-        .note {
-            position: absolute; width: 250px; min-height: 250px;
-            background: var(--color-white); backdrop-filter: blur(10px);
-            border: 1px solid rgba(0,0,0,0.05); border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            padding: 15px; cursor: move; display: flex; flex-direction: column;
-            transition: transform 0.3s, opacity 0.3s;
-        }
-
-        .note-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
-        .color-dot { width: 12px; height: 12px; border-radius: 50%; cursor: pointer; border: 1px solid rgba(0,0,0,0.1); }
-
-        .note-text { 
-            width: 100%; border: none; outline: none; background: transparent;
-            font-size: 1rem; color: var(--text-main); min-height: 60px;
-        }
-
-        /* 鬧鐘與語音工具列 */
-        .note-tools { display: flex; align-items: center; gap: 10px; margin-top: auto; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.03); }
-        .time-input { font-size: 0.7rem; border: none; background: rgba(0,0,0,0.05); border-radius: 5px; padding: 2px 5px; color: var(--text-main); }
-        .tool-btn { background: none; border: none; cursor: pointer; font-size: 0.9rem; opacity: 0.5; }
-        .tool-btn:hover { opacity: 1; }
-
-        /* --- 右下角收納資料夾 --- */
-        .folder-icon {
-            position: fixed; bottom: 30px; right: 30px;
-            width: 65px; height: 65px; background: var(--accent-amber);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 1.5rem; cursor: pointer; z-index: 2000;
-            box-shadow: 0 10px 30px rgba(193, 165, 131, 0.3);
-        }
-
-        /* 縮小狀態 */
         .minimized { transform: scale(0) !important; opacity: 0 !important; pointer-events: none; }
-
-        /* 鬧鐘閃爍動畫 */
-        @keyframes alarm-flash { 0% { background-color: var(--color-rose); } 50% { background-color: white; } 100% { background-color: var(--color-rose); } }
-        .alarm-active { animation: alarm-flash 0.5s infinite; border: 2px solid var(--accent-amber); }
+        .alarm-active { animation: pulse 0.5s infinite; border: 2px solid var(--accent-amber); }
+        @keyframes pulse { 0% { background: #fff; } 50% { background: var(--color-rose); } 100% { background: #fff; } }
     </style>
 </head>
 <body>
 
-    <div class="controls" id="main-controls">
-        <button class="btn-circle" onclick="createNote()">+</button>
+    <div class="controls"><button class="btn-add" onclick="createNote()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+    </button></div>
+
+    <div id="board" style="width:100%; height:100%;"></div>
+
+    <div class="folder-btn" onclick="toggleAll()">
+        <svg id="folder-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+        </svg>
     </div>
 
-    <div id="board" style="width: 100%; height: 100%;"></div>
-
-    <div class="folder-icon" onclick="toggleMinimize()">
-        <span id="folder-label">藏</span>
-    </div>
-
-    <audio id="alarm-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
+    <audio id="global-alarm" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
 
     <script>
         const board = document.getElementById('board');
-        const alarmSound = document.getElementById('alarm-sound');
-        let isAllMinimized = false;
+        let notes = JSON.parse(localStorage.getItem('vajra_notes_v3')) || [];
+        let isMinimized = false;
+        let mediaRecorder;
+        let audioChunks = [];
 
-        // --- 創建貼紙 ---
-        function createNote(x = 100, y = 100, savedData = null) {
+        function createNote(x = 50, y = 120, data = null) {
+            const id = data ? data.id : `n-${Date.now()}`;
             const note = document.createElement('div');
             note.className = 'note';
-            const noteId = savedData ? savedData.id : `note-${Date.now()}`;
-            note.id = noteId;
-            note.style.left = savedData ? savedData.x + 'px' : x + 'px';
-            note.style.top = savedData ? savedData.y + 'px' : y + 'px';
-            if(savedData) note.style.backgroundColor = savedData.color;
+            note.id = id;
+            note.style.left = data ? data.x + 'px' : x + 'px';
+            note.style.top = data ? data.y + 'px' : y + 'px';
+            if(data) note.style.backgroundColor = data.color;
 
             note.innerHTML = `
                 <div class="note-header">
-                    <div style="display:flex; gap:5px;">
-                        <div class="color-dot" style="background:var(--color-white)" onclick="changeColor('${noteId}', 'var(--color-white)')"></div>
-                        <div class="color-dot" style="background:var(--color-amber)" onclick="changeColor('${noteId}', 'var(--color-amber)')"></div>
-                        <div class="color-dot" style="background:var(--color-jade)" onclick="changeColor('${noteId}', 'var(--color-jade)')"></div>
-                        <div class="color-dot" style="background:var(--color-rose)" onclick="changeColor('${noteId}', 'var(--color-rose)')"></div>
+                    <div class="dot-group">
+                        <div class="dot" style="background:var(--color-white)" onclick="setColor('${id}','var(--color-white)')"></div>
+                        <div class="dot" style="background:var(--color-amber)" onclick="setColor('${id}','var(--color-amber)')"></div>
+                        <div class="dot" style="background:var(--color-jade)" onclick="setColor('${id}','var(--color-jade)')"></div>
                     </div>
-                    <span style="cursor:pointer; opacity:0.3" onclick="removeNote('${noteId}')">✕</span>
+                    <div onclick="removeNote('${id}')" style="cursor:pointer">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CCC" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </div>
                 </div>
-                <div class="note-text" contenteditable="true" oninput="saveAll()">${savedData ? savedData.text : '寫點什麼...'}</div>
+                <div class="note-text" contenteditable="true" oninput="save()">${data ? data.text : ''}</div>
+                <canvas class="note-canvas"></canvas>
                 <div class="note-tools">
-                    <button class="tool-btn" onclick="startVoice('${noteId}')">🎤</button>
-                    <input type="time" class="time-input" value="${savedData?.alarm || ''}" onchange="saveAll()">
-                    <span style="font-size:0.6rem; color:#CCC">提醒</span>
+                    <button class="btn-tool" id="rec-${id}" onclick="toggleRec('${id}')">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                    </button>
+                    <button class="btn-tool" id="play-${id}" onclick="playAudio('${id}')" style="display:${data?.audio ? 'block' : 'none'}">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                    </button>
+                    <input type="time" class="time-input" value="${data?.alarm || ''}" onchange="save()">
                 </div>
             `;
 
             board.appendChild(note);
-            makeDraggable(note);
-            saveAll();
+            initCanvas(note.querySelector('canvas'), data?.draw);
+            drag(note);
+            if(!data) save();
         }
 
-        // --- 變色邏輯 ---
-        function changeColor(id, color) {
-            document.getElementById(id).style.backgroundColor = color;
-            saveAll();
+        // --- 錄音邏輯 ---
+        async function toggleRec(id) {
+            const btn = document.getElementById(`rec-${id}`);
+            if (!mediaRecorder || mediaRecorder.state === "inactive") {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                mediaRecorder.onstop = async () => {
+                    const blob = new Blob(audioChunks, { type: 'audio/ogg; codecs=opus' });
+                    const reader = new FileReader();
+                    reader.readAsDataURL(blob);
+                    reader.onloadend = () => {
+                        const base64 = reader.result;
+                        updateNoteData(id, { audio: base64 });
+                        document.getElementById(`play-${id}`).style.display = 'block';
+                        save();
+                    };
+                };
+                mediaRecorder.start();
+                btn.style.stroke = "red";
+            } else {
+                mediaRecorder.stop();
+                btn.style.stroke = "currentColor";
+            }
         }
 
-        // --- 語音輸入 (Web Speech API) ---
-        function startVoice(id) {
-            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            recognition.lang = 'zh-TW';
-            recognition.start();
-            recognition.onresult = (event) => {
-                const text = event.results[0][0].transcript;
-                document.getElementById(id).querySelector('.note-text').innerText += text;
-                saveAll();
+        function playAudio(id) {
+            const data = JSON.parse(localStorage.getItem('vajra_notes_v3')).find(n => n.id === id);
+            if(data && data.audio) new Audio(data.audio).play();
+        }
+
+        // --- 畫布邏輯 ---
+        function initCanvas(cvs, saved) {
+            const ctx = cvs.getContext('2d');
+            cvs.width = cvs.offsetWidth; cvs.height = cvs.offsetHeight;
+            ctx.strokeStyle = '#C1A583'; ctx.lineWidth = 2; ctx.lineCap = 'round';
+            if(saved) { const img = new Image(); img.src = saved; img.onload = () => ctx.drawImage(img, 0, 0); }
+            let drawing = false;
+            cvs.onpointerdown = (e) => { drawing = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); };
+            cvs.onpointermove = (e) => { if(drawing) { ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); } };
+            cvs.onpointerup = () => { drawing = false; save(); };
+        }
+
+        // --- 基礎互動 ---
+        function drag(el) {
+            let ox, oy;
+            el.onpointerdown = e => {
+                if(e.target.tagName === 'CANVAS' || e.target.contentEditable === 'true' || e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
+                ox = e.clientX - el.offsetLeft; oy = e.clientY - el.offsetTop;
+                document.onpointermove = ev => { el.style.left = (ev.clientX - ox) + 'px'; el.style.top = (ev.clientY - oy) + 'px'; };
+                document.onpointerup = () => { document.onpointermove = null; save(); };
             };
         }
 
-        // --- 收納邏輯 ---
-        function toggleMinimize() {
-            isAllMinimized = !isAllMinimized;
-            const notes = document.querySelectorAll('.note');
-            const controls = document.getElementById('main-controls');
-            
-            notes.forEach(n => {
-                if(isAllMinimized) n.classList.add('minimized');
-                else n.classList.remove('minimized');
-            });
-            
-            controls.style.opacity = isAllMinimized ? "0" : "1";
-            document.getElementById('folder-label').innerText = isAllMinimized ? "現" : "藏";
+        function toggleAll() {
+            isMinimized = !isMinimized;
+            document.querySelectorAll('.note').forEach(n => isMinimized ? n.classList.add('minimized') : n.classList.remove('minimized'));
+            document.getElementById('folder-icon').style.stroke = isMinimized ? "var(--accent-jade)" : "white";
         }
 
-        // --- 鬧鐘檢查輪詢 (每秒檢查一次) ---
+        function save() {
+            const data = Array.from(document.querySelectorAll('.note')).map(n => ({
+                id: n.id, x: parseInt(n.style.left), y: parseInt(n.style.top),
+                text: n.querySelector('.note-text').innerText,
+                color: n.style.backgroundColor,
+                draw: n.querySelector('canvas').toDataURL(),
+                alarm: n.querySelector('.time-input').value,
+                audio: getExistingAudio(n.id)
+            }));
+            localStorage.setItem('vajra_notes_v3', JSON.stringify(data));
+        }
+
+        function getExistingAudio(id) {
+            const old = JSON.parse(localStorage.getItem('vajra_notes_v3'));
+            return old?.find(n => n.id === id)?.audio || null;
+        }
+
+        function updateNoteData(id, obj) {
+            let old = JSON.parse(localStorage.getItem('vajra_notes_v3'));
+            const idx = old.findIndex(n => n.id === id);
+            if(idx > -1) old[idx] = {...old[idx], ...obj};
+            localStorage.setItem('vajra_notes_v3', JSON.stringify(old));
+        }
+
+        function removeNote(id) { document.getElementById(id).remove(); save(); }
+        function setColor(id, c) { document.getElementById(id).style.backgroundColor = c; save(); }
+
+        // --- 鬧鐘輪詢 ---
         setInterval(() => {
             const now = new Date();
-            const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-            
+            const time = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
             document.querySelectorAll('.note').forEach(n => {
-                const alarmTime = n.querySelector('.time-input').value;
-                if(alarmTime === currentTime && !n.classList.contains('alarm-active')) {
+                if(n.querySelector('.time-input').value === time && !n.classList.contains('alarm-active')) {
                     n.classList.add('alarm-active');
-                    alarmSound.play();
-                    // 即使縮小了也強制顯示
-                    if(isAllMinimized) toggleMinimize(); 
-                    alert(`提醒：${n.querySelector('.note-text').innerText}`);
+                    if(isMinimized) toggleAll();
+                    document.getElementById('global-alarm').play();
                 }
             });
         }, 1000);
 
-        // --- 基礎邏輯 (拖動與保存) ---
-        function makeDraggable(el) {
-            let ox, oy;
-            el.onpointerdown = (e) => {
-                if(e.target.contentEditable === 'true' || e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
-                ox = e.clientX - el.offsetLeft; oy = e.clientY - el.offsetTop;
-                document.onpointermove = (ev) => { el.style.left = (ev.clientX - ox) + 'px'; el.style.top = (ev.clientY - oy) + 'px'; };
-                document.onpointerup = () => { document.onpointermove = null; saveAll(); };
-            };
-        }
-
-        function removeNote(id) { document.getElementById(id).remove(); saveAll(); }
-
-        function saveAll() {
-            const data = [];
-            document.querySelectorAll('.note').forEach(n => {
-                data.push({
-                    id: n.id,
-                    x: parseInt(n.style.left),
-                    y: parseInt(n.style.top),
-                    text: n.querySelector('.note-text').innerText,
-                    color: n.style.backgroundColor,
-                    alarm: n.querySelector('.time-input').value
-                });
-            });
-            localStorage.setItem('vajra_box_v2', JSON.stringify(data));
-        }
-
         window.onload = () => {
-            const saved = JSON.parse(localStorage.getItem('vajra_box_v2'));
+            const saved = JSON.parse(localStorage.getItem('vajra_notes_v3'));
             if(saved) saved.forEach(d => createNote(0, 0, d));
         };
     </script>
