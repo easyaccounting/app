@@ -3,129 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>淨息流 ． 全能金剛藏</title>
     <style>
         :root {
             --bg-gradient: linear-gradient(135deg, #FDFDFD, #F5F2EF);
-            --card-bg: #FFFFFF;
-            --text-main: #58504A;
             --accent-amber: #C1A583; --accent-jade: #82968C; --accent-rose: #CFA4A4;
-            --color-rose-trans: rgba(207, 164, 164, 0.6); /* 胭脂紅琉璃 */
-            --color-amber-trans: rgba(193, 165, 131, 0.6); /* 琥珀金琉璃 */
+            --text-main: #58504A; --text-light: #968E86;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.9);
         }
 
-        * { box-sizing: border-box; touch-action: none; }
-        body { margin: 0; padding: 20px; background: var(--bg-gradient); color: var(--text-main); font-family: -apple-system, sans-serif; overflow: hidden; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        * { box-sizing: border-box; touch-action: none; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; padding: 20px; background: var(--bg-gradient); color: var(--text-main); font-family: -apple-system, "PingFang TC", sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; align-items: center; }
 
-        /* --- 模擬圖 2 的首頁內容 (簡略) --- */
-        .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; max-width: 400px; margin-top: 30px; opacity: 0.3; } /* 模擬背景 */
-        .mock-card { background: white; border-radius: 20px; height: 100px; }
-
-        /* --- 便利貼入口 (Designated Spot) --- */
-        .box-entrance { position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; z-index: 800; }
-        .box-logo { width: 32px; height: 32px; filter: drop-shadow(0 0 5px var(--accent-amber)); cursor: pointer; }
-        .btn-plus { width: 42px; height: 42px; background: var(--accent-amber); border-radius: 50%; border: none; color: white; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(193, 165, 131, 0.3); }
-
-        /* --- 圖 2 下方的金剛藏密室 --- */
-        .diamond-chamber { position: fixed; bottom: 30px; width: 100%; max-width: 400px; background: white; border-radius: 24px; padding: 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-
-        /* --- 【百寶箱分頁】 (Full Screen Modal) --- */
-        .box-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-gradient); display: none; flex-direction: column; align-items: center; z-index: 1000; padding: 20px; animation: slideIn 0.3s ease; }
-        .box-page.active { display: flex; }
-        @keyframes slideIn { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
-        .board { width: 100%; height: 100%; position: relative; overflow: hidden; }
-
-        /* --- 【全能貼紙樣式】與琉璃濾鏡 --- */
-        .note { position: absolute; min-width: 280px; background: rgba(255,255,255,0.4); backdrop-filter: blur(10px); border: 1.5px solid var(--accent-amber); border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); padding: 18px; cursor: move; transition: 0.3s; }
+        /* --- 頂部導航 (模擬圖 5 修改位) --- */
+        .top-nav { width: 100%; max-width: 500px; display: flex; justify-content: space-between; align-items: center; padding: 10px 0; z-index: 2000; }
+        .nav-right { display: flex; gap: 15px; align-items: center; }
         
-        /* 媒體區域 (套用琉璃朧濾鏡) */
-        .media-viewer { width: 100%; border-radius: 12px; margin-bottom: 12px; position: relative; overflow: hidden; }
-        .media-viewer img, .media-viewer video { width: 100%; object-fit: cover; }
-        /* 琉璃層 (絕對乾淨的半透明 overlay) */
-        .media-viewer::after { content: ""; position: absolute; inset: 0; background: linear-gradient(135deg, var(--color-rose-trans), transparent, var(--color-amber-trans)); backdrop-filter: blur(2px); }
+        /* 向量便利貼 Logo 入口 */
+        .box-entrance-btn { width: 40px; height: 40px; background: var(--glass-bg); border-radius: 50%; border: 1px solid var(--glass-border); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
 
-        .note-text { font-size: 1rem; color: var(--text-main); margin-bottom: 10px; min-height: 40px; }
-        .note-canvas { width: 100%; height: 100px; background: rgba(255,255,255,0.2); border-radius: 12px; margin-bottom: 10px; cursor: crosshair; }
-        
-        .note-tools { display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(0,0,0,0.03); padding-top: 10px; }
-        .btn-tool { background: none; border: none; padding: 0; color: #CCC; cursor: pointer; }
-        .datetime-input { font-size: 0.7rem; border: none; background: rgba(0,0,0,0.05); border-radius: 5px; color: var(--text-main); }
+        /* --- 模擬首頁背景卡片 (圖 2 內容) --- */
+        .home-content { width: 100%; max-width: 400px; margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; opacity: 0.2; pointer-events: none; transition: 0.5s; }
+        .mock-card { background: white; border-radius: 24px; height: 120px; }
+        .dimmed { opacity: 0.05; filter: blur(5px); }
+
+        /* --- 便利貼畫布層 (自由亂貼位) --- */
+        #note-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1000; }
+        .note { 
+            position: absolute; width: 260px; background: var(--glass-bg); backdrop-filter: blur(15px);
+            border: 1.5px solid var(--glass-border); border-radius: 28px; padding: 20px;
+            box-shadow: 0 15px 45px rgba(160, 155, 150, 0.15); pointer-events: auto;
+            display: flex; flex-direction: column; animation: popIn 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+        }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        /* 琉璃朦朧濾鏡媒體區 */
+        .media-haze { 
+            width: 100%; border-radius: 18px; margin-bottom: 12px; position: relative; overflow: hidden; height: 120px; 
+            background: #F5F2EF; display: flex; align-items: center; justify-content: center;
+        }
+        .media-haze::after { 
+            content: ""; position: absolute; inset: 0; 
+            background: linear-gradient(135deg, rgba(207,164,164,0.3), transparent, rgba(193,165,131,0.3)); 
+            backdrop-filter: blur(4px);
+        }
+
+        .note-text { width: 100%; border: none; outline: none; background: transparent; font-size: 1rem; color: var(--text-main); min-height: 40px; margin-bottom: 10px; line-height: 1.5; }
+        .note-draw { width: 100%; height: 80px; background: rgba(255,255,255,0.2); border-radius: 12px; margin-bottom: 10px; }
+
+        /* 工具列 */
+        .note-tools { display: flex; align-items: center; gap: 12px; border-top: 1px solid rgba(0,0,0,0.03); padding-top: 12px; }
+        .tool-icon { background: none; border: none; cursor: pointer; color: var(--text-light); transition: 0.2s; }
+        .tool-icon:active { color: var(--accent-amber); transform: scale(1.2); }
+        .date-input { font-size: 0.7rem; border: none; background: rgba(0,0,0,0.05); border-radius: 6px; padding: 2px 6px; color: var(--text-main); }
+
+        /* --- 右下角金剛藏收納 --- */
+        .folder-btn { 
+            position: fixed; bottom: 35px; right: 35px; width: 60px; height: 60px; 
+            background: var(--accent-amber); border-radius: 50%; z-index: 2100;
+            display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(193, 165, 131, 0.4);
+            cursor: pointer; transition: 0.3s;
+        }
+        .minimized { transform: scale(0) !important; opacity: 0 !important; pointer-events: none; }
+
+        /* 收回首頁按鈕 */
+        .home-back { position: fixed; bottom: 35px; left: 35px; width: 60px; height: 60px; background: white; border-radius: 50%; z-index: 2100; display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--accent-amber); cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+
     </style>
 </head>
 <body>
 
-    <div class="mock-grid home-grid"><div class="mock-card"></div><div class="mock-card"></div><div class="mock-card"></div><div class="mock-card"></div></div>
-
-    <div class="box-entrance">
-        <svg class="box-logo" onclick="openBoxPage()" viewBox="0 0 100 100">
-            <rect x="20" y="20" width="60" height="60" rx="6" fill="none" stroke="var(--accent-amber)" stroke-width="2.5"/>
-            <path d="M70 30 L80 20 L80 70 L70 80 L30 80 L20 70" fill="none" stroke="var(--accent-amber)" stroke-width="1.5" opacity="0.6"/>
-            <polygon points="20,20 30,30 20,40" fill="var(--accent-amber)" opacity="0.3"/>
-        </svg>
-        <button class="btn-plus" onclick="createNewNote()">+</button>
-    </div>
-
-    <div class="diamond-chamber"><div style="display:flex; align-items:center; gap:10px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#CCC" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> 進入 ． 金剛藏密室</div><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#CCC" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
-
-    <div class="box-page" id="box-page">
-        <div class="header" style="display:flex; justify-content:space-between; width:100%; border:none; border-bottom:1px solid rgba(0,0,0,0.05);">
-            <div class="title" style="letter-spacing:10px; font-weight:300;">智見百寶箱</div>
-            <div onclick="closeBoxPage()" style="cursor:pointer; opacity:0.3">✕</div>
+    <div class="top-nav">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-light)" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+        
+        <div class="nav-right">
+            <div class="box-entrance-btn" onclick="addNote()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-amber)" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line>
+                </svg>
+            </div>
         </div>
-        <div class="board" id="board"></div>
     </div>
+
+    <div class="home-content" id="home-bg">
+        <div class="mock-card"></div><div class="mock-card"></div>
+        <div class="mock-card"></div><div class="mock-card"></div>
+    </div>
+
+    <div id="note-canvas"></div>
+
+    <div class="home-back" onclick="goHome()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-amber)" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+    </div>
+
+    <div class="folder-btn" onclick="toggleVault()">
+        <svg id="folder-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+    </div>
+
+    <audio id="alarm-bell" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
 
     <script>
-        // --- 本機資料庫 (模拟 IndexedDB 核心邏輯) ---
-        const DB_KEY = 'vajra_omni_box';
-        let omniDB = JSON.parse(localStorage.getItem(DB_KEY)) || [];
+        const canvas = document.getElementById('note-canvas');
+        const homeBg = document.getElementById('home-bg');
+        let isVaultOpen = false;
 
-        function openBoxPage() { document.getElementById('box-page').classList.add('active'); render(); }
-        function closeBoxPage() { document.getElementById('box-page').classList.remove('active'); }
+        // --- 1. 隨意貼生成邏輯 ---
+        function addNote(data = null) {
+            const id = data ? data.id : `n-${Date.now()}`;
+            const note = document.createElement('div');
+            note.className = 'note';
+            note.id = id;
+            note.style.left = data ? data.x + 'px' : (Math.random() * 50 + 50) + 'px';
+            note.style.top = data ? data.y + 'px' : (Math.random() * 100 + 150) + 'px';
+            note.style.zIndex = 1001;
 
-        async function createNewNote() {
-            // 這個核心邏輯會啟動相機、錄音，整合手繪與打字
-            // 存入 IndexedDB 倉庫。這裡簡化為生成一張全能卡片。
-            const newNote = { id: Date.now(), x: 50, y: 120, text: '覺察當下...', type: 'OMNI' };
-            omniDB.unshift(newNote);
-            localStorage.setItem(DB_KEY, JSON.stringify(omniDB));
-            render();
-            if(!document.getElementById('box-page').classList.contains('active')) openBoxPage();
-        }
-
-        // --- 琉璃般的朦朧濾鏡演繹 ---
-        function render() {
-            const container = document.getElementById('board');
-            container.innerHTML = omniDB.map(data => `
-                <div class="note" style="left:${data.x}px; top:${data.y}px;">
-                    
-                    <div class="card-header" style="border-bottom:1px solid rgba(0,0,0,0.03); margin-bottom:15px; padding-bottom:5px;">
-                        <span class="card-type" style="color:var(--accent-jade)">Vajra- Omni</span>
-                        <input type="datetime-local" class="datetime-input" value="${data.datetime || ''}">
-                    </div>
-
-                    <div class="media-viewer">
-                        <img src="https://via.placeholder.com/280x150/F5F2EF/F5F2EF?text=Media" alt="Media Placeholder">
-                    </div>
-
-                    <div class="note-text" contenteditable="true">${data.text}</div>
-                    
-                    <canvas class="note-canvas"></canvas>
-
-                    <div class="note-tools">
-                        <button class="btn-tool"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></button> <button class="btn-tool"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line></svg></button> <button class="btn-tool"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg></button> <button class="btn-tool" style="color:var(--accent-gold); margin-left:auto;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg></button> </div>
+            note.innerHTML = `
+                <div class="media-haze">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1" opacity="0.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
                 </div>
-            `).join('');
-            initInteractions(); // 初始化拖拽與 Canvas
+                <div class="note-text" contenteditable="true" oninput="save()">點擊紀錄...</div>
+                <canvas class="note-draw"></canvas>
+                <div class="note-tools">
+                    <button class="tool-icon" onclick="takePhoto('${id}')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path></svg></button>
+                    <button class="tool-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path></svg></button>
+                    <input type="time" class="date-input" onchange="save()">
+                    <span style="margin-left:auto; cursor:pointer; opacity:0.2" onclick="deleteNote('${id}')">✕</span>
+                </div>
+            `;
+
+            canvas.appendChild(note);
+            makeDraggable(note);
+            initCanvas(note.querySelector('.note-draw'));
+            homeBg.classList.add('dimmed');
+            save();
         }
-        
-        // 拖拽與畫布初始化代碼 (簡化)
-        function initInteractions() { 
-            // ... 同之前的邏輯 ...
+
+        // --- 2. 自由拖動邏輯 (支援手機觸控) ---
+        function makeDraggable(el) {
+            let ox, oy;
+            el.onpointerdown = e => {
+                if(e.target.contentEditable === 'true' || e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.tagName === 'CANVAS') return;
+                el.style.zIndex = 1500;
+                ox = e.clientX - el.offsetLeft; oy = e.clientY - el.offsetTop;
+                document.onpointermove = ev => {
+                    el.style.left = (ev.clientX - ox) + 'px';
+                    el.style.top = (ev.clientY - oy) + 'px';
+                };
+                document.onpointerup = () => {
+                    document.onpointermove = null;
+                    el.style.zIndex = 1001;
+                    save();
+                };
+            };
         }
+
+        // --- 3. 手寫畫布邏輯 ---
+        function initCanvas(cvs) {
+            const ctx = cvs.getContext('2d');
+            cvs.width = cvs.offsetWidth; cvs.height = cvs.offsetHeight;
+            ctx.strokeStyle = '#C1A583'; ctx.lineWidth = 2; ctx.lineCap = 'round';
+            let drawing = false;
+            cvs.onpointerdown = e => { drawing = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); };
+            cvs.onpointermove = e => { if(drawing) { ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); } };
+            cvs.onpointerup = () => { drawing = false; save(); };
+        }
+
+        // --- 4. 收納與回歸邏輯 ---
+        function toggleVault() {
+            isVaultOpen = !isVaultOpen;
+            const notes = document.querySelectorAll('.note');
+            notes.forEach(n => isVaultOpen ? n.classList.add('minimized') : n.classList.remove('minimized'));
+            document.getElementById('folder-svg').style.stroke = isVaultOpen ? "var(--accent-jade)" : "white";
+        }
+
+        function goHome() {
+            const notes = document.querySelectorAll('.note');
+            notes.forEach(n => n.classList.add('minimized'));
+            homeBg.classList.remove('dimmed');
+            isVaultOpen = true;
+            document.getElementById('folder-svg').style.stroke = "var(--accent-jade)";
+        }
+
+        function deleteNote(id) { document.getElementById(id).remove(); save(); }
+
+        // --- 5. 本地記憶 (金剛藏) ---
+        function save() {
+            const data = Array.from(document.querySelectorAll('.note')).map(n => ({
+                id: n.id, x: parseInt(n.style.left), y: parseInt(n.style.top),
+                text: n.querySelector('.note-text').innerText,
+                alarm: n.querySelector('.date-input').value
+            }));
+            localStorage.setItem('vajra_omni_v5', JSON.stringify(data));
+        }
+
+        window.onload = () => {
+            const saved = JSON.parse(localStorage.getItem('vajra_omni_v5'));
+            if(saved && saved.length > 0) saved.forEach(d => addNote(d));
+        };
     </script>
 </body>
 </html>
