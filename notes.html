@@ -188,7 +188,6 @@
             
             let startX = data ? data.x : Math.max(20, Math.random() * (window.innerWidth - 300));
             let startY = data ? data.y : Math.max(100, Math.random() * (window.innerHeight - 400));
-            
             startX = Math.max(0, Math.min(startX, window.innerWidth - 100));
             startY = Math.max(80, Math.min(startY, window.innerHeight - 100));
 
@@ -202,16 +201,30 @@
                 }
             };
 
-            let mediaHTML = `<div class="media-container empty" id="media-box-${id}"><div class="recording-badge" id="badge-${id}"><span style="width:6px;height:6px;background:white;border-radius:50%;"></span> <span id="timer-text-${id}">15s</span></div></div>`;
-            if (data && data.mediaType === 'video') mediaHTML = `<div class="media-container" id="media-box-${id}"><video src="${data.mediaData}" controls playsinline class="media-player"></video></div>`;
-            if (data && data.mediaType === 'audio') mediaHTML = `<div class="media-container" style="height:60px;" id="media-box-${id}"><audio src="${data.mediaData}" controls class="media-player"></audio></div>`;
+            // 修正：將 badge 標籤獨立出來，保證覆蓋時不會被刪掉
+            let mediaContent = `<svg class="empty-icon" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" opacity="0.6"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`;
+            let boxClass = "media-container empty";
+            let boxStyle = "";
+
+            if (data && data.mediaType === 'video') {
+                mediaContent = `<video src="${data.mediaData}" controls playsinline class="media-player"></video>`;
+                boxClass = "media-container"; boxStyle = "height: 120px;";
+            } else if (data && data.mediaType === 'audio') {
+                mediaContent = `<audio src="${data.mediaData}" controls class="media-player"></audio>`;
+                boxClass = "media-container"; boxStyle = "height: 60px;";
+            }
 
             note.innerHTML = `
                 <div class="delete-btn" onclick="deleteNoteFromDB('${id}')" title="刪除便利貼">✕</div>
                 <div class="drag-handle" title="按住圖釘拖曳">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"></circle><line x1="12" y1="11" x2="12" y2="21"></line><line x1="9" y1="21" x2="15" y2="21"></line></svg>
                 </div>
-                ${mediaHTML}
+                
+                <div class="${boxClass}" id="media-box-${id}" style="${boxStyle}">
+                    <div class="recording-badge" id="badge-${id}"><span style="width:6px;height:6px;background:white;border-radius:50%;"></span> <span id="timer-text-${id}">15s</span></div>
+                    ${mediaContent}
+                </div>
+                
                 <div class="note-text" contenteditable="true" onblur="saveNoteToDB('${id}')">${data ? data.text : '點擊紀錄...'}</div>
                 <canvas class="note-draw"></canvas>
                 
@@ -264,11 +277,9 @@
                 handle.onpointermove = ev => { 
                     let newX = ev.clientX - ox; 
                     let newY = ev.clientY - oy; 
-
                     newY = Math.max(80, newY);
                     newY = Math.min(newY, window.innerHeight - 80);
                     newX = Math.max(-200, Math.min(newX, window.innerWidth - 80)); 
-
                     el.style.left = newX + 'px'; 
                     el.style.top = newY + 'px'; 
                 };
@@ -318,13 +329,15 @@
 
         let activeRecorders = {}; let recordTimers = {};
         
-        // --- 優化後的手機相機與麥克風相容性設定 ---
         async function toggleRecord(id, type) {
+            if (window.location.protocol === 'file:') {
+                alert('安全性限制：瀏覽器禁止在單機檔案中使用相機與麥克風。\n請推上 GitHub Pages 測試。');
+                return;
+            }
             const btn = document.getElementById(`btn-${type}-${id}`);
             if (activeRecorders[id]) { stopRecording(id, type); return; }
 
             try {
-                // 優化：針對手機優先開啟前置鏡頭
                 const constraints = type === 'video' 
                     ? { video: { facingMode: 'user' }, audio: true } 
                     : { audio: true };
@@ -344,7 +357,6 @@
                     stream.getTracks().forEach(track => track.stop());
                     delete activeRecorders[id]; clearInterval(recordTimers[id]);
 
-                    // 優化：不強制鎖定 webm，讓手機自動選擇最適合的格式 (如 mp4)
                     const mimeType = mediaRecorder.mimeType || (type === 'video' ? 'video/mp4' : 'audio/mp4');
                     const blob = new Blob(chunks, { type: mimeType });
                     const reader = new FileReader();
@@ -355,14 +367,26 @@
                         const box = document.getElementById(`media-box-${id}`);
                         box.classList.remove('empty');
                         
-                        // 優化：iPhone 影片需要加上 playsinline 才能正常預覽
+                        // 修正：刪除舊的播放器或預設 SVG，但不刪除 badge
+                        const oldMedia = box.querySelector('.media-player');
+                        if (oldMedia) oldMedia.remove();
+                        const oldSvg = box.querySelector('.empty-icon');
+                        if (oldSvg) oldSvg.remove();
+
+                        // 建立新的播放器元素
+                        const mediaEl = document.createElement(type === 'video' ? 'video' : 'audio');
+                        mediaEl.src = reader.result;
+                        mediaEl.controls = true;
+                        mediaEl.className = 'media-player';
+                        
                         if (type === 'video') { 
+                            mediaEl.playsInline = true;
                             box.style.height = '120px'; 
-                            box.innerHTML = `<video src="${reader.result}" controls playsinline class="media-player"></video>`; 
                         } else { 
                             box.style.height = '60px'; 
-                            box.innerHTML = `<audio src="${reader.result}" controls class="media-player"></audio>`; 
                         }
+                        box.appendChild(mediaEl);
+                        
                         saveNoteToDB(id);
                     };
                     reader.readAsDataURL(blob);
@@ -373,7 +397,6 @@
                 recordTimers[id] = setInterval(() => { timeLeft--; document.getElementById(`timer-text-${id}`).innerText = `${timeLeft}s`; if (timeLeft <= 0) stopRecording(id, type); }, 1000);
                 
             } catch (err) { 
-                // 優化：跳出具體的錯誤原因，讓我們知道是哪裡卡住了
                 alert('無法開啟相機/麥克風！原因：' + err.message); 
             }
         }
