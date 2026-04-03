@@ -25,13 +25,12 @@
 
         #note-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1000; overflow: hidden; }
         
-        /* 四國顏色主題變數 */
         .note { 
             --n-bg: rgba(255, 255, 255, 0.7); 
             --n-accent: var(--accent-amber);
             position: absolute; width: 280px; 
             background: var(--n-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border: 1.5px solid var(--glass-border); border-radius: 28px; padding: 15px 20px 20px;
+            border: 1.5px solid var(--glass-border); border-radius: 28px; padding: 10px 20px 20px;
             box-shadow: 0 15px 45px rgba(160, 155, 150, 0.2); pointer-events: auto;
             display: flex; flex-direction: column; animation: popIn 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
             transition: transform 0.3s, opacity 0.3s, width 0.3s, height 0.3s, top 0.3s, left 0.3s, background 0.3s;
@@ -42,14 +41,18 @@
 
         @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        /* 圖釘與拖曳把手 */
-        .drag-handle { width: 100%; height: 30px; display: flex; justify-content: center; align-items: flex-start; cursor: grab; color: var(--n-accent); margin-bottom: 5px; opacity: 0.8; transition: 0.2s; }
+        /* --- 優化後的拖曳把手 (圖釘) --- */
+        .drag-handle { 
+            width: 100%; height: 35px; /* 加大觸控範圍 */
+            display: flex; justify-content: center; align-items: flex-start; 
+            cursor: grab; color: var(--n-accent); opacity: 0.8; transition: 0.2s; 
+            margin-bottom: 5px; touch-action: none; /* 防止滑動時螢幕跟著滾 */
+        }
+        .drag-handle * { pointer-events: none; } /* 避免 SVG 干擾點擊判定 */
         .drag-handle:active { cursor: grabbing; opacity: 1; transform: scale(1.1); }
         
-        /* 滿版放大樣式 */
         .note.expanded { top: env(safe-area-inset-top, 20px) !important; left: 5% !important; width: 90% !important; height: calc(100dvh - env(safe-area-inset-top, 20px) - 20px) !important; z-index: 3000 !important; }
 
-        /* 警告閃爍動畫 */
         .note.glowing { animation: pulseWarning 1.5s infinite; border-color: var(--n-accent); }
         @keyframes pulseWarning { 0% { box-shadow: 0 0 0 0 rgba(203, 163, 122, 0.6); } 70% { box-shadow: 0 0 0 15px rgba(203, 163, 122, 0); } 100% { box-shadow: 0 0 0 0 rgba(203, 163, 122, 0); } }
 
@@ -68,7 +71,6 @@
         .tool-icon:active { transform: scale(0.9); }
         .date-input { font-size: 0.75rem; border: none; background: rgba(255,255,255,0.6); border-radius: 6px; padding: 4px 6px; color: var(--text-main); font-family: inherit; width: 65px; border: 1px solid var(--glass-border); }
 
-        /* 四色調色盤 */
         .color-palette { display: flex; gap: 5px; align-items: center; margin-right: 5px; }
         .color-dot { width: 14px; height: 14px; border-radius: 50%; cursor: pointer; border: 1.5px solid rgba(255,255,255,0.9); box-shadow: 0 2px 4px rgba(0,0,0,0.08); transition: 0.2s; }
         .color-dot:active { transform: scale(0.8); }
@@ -111,7 +113,6 @@
         const canvasContainer = document.getElementById('note-canvas');
         let isVaultOpen = true;
 
-        // --- 無版權電子音 API ---
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function playBeep() {
             if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -122,15 +123,13 @@
                 osc.connect(gainNode); gainNode.connect(audioCtx.destination);
                 osc.start(audioCtx.currentTime + timeOffset); osc.stop(audioCtx.currentTime + timeOffset + 0.15);
             };
-            playTone(0); playTone(0.3); // 兩聲短嗶
+            playTone(0); playTone(0.3);
         }
 
-        // --- IndexedDB 核心資料庫 ---
         const DB_NAME = "VajraOmniDB";
         let db;
-
         function initDB(callback) {
-            const request = indexedDB.open(DB_NAME, 2); // 版本升級以支援 theme
+            const request = indexedDB.open(DB_NAME, 2);
             request.onupgradeneeded = (e) => {
                 db = e.target.result;
                 if (!db.objectStoreNames.contains('notes')) db.createObjectStore('notes', { keyPath: 'id' });
@@ -149,17 +148,12 @@
             if(!db) return;
             const el = document.getElementById(id);
             if(!el) return;
-
             const cvs = el.querySelector('.note-draw');
             const data = {
-                id: id,
-                theme: el.dataset.theme || 'default',
+                id: id, theme: el.dataset.theme || 'default',
                 x: parseInt(el.style.left) || 20, y: parseInt(el.style.top) || 100,
-                text: el.querySelector('.note-text').innerText,
-                alarm: el.querySelector('.date-input').value,
-                drawing: cvs.toDataURL(),
-                mediaType: el.dataset.mediaType || 'none',
-                mediaData: el.dataset.mediaData || null,
+                text: el.querySelector('.note-text').innerText, alarm: el.querySelector('.date-input').value,
+                drawing: cvs.toDataURL(), mediaType: el.dataset.mediaType || 'none', mediaData: el.dataset.mediaData || null,
                 isNotified: el.dataset.isNotified === 'true'
             };
             db.transaction('notes', 'readwrite').objectStore('notes').put(data);
@@ -170,32 +164,23 @@
             if(db) db.transaction('notes', 'readwrite').objectStore('notes').delete(id);
         }
 
-        // --- 切換主題顏色 ---
         function changeTheme(id, theme) {
             const note = document.getElementById(id);
-            note.className = `note theme-${theme}`;
-            note.dataset.theme = theme;
-            
-            // 根據主題改變畫筆顏色
+            note.className = `note theme-${theme}`; note.dataset.theme = theme;
             const cvs = note.querySelector('.note-draw');
             const colorMap = { 'default': '#C1A583', 'pink': '#CFA4A4', 'green': '#82968C', 'blue': '#8BA9B4' };
             cvs.getContext('2d').strokeStyle = colorMap[theme] || '#C1A583';
-            
             saveNoteToDB(id);
         }
 
-        // --- 隨意貼生成與互動 ---
         function addNote(data = null) {
             const id = data ? data.id : `n-${Date.now()}`;
             const theme = data && data.theme ? data.theme : 'default';
             const note = document.createElement('div');
             
-            note.className = `note theme-${theme}`;
-            note.id = id;
-            note.dataset.theme = theme;
-            note.dataset.mediaType = data ? data.mediaType : 'none';
-            note.dataset.mediaData = data ? data.mediaData : '';
-            note.dataset.isNotified = data && data.isNotified ? 'true' : 'false';
+            note.className = `note theme-${theme}`; note.id = id;
+            note.dataset.theme = theme; note.dataset.mediaType = data ? data.mediaType : 'none';
+            note.dataset.mediaData = data ? data.mediaData : ''; note.dataset.isNotified = data && data.isNotified ? 'true' : 'false';
             
             note.style.left = data ? data.x + 'px' : Math.max(20, Math.random() * (window.innerWidth - 300)) + 'px';
             note.style.top = data ? data.y + 'px' : Math.max(100, Math.random() * (window.innerHeight - 400)) + 'px';
@@ -203,28 +188,18 @@
 
             note.onclick = (e) => {
                 if (note.classList.contains('glowing') && e.target.tagName !== 'INPUT') {
-                    note.classList.remove('glowing');
-                    note.dataset.isNotified = 'true';
-                    saveNoteToDB(id);
+                    note.classList.remove('glowing'); note.dataset.isNotified = 'true'; saveNoteToDB(id);
                 }
             };
 
-            let mediaHTML = `<div class="media-container empty" id="media-box-${id}">
-                <div class="recording-badge" id="badge-${id}"><span style="width:6px;height:6px;background:white;border-radius:50%;"></span> <span id="timer-text-${id}">15s</span></div>
-            </div>`;
-
+            let mediaHTML = `<div class="media-container empty" id="media-box-${id}"><div class="recording-badge" id="badge-${id}"><span style="width:6px;height:6px;background:white;border-radius:50%;"></span> <span id="timer-text-${id}">15s</span></div></div>`;
             if (data && data.mediaType === 'video') mediaHTML = `<div class="media-container" id="media-box-${id}"><video src="${data.mediaData}" controls class="media-player"></video></div>`;
             if (data && data.mediaType === 'audio') mediaHTML = `<div class="media-container" style="height:60px;" id="media-box-${id}"><audio src="${data.mediaData}" controls class="media-player"></audio></div>`;
 
             note.innerHTML = `
                 <div class="drag-handle" title="按住圖釘拖曳">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="7" r="4"></circle>
-                        <line x1="12" y1="11" x2="12" y2="21"></line>
-                        <line x1="9" y1="21" x2="15" y2="21"></line>
-                    </svg>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"></circle><line x1="12" y1="11" x2="12" y2="21"></line><line x1="9" y1="21" x2="15" y2="21"></line></svg>
                 </div>
-                
                 ${mediaHTML}
                 <div class="note-text" contenteditable="true" onblur="saveNoteToDB('${id}')">${data ? data.text : '點擊紀錄...'}</div>
                 <canvas class="note-draw"></canvas>
@@ -242,6 +217,7 @@
                         <button class="tool-icon" id="btn-audio-${id}" onclick="toggleRecord('${id}', 'audio')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path></svg></button>
                         <button class="tool-icon" onclick="toggleExpand('${id}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg></button>
                         <input type="time" class="date-input" value="${data && data.alarm ? data.alarm : ''}" onchange="resetNotification('${id}')">
+                        <span style="cursor:pointer; font-size:1.1rem; color:var(--text-light); padding-left: 4px;" onclick="deleteNoteFromDB('${id}')">✕</span>
                     </div>
                 </div>
             `;
@@ -264,30 +240,32 @@
             if(!data) saveNoteToDB(id);
         }
 
-        // --- 拖曳邏輯 (僅限圖釘觸發) ---
+        // --- 優化後的圖釘拖曳邏輯 ---
         function makeDraggable(el, id) {
             const handle = el.querySelector('.drag-handle');
             let ox, oy;
             handle.onpointerdown = e => {
-                if(el.classList.contains('expanded')) return; // 放大模式禁止拖曳
+                if(el.classList.contains('expanded')) return;
                 
+                // 鎖定游標，確保手指滑出圖釘也能繼續拖曳
+                handle.setPointerCapture(e.pointerId);
                 el.style.zIndex = 1500;
                 ox = e.clientX - el.offsetLeft; oy = e.clientY - el.offsetTop;
                 
-                document.onpointermove = ev => { 
+                handle.onpointermove = ev => { 
                     el.style.left = (ev.clientX - ox) + 'px'; 
                     el.style.top = (ev.clientY - oy) + 'px'; 
                 };
-                document.onpointerup = () => { 
-                    document.onpointermove = null; 
-                    document.onpointerup = null;
+                handle.onpointerup = (ev) => { 
+                    handle.onpointermove = null; 
+                    handle.onpointerup = null;
+                    handle.releasePointerCapture(ev.pointerId); // 釋放游標鎖定
                     el.style.zIndex = 1001; 
                     saveNoteToDB(id); 
                 };
             };
         }
 
-        // --- 滿版放大/縮小 ---
         function toggleExpand(id) {
             const note = document.getElementById(id);
             note.classList.toggle('expanded');
@@ -303,7 +281,6 @@
             }, 350);
         }
 
-        // --- 畫布繪圖 ---
         function initCanvas(cvs, id) {
             const ctx = cvs.getContext('2d');
             const note = document.getElementById(id);
@@ -323,9 +300,12 @@
             cvs.ontouchstart = start; cvs.ontouchmove = draw; cvs.ontouchend = stop;
         }
 
-        // --- 限制時間錄製引擎 (最多15秒) ---
         let activeRecorders = {}; let recordTimers = {};
         async function toggleRecord(id, type) {
+            if (window.location.protocol === 'file:') {
+                alert('安全性限制：瀏覽器禁止在單機檔案中使用相機與麥克風。\n請推上 GitHub Pages 測試。');
+                return;
+            }
             const btn = document.getElementById(`btn-${type}-${id}`);
             if (activeRecorders[id]) { stopRecording(id, type); return; }
 
@@ -369,7 +349,6 @@
             }
         }
 
-        // --- 警告閃爍與時間檢查 ---
         function resetNotification(id) {
             const note = document.getElementById(id);
             note.dataset.isNotified = 'false'; note.classList.remove('glowing');
