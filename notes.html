@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>淨息流 ． 便利貼</title>
+    <title>淨息流 ． 全能便利貼</title>
     <style>
         :root {
-            /* 淨息流主色系 */
             --bg-gradient: linear-gradient(135deg, #FDFDFD, #F5F2EF);
             --glass-bg: rgba(255, 255, 255, 0.65);
             --glass-border: rgba(255, 255, 255, 0.9);
             --text-main: #58504A; --text-light: #968E86;
-            --accent-amber: #C1A583; --accent-jade: #82968C;
+            --accent-amber: #C1A583; --accent-jade: #82968C; --accent-red: #CFA4A4;
             --shadow-soft: 0 10px 40px rgba(160, 155, 150, 0.12);
         }
 
@@ -25,18 +24,10 @@
         }
 
         /* --- 頂部導航 --- */
-        .top-nav { 
-            width: 100%; padding: max(15px, env(safe-area-inset-top)) 20px 15px; 
-            display: flex; justify-content: center; background: transparent; z-index: 2000; position: fixed; top: 0;
-        }
+        .top-nav { width: 100%; padding: max(15px, env(safe-area-inset-top)) 20px 15px; display: flex; justify-content: center; z-index: 2000; position: fixed; top: 0; }
         .nav-content { width: 100%; max-width: 720px; display: flex; justify-content: space-between; align-items: center; }
-        .nav-btn { 
-            display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; 
-            border-radius: 50%; background: var(--glass-bg); backdrop-filter: blur(12px); 
-            border: 1px solid var(--glass-border); color: var(--text-main); 
-            box-shadow: var(--shadow-soft); cursor: pointer; transition: all 0.2s; 
-        }
-        .nav-btn:active { transform: scale(0.92); background: rgba(255,255,255,0.9); }
+        .nav-btn { display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%; background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); color: var(--text-main); box-shadow: var(--shadow-soft); cursor: pointer; transition: 0.2s; }
+        .nav-btn:active { transform: scale(0.92); }
         .nav-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
         .page-title { font-size: 1.15rem; font-weight: 500; letter-spacing: 3px; color: var(--text-main); }
 
@@ -44,7 +35,7 @@
         #note-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1000; overflow: hidden; }
         
         .note { 
-            position: absolute; width: 260px; background: var(--glass-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            position: absolute; width: 280px; background: var(--glass-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             border: 1.5px solid var(--glass-border); border-radius: 28px; padding: 20px;
             box-shadow: 0 15px 45px rgba(160, 155, 150, 0.2); pointer-events: auto;
             display: flex; flex-direction: column; animation: popIn 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
@@ -52,57 +43,53 @@
         }
         @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        /* 琉璃朦朧濾鏡媒體區 */
-        .media-haze { 
-            width: 100%; border-radius: 18px; margin-bottom: 12px; position: relative; overflow: hidden; height: 100px; 
-            background: #F5F2EF; display: flex; align-items: center; justify-content: center;
+        /* 多媒體展示區 */
+        .media-container { 
+            width: 100%; border-radius: 18px; margin-bottom: 12px; position: relative; overflow: hidden; height: 120px; 
+            background: #F5F2EF; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
         }
-        .media-haze::after { 
+        .media-container.empty::after { 
             content: ""; position: absolute; inset: 0; 
             background: linear-gradient(135deg, rgba(207,164,164,0.3), transparent, rgba(193,165,131,0.3)); 
-            backdrop-filter: blur(4px);
         }
+        .media-player { width: 100%; height: 100%; object-fit: cover; border-radius: 18px; z-index: 2; }
+        
+        /* 錄製狀態提示 */
+        .recording-badge { position: absolute; top: 10px; right: 10px; background: rgba(207,164,164,0.9); color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.7rem; z-index: 10; display: none; align-items: center; gap: 4px; animation: blink 1s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
         .note-text { width: 100%; border: none; outline: none; background: transparent; font-size: 0.95rem; color: var(--text-main); min-height: 40px; margin-bottom: 10px; line-height: 1.5; }
         
-        /* 修正：給定固定尺寸確保畫布繪圖正確 */
-        .note-draw { width: 216px; height: 80px; background: rgba(255,255,255,0.4); border-radius: 12px; margin-bottom: 10px; border: 1px dashed rgba(193, 165, 131, 0.3); touch-action: none; }
+        /* 繪圖區 */
+        .note-draw { width: 100%; height: 100px; background: rgba(255,255,255,0.4); border-radius: 12px; margin-bottom: 10px; border: 1px dashed rgba(193, 165, 131, 0.4); touch-action: none; cursor: crosshair; }
 
         /* 工具列 */
-        .note-tools { display: flex; align-items: center; gap: 12px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 12px; }
-        .tool-icon { background: none; border: none; cursor: pointer; color: var(--text-light); transition: 0.2s; padding: 0; display: flex;}
-        .tool-icon:active { color: var(--accent-amber); transform: scale(1.2); }
-        .date-input { font-size: 0.75rem; border: none; background: rgba(0,0,0,0.05); border-radius: 6px; padding: 4px 6px; color: var(--text-main); font-family: inherit; }
+        .note-tools { display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 12px; }
+        .tool-icon { background: rgba(255,255,255,0.5); border: 1px solid var(--glass-border); border-radius: 50%; width: 32px; height: 32px; display: flex; justify-content: center; align-items: center; cursor: pointer; color: var(--text-light); transition: 0.2s; }
+        .tool-icon:active { color: var(--accent-amber); transform: scale(0.9); background: white; }
+        .tool-icon.recording { color: var(--accent-red); border-color: var(--accent-red); background: rgba(207,164,164,0.1); }
+        .date-input { font-size: 0.75rem; border: none; background: rgba(0,0,0,0.05); border-radius: 6px; padding: 4px; color: var(--text-main); font-family: inherit; width: 70px; }
 
         /* --- 右下角金剛藏收納 --- */
-        .folder-btn { 
-            position: fixed; bottom: 35px; right: 35px; width: 60px; height: 60px; 
-            background: var(--accent-amber); border-radius: 50%; z-index: 2100;
-            display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(193, 165, 131, 0.4);
-            cursor: pointer; transition: 0.3s; border: none;
-        }
+        .folder-btn { position: fixed; bottom: 35px; right: 35px; width: 60px; height: 60px; background: var(--accent-amber); border-radius: 50%; z-index: 2100; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(193, 165, 131, 0.4); cursor: pointer; transition: 0.3s; border: none; }
         .folder-btn:active { transform: scale(0.9); }
         .minimized { transform: scale(0) translateY(200px) !important; opacity: 0 !important; pointer-events: none; }
-
     </style>
 </head>
 <body>
 
     <div class="top-nav">
         <div class="nav-content">
-            <div style="width: 42px; display: flex; justify-content: flex-start;">
+            <div style="width: 42px;">
                 <div class="nav-btn" onclick="window.location.href='index.html'">
-                    <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                    <svg viewBox="0 0 24 24" stroke="currentColor"><polyline points="15 18 9 12 15 6"></polyline></svg>
                 </div>
             </div>
-            
-            <div class="page-title">靈感隨意貼</div>
-
-            <div style="width: 42px; display: flex; justify-content: flex-end;">
+            <div class="page-title">全能便利貼</div>
+            <div style="width: 42px;">
                 <div class="nav-btn" onclick="addNote()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent-amber)" stroke-width="2">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
                         <line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line>
                     </svg>
                 </div>
@@ -120,124 +107,233 @@
         const canvasContainer = document.getElementById('note-canvas');
         let isVaultOpen = true;
 
-        // --- 1. 隨意貼生成邏輯 ---
+        // ================= 1. IndexedDB 核心資料庫 (解決影音儲存限制) =================
+        const DB_NAME = "VajraOmniDB";
+        let db;
+
+        function initDB(callback) {
+            const request = indexedDB.open(DB_NAME, 1);
+            request.onupgradeneeded = (e) => {
+                db = e.target.result;
+                if (!db.objectStoreNames.contains('notes')) {
+                    db.createObjectStore('notes', { keyPath: 'id' });
+                }
+            };
+            request.onsuccess = (e) => { db = e.target.result; callback(); };
+            request.onerror = (e) => console.error("IndexedDB 啟動失敗", e);
+        }
+
+        function loadNotesFromDB() {
+            const tx = db.transaction('notes', 'readonly');
+            const store = tx.objectStore('notes');
+            store.getAll().onsuccess = (e) => {
+                const notes = e.target.result;
+                notes.forEach(data => addNote(data));
+            };
+        }
+
+        function saveNoteToDB(id) {
+            if(!db) return;
+            const el = document.getElementById(id);
+            if(!el) return;
+
+            // 抓取畫布影像
+            const cvs = el.querySelector('.note-draw');
+            const drawData = cvs.toDataURL(); 
+
+            // 檢查多媒體 (錄影或錄音)
+            let mediaType = 'none';
+            let mediaData = null;
+            const videoEl = el.querySelector('video.media-player');
+            const audioEl = el.querySelector('audio.media-player');
+            
+            if (videoEl && videoEl.src && !videoEl.src.startsWith('blob:')) {
+                mediaType = 'video'; mediaData = videoEl.src;
+            } else if (audioEl && audioEl.src && !audioEl.src.startsWith('blob:')) {
+                mediaType = 'audio'; mediaData = audioEl.src;
+            }
+
+            const data = {
+                id: id,
+                x: parseInt(el.style.left) || 20,
+                y: parseInt(el.style.top) || 100,
+                text: el.querySelector('.note-text').innerText,
+                alarm: el.querySelector('.date-input').value,
+                drawing: drawData,
+                mediaType: mediaType,
+                mediaData: mediaData
+            };
+
+            const tx = db.transaction('notes', 'readwrite');
+            tx.objectStore('notes').put(data);
+        }
+
+        function deleteNoteFromDB(id) {
+            document.getElementById(id).remove();
+            if(db) db.transaction('notes', 'readwrite').objectStore('notes').delete(id);
+        }
+
+        // ================= 2. 隨意貼生成邏輯 =================
         function addNote(data = null) {
             const id = data ? data.id : `n-${Date.now()}`;
             const note = document.createElement('div');
             note.className = 'note';
             note.id = id;
             
-            // 如果沒有座標，隨機散落在畫面中間區域
             let startX = data ? data.x : Math.max(20, Math.random() * (window.innerWidth - 300));
             let startY = data ? data.y : Math.max(100, Math.random() * (window.innerHeight - 400));
             
-            note.style.left = startX + 'px';
-            note.style.top = startY + 'px';
-            note.style.zIndex = 1001;
+            note.style.left = startX + 'px'; note.style.top = startY + 'px'; note.style.zIndex = 1001;
+
+            // 判斷多媒體呈現區
+            let mediaHTML = `<div class="media-container empty" id="media-box-${id}">
+                <div class="recording-badge" id="badge-${id}"><span style="width:6px;height:6px;background:white;border-radius:50%;"></span> 錄製中</div>
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" opacity="0.6"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path></svg>
+            </div>`;
+
+            if (data && data.mediaType === 'video') {
+                mediaHTML = `<div class="media-container" id="media-box-${id}"><video src="${data.mediaData}" controls class="media-player"></video></div>`;
+            } else if (data && data.mediaType === 'audio') {
+                mediaHTML = `<div class="media-container" style="height: 60px;" id="media-box-${id}"><audio src="${data.mediaData}" controls class="media-player"></audio></div>`;
+            }
 
             note.innerHTML = `
-                <div class="media-haze">
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" opacity="0.6"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-                </div>
-                <div class="note-text" contenteditable="true" oninput="saveNotes()">${data ? data.text : '點擊紀錄...'}</div>
-                <canvas class="note-draw" width="216" height="80"></canvas>
+                ${mediaHTML}
+                <div class="note-text" contenteditable="true" onblur="saveNoteToDB('${id}')">${data ? data.text : '點擊打字...'}</div>
+                <canvas class="note-draw" width="236" height="100"></canvas>
                 <div class="note-tools">
-                    <button class="tool-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path></svg></button>
-                    <button class="tool-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path></svg></button>
-                    <input type="time" class="date-input" value="${data ? data.alarm : ''}" onchange="saveNotes()">
-                    <span style="margin-left:auto; cursor:pointer; opacity:0.3; font-size:1.2rem;" onclick="deleteNote('${id}')">✕</span>
+                    <button class="tool-icon" id="btn-video-${id}" onclick="toggleRecord('${id}', 'video')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg></button>
+                    <button class="tool-icon" id="btn-audio-${id}" onclick="toggleRecord('${id}', 'audio')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path></svg></button>
+                    <input type="time" class="date-input" value="${data && data.alarm ? data.alarm : ''}" onchange="saveNoteToDB('${id}')">
+                    <span style="margin-left:auto; cursor:pointer; font-size:1.1rem; color:var(--text-light);" onclick="deleteNoteFromDB('${id}')">✕</span>
                 </div>
             `;
 
             canvasContainer.appendChild(note);
-            makeDraggable(note);
-            initCanvas(note.querySelector('.note-draw'));
+            makeDraggable(note, id);
             
-            // 確保新增時是展開狀態
+            // 初始化畫布並載入舊圖
+            const cvs = note.querySelector('.note-draw');
+            initCanvas(cvs, id);
+            if(data && data.drawing) {
+                const img = new Image();
+                img.onload = () => { cvs.getContext('2d').drawImage(img, 0, 0); };
+                img.src = data.drawing;
+            }
+
             if (!isVaultOpen) toggleVault();
-            saveNotes();
+            if(!data) saveNoteToDB(id);
         }
 
-        // --- 2. 自由拖動邏輯 (支援手機觸控) ---
-        function makeDraggable(el) {
+        // ================= 3. 媒體錄製引擎 (影/音) =================
+        let activeRecorders = {}; // 紀錄目前正在錄製的物件
+
+        async function toggleRecord(id, type) {
+            const btn = document.getElementById(`btn-${type}-${id}`);
+            
+            // 停止錄製
+            if (activeRecorders[id]) {
+                activeRecorders[id].stop();
+                btn.classList.remove('recording');
+                document.getElementById(`badge-${id}`).style.display = 'none';
+                return;
+            }
+
+            // 開始錄製
+            try {
+                const constraints = type === 'video' ? { video: true, audio: true } : { audio: true };
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                const mediaRecorder = new MediaRecorder(stream);
+                const chunks = [];
+
+                btn.classList.add('recording');
+                document.getElementById(`badge-${id}`).style.display = 'flex';
+
+                mediaRecorder.ondataavailable = e => chunks.push(e.data);
+                mediaRecorder.onstop = () => {
+                    // 關閉硬體設備
+                    stream.getTracks().forEach(track => track.stop());
+                    delete activeRecorders[id];
+
+                    // 將 Blob 轉為 Base64 存入 IndexedDB
+                    const blob = new Blob(chunks, { type: type === 'video' ? 'video/webm' : 'audio/webm' });
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        const base64data = reader.result;
+                        const box = document.getElementById(`media-box-${id}`);
+                        box.classList.remove('empty');
+                        if (type === 'video') {
+                            box.style.height = '120px';
+                            box.innerHTML = `<video src="${base64data}" controls class="media-player"></video>`;
+                        } else {
+                            box.style.height = '60px';
+                            box.innerHTML = `<audio src="${base64data}" controls class="media-player"></audio>`;
+                        }
+                        saveNoteToDB(id);
+                    };
+                    reader.readAsDataURL(blob);
+                };
+
+                mediaRecorder.start();
+                activeRecorders[id] = mediaRecorder;
+
+            } catch (err) {
+                alert('無法存取麥克風或相機！請確認權限或確保在安全網域(https)下執行。');
+                console.error(err);
+            }
+        }
+
+        // ================= 4. 畫布繪圖引擎 =================
+        function initCanvas(cvs, id) {
+            const ctx = cvs.getContext('2d');
+            ctx.strokeStyle = '#C1A583'; ctx.lineWidth = 2.5; ctx.lineCap = 'round';
+            let drawing = false;
+            
+            const startDraw = (e) => { 
+                drawing = true; ctx.beginPath(); 
+                const rect = cvs.getBoundingClientRect();
+                const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+                const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+                ctx.moveTo(x, y); 
+                e.preventDefault(); 
+            };
+            const draw = (e) => { 
+                if(!drawing) return;
+                const rect = cvs.getBoundingClientRect();
+                const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+                const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+                ctx.lineTo(x, y); ctx.stroke(); 
+                e.preventDefault();
+            };
+            const stopDraw = () => { if(drawing) { drawing = false; saveNoteToDB(id); } };
+
+            cvs.addEventListener('mousedown', startDraw); cvs.addEventListener('mousemove', draw); cvs.addEventListener('mouseup', stopDraw); cvs.addEventListener('mouseout', stopDraw);
+            cvs.addEventListener('touchstart', startDraw, {passive: false}); cvs.addEventListener('touchmove', draw, {passive: false}); cvs.addEventListener('touchend', stopDraw);
+        }
+
+        // ================= 5. 拖曳與UI互動 =================
+        function makeDraggable(el, id) {
             let ox, oy;
             el.onpointerdown = e => {
-                // 防止點擊輸入框、按鈕或畫布時觸發拖曳
-                if(e.target.contentEditable === 'true' || e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.tagName === 'CANVAS' || e.target.tagName === 'svg' || e.target.tagName === 'path') return;
-                
+                if(e.target.contentEditable === 'true' || ['INPUT','BUTTON','CANVAS','VIDEO','AUDIO','svg','path'].includes(e.target.tagName)) return;
                 el.style.zIndex = 1500;
-                ox = e.clientX - el.offsetLeft; 
-                oy = e.clientY - el.offsetTop;
-                
-                document.onpointermove = ev => {
-                    el.style.left = (ev.clientX - ox) + 'px';
-                    el.style.top = (ev.clientY - oy) + 'px';
-                };
-                
-                document.onpointerup = () => {
-                    document.onpointermove = null;
-                    document.onpointerup = null;
-                    el.style.zIndex = 1001;
-                    saveNotes();
-                };
+                ox = e.clientX - el.offsetLeft; oy = e.clientY - el.offsetTop;
+                document.onpointermove = ev => { el.style.left = (ev.clientX - ox) + 'px'; el.style.top = (ev.clientY - oy) + 'px'; };
+                document.onpointerup = () => { document.onpointermove = null; document.onpointerup = null; el.style.zIndex = 1001; saveNoteToDB(id); };
             };
         }
 
-        // --- 3. 手寫畫布邏輯 ---
-        function initCanvas(cvs) {
-            const ctx = cvs.getContext('2d');
-            ctx.strokeStyle = '#C1A583'; 
-            ctx.lineWidth = 2.5; 
-            ctx.lineCap = 'round';
-            
-            let drawing = false;
-            cvs.onpointerdown = e => { 
-                drawing = true; 
-                ctx.beginPath(); 
-                ctx.moveTo(e.offsetX, e.offsetY); 
-            };
-            cvs.onpointermove = e => { 
-                if(drawing) { 
-                    ctx.lineTo(e.offsetX, e.offsetY); 
-                    ctx.stroke(); 
-                } 
-            };
-            cvs.onpointerup = () => { drawing = false; saveNotes(); };
-            cvs.onpointerout = () => { drawing = false; };
-        }
-
-        // --- 4. 收納與回歸邏輯 ---
         function toggleVault() {
             isVaultOpen = !isVaultOpen;
-            const notes = document.querySelectorAll('.note');
-            notes.forEach(n => isVaultOpen ? n.classList.remove('minimized') : n.classList.add('minimized'));
+            document.querySelectorAll('.note').forEach(n => isVaultOpen ? n.classList.remove('minimized') : n.classList.add('minimized'));
             document.getElementById('folder-svg').style.stroke = isVaultOpen ? "white" : "var(--accent-jade)";
         }
 
-        function deleteNote(id) { 
-            document.getElementById(id).remove(); 
-            saveNotes(); 
-        }
-
-        // --- 5. 本地記憶 (金剛藏) ---
-        function saveNotes() {
-            const data = Array.from(document.querySelectorAll('.note')).map(n => ({
-                id: n.id, 
-                x: parseInt(n.style.left) || 20, 
-                y: parseInt(n.style.top) || 100,
-                text: n.querySelector('.note-text').innerText,
-                alarm: n.querySelector('.date-input').value
-            }));
-            // 共用的 localStorage Key
-            localStorage.setItem('vajra_omni_notes', JSON.stringify(data));
-        }
-
-        // 頁面載入時讀取
+        // 啟動程序
         window.addEventListener('DOMContentLoaded', () => {
-            const saved = JSON.parse(localStorage.getItem('vajra_omni_notes'));
-            if(saved && saved.length > 0) {
-                saved.forEach(d => addNote(d));
-            }
+            initDB(() => {
+                loadNotesFromDB();
+            });
         });
     </script>
 </body>
