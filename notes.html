@@ -2,45 +2,59 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>淨息流 ． 全能金剛藏</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>淨息流 ． 便利貼</title>
     <style>
         :root {
+            /* 淨息流主色系 */
             --bg-gradient: linear-gradient(135deg, #FDFDFD, #F5F2EF);
-            --accent-amber: #C1A583; --accent-jade: #82968C; --accent-rose: #CFA4A4;
-            --text-main: #58504A; --text-light: #968E86;
-            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-bg: rgba(255, 255, 255, 0.65);
             --glass-border: rgba(255, 255, 255, 0.9);
+            --text-main: #58504A; --text-light: #968E86;
+            --accent-amber: #C1A583; --accent-jade: #82968C;
+            --shadow-soft: 0 10px 40px rgba(160, 155, 150, 0.12);
         }
 
-        * { box-sizing: border-box; touch-action: none; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; padding: 20px; background: var(--bg-gradient); color: var(--text-main); font-family: -apple-system, "PingFang TC", sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; align-items: center; }
-
-        /* --- 頂部導航 (模擬圖 5 修改位) --- */
-        .top-nav { width: 100%; max-width: 500px; display: flex; justify-content: space-between; align-items: center; padding: 10px 0; z-index: 2000; }
-        .nav-right { display: flex; gap: 15px; align-items: center; }
+        * { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
         
-        /* 向量便利貼 Logo 入口 */
-        .box-entrance-btn { width: 40px; height: 40px; background: var(--glass-bg); border-radius: 50%; border: 1px solid var(--glass-border); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        html, body { 
+            margin: 0; padding: 0; width: 100%; height: 100dvh; 
+            background: var(--bg-gradient); color: var(--text-main); 
+            font-family: -apple-system, sans-serif; overflow: hidden; 
+            display: flex; flex-direction: column; align-items: center; 
+        }
 
-        /* --- 模擬首頁背景卡片 (圖 2 內容) --- */
-        .home-content { width: 100%; max-width: 400px; margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; opacity: 0.2; pointer-events: none; transition: 0.5s; }
-        .mock-card { background: white; border-radius: 24px; height: 120px; }
-        .dimmed { opacity: 0.05; filter: blur(5px); }
+        /* --- 頂部導航 --- */
+        .top-nav { 
+            width: 100%; padding: max(15px, env(safe-area-inset-top)) 20px 15px; 
+            display: flex; justify-content: center; background: transparent; z-index: 2000; position: fixed; top: 0;
+        }
+        .nav-content { width: 100%; max-width: 720px; display: flex; justify-content: space-between; align-items: center; }
+        .nav-btn { 
+            display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; 
+            border-radius: 50%; background: var(--glass-bg); backdrop-filter: blur(12px); 
+            border: 1px solid var(--glass-border); color: var(--text-main); 
+            box-shadow: var(--shadow-soft); cursor: pointer; transition: all 0.2s; 
+        }
+        .nav-btn:active { transform: scale(0.92); background: rgba(255,255,255,0.9); }
+        .nav-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
+        .page-title { font-size: 1.15rem; font-weight: 500; letter-spacing: 3px; color: var(--text-main); }
 
-        /* --- 便利貼畫布層 (自由亂貼位) --- */
-        #note-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1000; }
+        /* --- 便利貼畫布層 --- */
+        #note-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1000; overflow: hidden; }
+        
         .note { 
-            position: absolute; width: 260px; background: var(--glass-bg); backdrop-filter: blur(15px);
+            position: absolute; width: 260px; background: var(--glass-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             border: 1.5px solid var(--glass-border); border-radius: 28px; padding: 20px;
-            box-shadow: 0 15px 45px rgba(160, 155, 150, 0.15); pointer-events: auto;
+            box-shadow: 0 15px 45px rgba(160, 155, 150, 0.2); pointer-events: auto;
             display: flex; flex-direction: column; animation: popIn 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            transition: transform 0.3s opacity 0.3s;
         }
         @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
         /* 琉璃朦朧濾鏡媒體區 */
         .media-haze { 
-            width: 100%; border-radius: 18px; margin-bottom: 12px; position: relative; overflow: hidden; height: 120px; 
+            width: 100%; border-radius: 18px; margin-bottom: 12px; position: relative; overflow: hidden; height: 100px; 
             background: #F5F2EF; display: flex; align-items: center; justify-content: center;
         }
         .media-haze::after { 
@@ -49,66 +63,62 @@
             backdrop-filter: blur(4px);
         }
 
-        .note-text { width: 100%; border: none; outline: none; background: transparent; font-size: 1rem; color: var(--text-main); min-height: 40px; margin-bottom: 10px; line-height: 1.5; }
-        .note-draw { width: 100%; height: 80px; background: rgba(255,255,255,0.2); border-radius: 12px; margin-bottom: 10px; }
+        .note-text { width: 100%; border: none; outline: none; background: transparent; font-size: 0.95rem; color: var(--text-main); min-height: 40px; margin-bottom: 10px; line-height: 1.5; }
+        
+        /* 修正：給定固定尺寸確保畫布繪圖正確 */
+        .note-draw { width: 216px; height: 80px; background: rgba(255,255,255,0.4); border-radius: 12px; margin-bottom: 10px; border: 1px dashed rgba(193, 165, 131, 0.3); touch-action: none; }
 
         /* 工具列 */
-        .note-tools { display: flex; align-items: center; gap: 12px; border-top: 1px solid rgba(0,0,0,0.03); padding-top: 12px; }
-        .tool-icon { background: none; border: none; cursor: pointer; color: var(--text-light); transition: 0.2s; }
+        .note-tools { display: flex; align-items: center; gap: 12px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 12px; }
+        .tool-icon { background: none; border: none; cursor: pointer; color: var(--text-light); transition: 0.2s; padding: 0; display: flex;}
         .tool-icon:active { color: var(--accent-amber); transform: scale(1.2); }
-        .date-input { font-size: 0.7rem; border: none; background: rgba(0,0,0,0.05); border-radius: 6px; padding: 2px 6px; color: var(--text-main); }
+        .date-input { font-size: 0.75rem; border: none; background: rgba(0,0,0,0.05); border-radius: 6px; padding: 4px 6px; color: var(--text-main); font-family: inherit; }
 
         /* --- 右下角金剛藏收納 --- */
         .folder-btn { 
             position: fixed; bottom: 35px; right: 35px; width: 60px; height: 60px; 
             background: var(--accent-amber); border-radius: 50%; z-index: 2100;
             display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(193, 165, 131, 0.4);
-            cursor: pointer; transition: 0.3s;
+            cursor: pointer; transition: 0.3s; border: none;
         }
-        .minimized { transform: scale(0) !important; opacity: 0 !important; pointer-events: none; }
-
-        /* 收回首頁按鈕 */
-        .home-back { position: fixed; bottom: 35px; left: 35px; width: 60px; height: 60px; background: white; border-radius: 50%; z-index: 2100; display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--accent-amber); cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .folder-btn:active { transform: scale(0.9); }
+        .minimized { transform: scale(0) translateY(200px) !important; opacity: 0 !important; pointer-events: none; }
 
     </style>
 </head>
 <body>
 
     <div class="top-nav">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-light)" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
-        
-        <div class="nav-right">
-            <div class="box-entrance-btn" onclick="addNote()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-amber)" stroke-width="2">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                    <line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line>
-                </svg>
+        <div class="nav-content">
+            <div style="width: 42px; display: flex; justify-content: flex-start;">
+                <div class="nav-btn" onclick="window.location.href='index.html'">
+                    <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </div>
+            </div>
+            
+            <div class="page-title">靈感隨意貼</div>
+
+            <div style="width: 42px; display: flex; justify-content: flex-end;">
+                <div class="nav-btn" onclick="addNote()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent-amber)" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line>
+                    </svg>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="home-content" id="home-bg">
-        <div class="mock-card"></div><div class="mock-card"></div>
-        <div class="mock-card"></div><div class="mock-card"></div>
-    </div>
-
     <div id="note-canvas"></div>
 
-    <div class="home-back" onclick="goHome()">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-amber)" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-    </div>
-
-    <div class="folder-btn" onclick="toggleVault()">
+    <button class="folder-btn" onclick="toggleVault()">
         <svg id="folder-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-    </div>
-
-    <audio id="alarm-bell" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
+    </button>
 
     <script>
-        const canvas = document.getElementById('note-canvas');
-        const homeBg = document.getElementById('home-bg');
-        let isVaultOpen = false;
+        const canvasContainer = document.getElementById('note-canvas');
+        let isVaultOpen = true;
 
         // --- 1. 隨意貼生成邏輯 ---
         function addNote(data = null) {
@@ -116,46 +126,59 @@
             const note = document.createElement('div');
             note.className = 'note';
             note.id = id;
-            note.style.left = data ? data.x + 'px' : (Math.random() * 50 + 50) + 'px';
-            note.style.top = data ? data.y + 'px' : (Math.random() * 100 + 150) + 'px';
+            
+            // 如果沒有座標，隨機散落在畫面中間區域
+            let startX = data ? data.x : Math.max(20, Math.random() * (window.innerWidth - 300));
+            let startY = data ? data.y : Math.max(100, Math.random() * (window.innerHeight - 400));
+            
+            note.style.left = startX + 'px';
+            note.style.top = startY + 'px';
             note.style.zIndex = 1001;
 
             note.innerHTML = `
                 <div class="media-haze">
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1" opacity="0.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" opacity="0.6"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
                 </div>
-                <div class="note-text" contenteditable="true" oninput="save()">點擊紀錄...</div>
-                <canvas class="note-draw"></canvas>
+                <div class="note-text" contenteditable="true" oninput="saveNotes()">${data ? data.text : '點擊紀錄...'}</div>
+                <canvas class="note-draw" width="216" height="80"></canvas>
                 <div class="note-tools">
-                    <button class="tool-icon" onclick="takePhoto('${id}')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path></svg></button>
+                    <button class="tool-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path></svg></button>
                     <button class="tool-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path></svg></button>
-                    <input type="time" class="date-input" onchange="save()">
-                    <span style="margin-left:auto; cursor:pointer; opacity:0.2" onclick="deleteNote('${id}')">✕</span>
+                    <input type="time" class="date-input" value="${data ? data.alarm : ''}" onchange="saveNotes()">
+                    <span style="margin-left:auto; cursor:pointer; opacity:0.3; font-size:1.2rem;" onclick="deleteNote('${id}')">✕</span>
                 </div>
             `;
 
-            canvas.appendChild(note);
+            canvasContainer.appendChild(note);
             makeDraggable(note);
             initCanvas(note.querySelector('.note-draw'));
-            homeBg.classList.add('dimmed');
-            save();
+            
+            // 確保新增時是展開狀態
+            if (!isVaultOpen) toggleVault();
+            saveNotes();
         }
 
         // --- 2. 自由拖動邏輯 (支援手機觸控) ---
         function makeDraggable(el) {
             let ox, oy;
             el.onpointerdown = e => {
-                if(e.target.contentEditable === 'true' || e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.tagName === 'CANVAS') return;
+                // 防止點擊輸入框、按鈕或畫布時觸發拖曳
+                if(e.target.contentEditable === 'true' || e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.tagName === 'CANVAS' || e.target.tagName === 'svg' || e.target.tagName === 'path') return;
+                
                 el.style.zIndex = 1500;
-                ox = e.clientX - el.offsetLeft; oy = e.clientY - el.offsetTop;
+                ox = e.clientX - el.offsetLeft; 
+                oy = e.clientY - el.offsetTop;
+                
                 document.onpointermove = ev => {
                     el.style.left = (ev.clientX - ox) + 'px';
                     el.style.top = (ev.clientY - oy) + 'px';
                 };
+                
                 document.onpointerup = () => {
                     document.onpointermove = null;
+                    document.onpointerup = null;
                     el.style.zIndex = 1001;
-                    save();
+                    saveNotes();
                 };
             };
         }
@@ -163,46 +186,59 @@
         // --- 3. 手寫畫布邏輯 ---
         function initCanvas(cvs) {
             const ctx = cvs.getContext('2d');
-            cvs.width = cvs.offsetWidth; cvs.height = cvs.offsetHeight;
-            ctx.strokeStyle = '#C1A583'; ctx.lineWidth = 2; ctx.lineCap = 'round';
+            ctx.strokeStyle = '#C1A583'; 
+            ctx.lineWidth = 2.5; 
+            ctx.lineCap = 'round';
+            
             let drawing = false;
-            cvs.onpointerdown = e => { drawing = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); };
-            cvs.onpointermove = e => { if(drawing) { ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); } };
-            cvs.onpointerup = () => { drawing = false; save(); };
+            cvs.onpointerdown = e => { 
+                drawing = true; 
+                ctx.beginPath(); 
+                ctx.moveTo(e.offsetX, e.offsetY); 
+            };
+            cvs.onpointermove = e => { 
+                if(drawing) { 
+                    ctx.lineTo(e.offsetX, e.offsetY); 
+                    ctx.stroke(); 
+                } 
+            };
+            cvs.onpointerup = () => { drawing = false; saveNotes(); };
+            cvs.onpointerout = () => { drawing = false; };
         }
 
         // --- 4. 收納與回歸邏輯 ---
         function toggleVault() {
             isVaultOpen = !isVaultOpen;
             const notes = document.querySelectorAll('.note');
-            notes.forEach(n => isVaultOpen ? n.classList.add('minimized') : n.classList.remove('minimized'));
-            document.getElementById('folder-svg').style.stroke = isVaultOpen ? "var(--accent-jade)" : "white";
+            notes.forEach(n => isVaultOpen ? n.classList.remove('minimized') : n.classList.add('minimized'));
+            document.getElementById('folder-svg').style.stroke = isVaultOpen ? "white" : "var(--accent-jade)";
         }
 
-        function goHome() {
-            const notes = document.querySelectorAll('.note');
-            notes.forEach(n => n.classList.add('minimized'));
-            homeBg.classList.remove('dimmed');
-            isVaultOpen = true;
-            document.getElementById('folder-svg').style.stroke = "var(--accent-jade)";
+        function deleteNote(id) { 
+            document.getElementById(id).remove(); 
+            saveNotes(); 
         }
-
-        function deleteNote(id) { document.getElementById(id).remove(); save(); }
 
         // --- 5. 本地記憶 (金剛藏) ---
-        function save() {
+        function saveNotes() {
             const data = Array.from(document.querySelectorAll('.note')).map(n => ({
-                id: n.id, x: parseInt(n.style.left), y: parseInt(n.style.top),
+                id: n.id, 
+                x: parseInt(n.style.left) || 20, 
+                y: parseInt(n.style.top) || 100,
                 text: n.querySelector('.note-text').innerText,
                 alarm: n.querySelector('.date-input').value
             }));
-            localStorage.setItem('vajra_omni_v5', JSON.stringify(data));
+            // 共用的 localStorage Key
+            localStorage.setItem('vajra_omni_notes', JSON.stringify(data));
         }
 
-        window.onload = () => {
-            const saved = JSON.parse(localStorage.getItem('vajra_omni_v5'));
-            if(saved && saved.length > 0) saved.forEach(d => addNote(d));
-        };
+        // 頁面載入時讀取
+        window.addEventListener('DOMContentLoaded', () => {
+            const saved = JSON.parse(localStorage.getItem('vajra_omni_notes'));
+            if(saved && saved.length > 0) {
+                saved.forEach(d => addNote(d));
+            }
+        });
     </script>
 </body>
 </html>
