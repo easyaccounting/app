@@ -7,23 +7,15 @@
     <style>
         :root {
             --bg-gradient: linear-gradient(135deg, #FDFDFD, #F5F2EF);
-            --glass-bg: rgba(255, 255, 255, 0.65);
-            --glass-border: rgba(255, 255, 255, 0.9);
+            --glass-bg: rgba(255, 255, 255, 0.65); --glass-border: rgba(255, 255, 255, 0.9);
             --text-main: #58504A; --text-light: #968E86;
-            --accent-amber: #C1A583; --accent-jade: #82968C; --accent-red: #CFA4A4;
+            --accent-amber: #C1A583; --accent-jade: #82968C; --accent-red: #CFA4A4; --accent-gold: #CBA37A;
             --shadow-soft: 0 10px 40px rgba(160, 155, 150, 0.12);
         }
 
         * { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
-        
-        html, body { 
-            margin: 0; padding: 0; width: 100%; height: 100dvh; 
-            background: var(--bg-gradient); color: var(--text-main); 
-            font-family: -apple-system, sans-serif; overflow: hidden; 
-            display: flex; flex-direction: column; align-items: center; 
-        }
+        html, body { margin: 0; padding: 0; width: 100%; height: 100dvh; background: var(--bg-gradient); color: var(--text-main); font-family: -apple-system, sans-serif; overflow: hidden; display: flex; flex-direction: column; align-items: center; }
 
-        /* --- 頂部導航 --- */
         .top-nav { width: 100%; padding: max(15px, env(safe-area-inset-top)) 20px 15px; display: flex; justify-content: center; z-index: 2000; position: fixed; top: 0; }
         .nav-content { width: 100%; max-width: 720px; display: flex; justify-content: space-between; align-items: center; }
         .nav-btn { display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%; background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); color: var(--text-main); box-shadow: var(--shadow-soft); cursor: pointer; transition: 0.2s; }
@@ -31,7 +23,6 @@
         .nav-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
         .page-title { font-size: 1.15rem; font-weight: 500; letter-spacing: 3px; color: var(--text-main); }
 
-        /* --- 便利貼畫布層 --- */
         #note-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1000; overflow: hidden; }
         
         .note { 
@@ -39,38 +30,42 @@
             border: 1.5px solid var(--glass-border); border-radius: 28px; padding: 20px;
             box-shadow: 0 15px 45px rgba(160, 155, 150, 0.2); pointer-events: auto;
             display: flex; flex-direction: column; animation: popIn 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-            transition: transform 0.3s opacity 0.3s;
+            transition: transform 0.3s, opacity 0.3s, width 0.3s, height 0.3s, top 0.3s, left 0.3s;
         }
         @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        /* 多媒體展示區 */
-        .media-container { 
-            width: 100%; border-radius: 18px; margin-bottom: 12px; position: relative; overflow: hidden; height: 120px; 
-            background: #F5F2EF; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        /* 滿版放大樣式 */
+        .note.expanded {
+            top: env(safe-area-inset-top, 20px) !important; left: 5% !important;
+            width: 90% !important; height: calc(100dvh - env(safe-area-inset-top, 20px) - 20px) !important;
+            z-index: 3000 !important;
         }
-        .media-container.empty::after { 
-            content: ""; position: absolute; inset: 0; 
-            background: linear-gradient(135deg, rgba(207,164,164,0.3), transparent, rgba(193,165,131,0.3)); 
+
+        /* 警告閃爍動畫 */
+        .note.glowing {
+            animation: pulseWarning 1.5s infinite; border-color: var(--accent-gold);
         }
+        @keyframes pulseWarning {
+            0% { box-shadow: 0 0 0 0 rgba(203, 163, 122, 0.6); }
+            70% { box-shadow: 0 0 0 15px rgba(203, 163, 122, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(203, 163, 122, 0); }
+        }
+
+        .media-container { width: 100%; border-radius: 18px; margin-bottom: 12px; position: relative; overflow: hidden; height: 100px; background: #F5F2EF; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .media-container.empty::after { content: ""; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(207,164,164,0.3), transparent, rgba(193,165,131,0.3)); }
         .media-player { width: 100%; height: 100%; object-fit: cover; border-radius: 18px; z-index: 2; }
         
-        /* 錄製狀態提示 */
-        .recording-badge { position: absolute; top: 10px; right: 10px; background: rgba(207,164,164,0.9); color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.7rem; z-index: 10; display: none; align-items: center; gap: 4px; animation: blink 1s infinite; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .recording-badge { position: absolute; top: 10px; right: 10px; background: var(--accent-red); color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; z-index: 10; display: none; align-items: center; gap: 4px; font-weight: bold; }
 
-        .note-text { width: 100%; border: none; outline: none; background: transparent; font-size: 0.95rem; color: var(--text-main); min-height: 40px; margin-bottom: 10px; line-height: 1.5; }
-        
-        /* 繪圖區 */
-        .note-draw { width: 100%; height: 100px; background: rgba(255,255,255,0.4); border-radius: 12px; margin-bottom: 10px; border: 1px dashed rgba(193, 165, 131, 0.4); touch-action: none; cursor: crosshair; }
+        .note-text { width: 100%; border: none; outline: none; background: transparent; font-size: 0.95rem; color: var(--text-main); min-height: 40px; margin-bottom: 10px; line-height: 1.5; flex-grow: 1; overflow-y: auto; }
+        .note-draw { width: 100%; height: 120px; background: rgba(255,255,255,0.4); border-radius: 12px; margin-bottom: 10px; border: 1px dashed rgba(193, 165, 131, 0.4); touch-action: none; cursor: crosshair; flex-shrink: 0; }
+        .note.expanded .note-draw { height: 35%; } /* 放大時畫布自動變高 */
 
-        /* 工具列 */
-        .note-tools { display: flex; align-items: center; gap: 10px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 12px; }
-        .tool-icon { background: rgba(255,255,255,0.5); border: 1px solid var(--glass-border); border-radius: 50%; width: 32px; height: 32px; display: flex; justify-content: center; align-items: center; cursor: pointer; color: var(--text-light); transition: 0.2s; }
-        .tool-icon:active { color: var(--accent-amber); transform: scale(0.9); background: white; }
-        .tool-icon.recording { color: var(--accent-red); border-color: var(--accent-red); background: rgba(207,164,164,0.1); }
-        .date-input { font-size: 0.75rem; border: none; background: rgba(0,0,0,0.05); border-radius: 6px; padding: 4px; color: var(--text-main); font-family: inherit; width: 70px; }
+        .note-tools { display: flex; align-items: center; gap: 8px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 12px; flex-shrink: 0; }
+        .tool-icon { background: rgba(255,255,255,0.5); border: 1px solid var(--glass-border); border-radius: 50%; width: 32px; height: 32px; display: flex; justify-content: center; align-items: center; cursor: pointer; color: var(--text-light); transition: 0.2s; padding: 0; }
+        .tool-icon:active { transform: scale(0.9); }
+        .date-input { font-size: 0.75rem; border: none; background: rgba(0,0,0,0.05); border-radius: 6px; padding: 4px 6px; color: var(--text-main); font-family: inherit; width: 75px; }
 
-        /* --- 右下角金剛藏收納 --- */
         .folder-btn { position: fixed; bottom: 35px; right: 35px; width: 60px; height: 60px; background: var(--accent-amber); border-radius: 50%; z-index: 2100; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(193, 165, 131, 0.4); cursor: pointer; transition: 0.3s; border: none; }
         .folder-btn:active { transform: scale(0.9); }
         .minimized { transform: scale(0) translateY(200px) !important; opacity: 0 !important; pointer-events: none; }
@@ -107,7 +102,35 @@
         const canvasContainer = document.getElementById('note-canvas');
         let isVaultOpen = true;
 
-        // ================= 1. IndexedDB 核心資料庫 (解決影音儲存限制) =================
+        // ================= 1. 內建無版權電子音 API =================
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playBeep() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.type = 'sine'; // 乾淨的電子音
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime); // 頻率
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); // 音量
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.15); // 短促的一聲
+            
+            // 0.3秒後再嗶一聲
+            setTimeout(() => {
+                const osc2 = audioCtx.createOscillator();
+                const gain2 = audioCtx.createGain();
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(800, audioCtx.currentTime);
+                gain2.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                osc2.connect(gain2);
+                gain2.connect(audioCtx.destination);
+                osc2.start();
+                osc2.stop(audioCtx.currentTime + 0.15);
+            }, 300);
+        }
+
+        // ================= 2. IndexedDB 核心資料庫 =================
         const DB_NAME = "VajraOmniDB";
         let db;
 
@@ -115,20 +138,15 @@
             const request = indexedDB.open(DB_NAME, 1);
             request.onupgradeneeded = (e) => {
                 db = e.target.result;
-                if (!db.objectStoreNames.contains('notes')) {
-                    db.createObjectStore('notes', { keyPath: 'id' });
-                }
+                if (!db.objectStoreNames.contains('notes')) db.createObjectStore('notes', { keyPath: 'id' });
             };
             request.onsuccess = (e) => { db = e.target.result; callback(); };
-            request.onerror = (e) => console.error("IndexedDB 啟動失敗", e);
         }
 
         function loadNotesFromDB() {
-            const tx = db.transaction('notes', 'readonly');
-            const store = tx.objectStore('notes');
-            store.getAll().onsuccess = (e) => {
-                const notes = e.target.result;
-                notes.forEach(data => addNote(data));
+            db.transaction('notes', 'readonly').objectStore('notes').getAll().onsuccess = (e) => {
+                e.target.result.forEach(data => addNote(data));
+                checkAlarms(); // 載入後馬上檢查時間
             };
         }
 
@@ -137,35 +155,18 @@
             const el = document.getElementById(id);
             if(!el) return;
 
-            // 抓取畫布影像
             const cvs = el.querySelector('.note-draw');
-            const drawData = cvs.toDataURL(); 
-
-            // 檢查多媒體 (錄影或錄音)
-            let mediaType = 'none';
-            let mediaData = null;
-            const videoEl = el.querySelector('video.media-player');
-            const audioEl = el.querySelector('audio.media-player');
-            
-            if (videoEl && videoEl.src && !videoEl.src.startsWith('blob:')) {
-                mediaType = 'video'; mediaData = videoEl.src;
-            } else if (audioEl && audioEl.src && !audioEl.src.startsWith('blob:')) {
-                mediaType = 'audio'; mediaData = audioEl.src;
-            }
-
             const data = {
                 id: id,
-                x: parseInt(el.style.left) || 20,
-                y: parseInt(el.style.top) || 100,
+                x: parseInt(el.style.left) || 20, y: parseInt(el.style.top) || 100,
                 text: el.querySelector('.note-text').innerText,
                 alarm: el.querySelector('.date-input').value,
-                drawing: drawData,
-                mediaType: mediaType,
-                mediaData: mediaData
+                drawing: cvs.toDataURL(),
+                mediaType: el.dataset.mediaType || 'none',
+                mediaData: el.dataset.mediaData || null,
+                isNotified: el.dataset.isNotified === 'true' // 紀錄是否已經提醒過
             };
-
-            const tx = db.transaction('notes', 'readwrite');
-            tx.objectStore('notes').put(data);
+            db.transaction('notes', 'readwrite').objectStore('notes').put(data);
         }
 
         function deleteNoteFromDB(id) {
@@ -173,153 +174,223 @@
             if(db) db.transaction('notes', 'readwrite').objectStore('notes').delete(id);
         }
 
-        // ================= 2. 隨意貼生成邏輯 =================
+        // ================= 3. 隨意貼生成與互動 =================
         function addNote(data = null) {
             const id = data ? data.id : `n-${Date.now()}`;
             const note = document.createElement('div');
             note.className = 'note';
             note.id = id;
+            note.dataset.mediaType = data ? data.mediaType : 'none';
+            note.dataset.mediaData = data ? data.mediaData : '';
+            note.dataset.isNotified = data && data.isNotified ? 'true' : 'false';
             
-            let startX = data ? data.x : Math.max(20, Math.random() * (window.innerWidth - 300));
-            let startY = data ? data.y : Math.max(100, Math.random() * (window.innerHeight - 400));
-            
-            note.style.left = startX + 'px'; note.style.top = startY + 'px'; note.style.zIndex = 1001;
+            note.style.left = data ? data.x + 'px' : Math.max(20, Math.random() * (window.innerWidth - 300)) + 'px';
+            note.style.top = data ? data.y + 'px' : Math.max(100, Math.random() * (window.innerHeight - 400)) + 'px';
+            note.style.zIndex = 1001;
 
-            // 判斷多媒體呈現區
+            // 點擊便利貼時，如果有閃爍就解除警告
+            note.onclick = () => {
+                if (note.classList.contains('glowing')) {
+                    note.classList.remove('glowing');
+                    note.dataset.isNotified = 'true';
+                    saveNoteToDB(id);
+                }
+            };
+
             let mediaHTML = `<div class="media-container empty" id="media-box-${id}">
-                <div class="recording-badge" id="badge-${id}"><span style="width:6px;height:6px;background:white;border-radius:50%;"></span> 錄製中</div>
-                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" opacity="0.6"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path></svg>
+                <div class="recording-badge" id="badge-${id}"><span style="width:6px;height:6px;background:white;border-radius:50%;"></span> <span id="timer-text-${id}">15s</span></div>
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" opacity="0.6"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
             </div>`;
 
-            if (data && data.mediaType === 'video') {
-                mediaHTML = `<div class="media-container" id="media-box-${id}"><video src="${data.mediaData}" controls class="media-player"></video></div>`;
-            } else if (data && data.mediaType === 'audio') {
-                mediaHTML = `<div class="media-container" style="height: 60px;" id="media-box-${id}"><audio src="${data.mediaData}" controls class="media-player"></audio></div>`;
-            }
+            if (data && data.mediaType === 'video') mediaHTML = `<div class="media-container" id="media-box-${id}"><video src="${data.mediaData}" controls class="media-player"></video></div>`;
+            if (data && data.mediaType === 'audio') mediaHTML = `<div class="media-container" style="height:60px;" id="media-box-${id}"><audio src="${data.mediaData}" controls class="media-player"></audio></div>`;
 
             note.innerHTML = `
                 ${mediaHTML}
-                <div class="note-text" contenteditable="true" onblur="saveNoteToDB('${id}')">${data ? data.text : '點擊打字...'}</div>
-                <canvas class="note-draw" width="236" height="100"></canvas>
+                <div class="note-text" contenteditable="true" onblur="saveNoteToDB('${id}')">${data ? data.text : '點擊紀錄...'}</div>
+                <canvas class="note-draw"></canvas>
                 <div class="note-tools">
                     <button class="tool-icon" id="btn-video-${id}" onclick="toggleRecord('${id}', 'video')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg></button>
                     <button class="tool-icon" id="btn-audio-${id}" onclick="toggleRecord('${id}', 'audio')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path></svg></button>
-                    <input type="time" class="date-input" value="${data && data.alarm ? data.alarm : ''}" onchange="saveNoteToDB('${id}')">
-                    <span style="margin-left:auto; cursor:pointer; font-size:1.1rem; color:var(--text-light);" onclick="deleteNoteFromDB('${id}')">✕</span>
+                    
+                    <button class="tool-icon" onclick="toggleExpand('${id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg></button>
+                    
+                    <input type="time" class="date-input" value="${data && data.alarm ? data.alarm : ''}" onchange="resetNotification('${id}')">
+                    <span style="margin-left:auto; cursor:pointer; font-size:1.2rem; color:var(--text-light); opacity:0.5;" onclick="deleteNoteFromDB('${id}')">✕</span>
                 </div>
             `;
 
             canvasContainer.appendChild(note);
             makeDraggable(note, id);
             
-            // 初始化畫布並載入舊圖
-            const cvs = note.querySelector('.note-draw');
-            initCanvas(cvs, id);
-            if(data && data.drawing) {
-                const img = new Image();
-                img.onload = () => { cvs.getContext('2d').drawImage(img, 0, 0); };
-                img.src = data.drawing;
-            }
+            // 延遲初始化畫布尺寸以適應 Flex
+            setTimeout(() => {
+                const cvs = note.querySelector('.note-draw');
+                cvs.width = cvs.offsetWidth; cvs.height = cvs.offsetHeight;
+                initCanvas(cvs, id);
+                if(data && data.drawing) {
+                    const img = new Image();
+                    img.onload = () => cvs.getContext('2d').drawImage(img, 0, 0, cvs.width, cvs.height);
+                    img.src = data.drawing;
+                }
+            }, 50);
 
             if (!isVaultOpen) toggleVault();
             if(!data) saveNoteToDB(id);
         }
 
-        // ================= 3. 媒體錄製引擎 (影/音) =================
-        let activeRecorders = {}; // 紀錄目前正在錄製的物件
+        // ================= 4. 滿版放大/縮小 =================
+        function toggleExpand(id) {
+            const note = document.getElementById(id);
+            note.classList.toggle('expanded');
+            
+            // 重新繪製畫布尺寸以免模糊
+            setTimeout(() => {
+                const cvs = note.querySelector('.note-draw');
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = cvs.width; tempCanvas.height = cvs.height;
+                tempCanvas.getContext('2d').drawImage(cvs, 0, 0);
+                
+                cvs.width = cvs.offsetWidth; cvs.height = cvs.offsetHeight;
+                initCanvas(cvs, id);
+                cvs.getContext('2d').drawImage(tempCanvas, 0, 0, tempCanvas.width, tempCanvas.height, 0, 0, cvs.width, cvs.height);
+            }, 350);
+        }
+
+        // ================= 5. 限制時間錄製引擎 (最多15秒) =================
+        let activeRecorders = {}; 
+        let recordTimers = {};
 
         async function toggleRecord(id, type) {
-            const btn = document.getElementById(`btn-${type}-${id}`);
-            
-            // 停止錄製
-            if (activeRecorders[id]) {
-                activeRecorders[id].stop();
-                btn.classList.remove('recording');
-                document.getElementById(`badge-${id}`).style.display = 'none';
+            if (window.location.protocol === 'file:') {
+                alert('安全性限制：瀏覽器禁止在單機檔案 (file://) 中使用相機與麥克風。\n請將網頁放上 GitHub Pages 測試。');
                 return;
             }
 
-            // 開始錄製
+            const btn = document.getElementById(`btn-${type}-${id}`);
+            
+            if (activeRecorders[id]) {
+                stopRecording(id, type);
+                return;
+            }
+
             try {
                 const constraints = type === 'video' ? { video: true, audio: true } : { audio: true };
                 const stream = await navigator.mediaDevices.getUserMedia(constraints);
                 const mediaRecorder = new MediaRecorder(stream);
                 const chunks = [];
 
-                btn.classList.add('recording');
-                document.getElementById(`badge-${id}`).style.display = 'flex';
+                btn.style.color = "var(--accent-red)";
+                const badge = document.getElementById(`badge-${id}`);
+                const timerText = document.getElementById(`timer-text-${id}`);
+                badge.style.display = 'flex';
 
                 mediaRecorder.ondataavailable = e => chunks.push(e.data);
                 mediaRecorder.onstop = () => {
-                    // 關閉硬體設備
                     stream.getTracks().forEach(track => track.stop());
                     delete activeRecorders[id];
+                    clearInterval(recordTimers[id]);
 
-                    // 將 Blob 轉為 Base64 存入 IndexedDB
-                    const blob = new Blob(chunks, { type: type === 'video' ? 'video/webm' : 'audio/webm' });
                     const reader = new FileReader();
                     reader.onloadend = () => {
-                        const base64data = reader.result;
+                        document.getElementById(id).dataset.mediaType = type;
+                        document.getElementById(id).dataset.mediaData = reader.result;
+                        
                         const box = document.getElementById(`media-box-${id}`);
                         box.classList.remove('empty');
                         if (type === 'video') {
-                            box.style.height = '120px';
-                            box.innerHTML = `<video src="${base64data}" controls class="media-player"></video>`;
+                            box.style.height = '120px'; box.innerHTML = `<video src="${reader.result}" controls class="media-player"></video>`;
                         } else {
-                            box.style.height = '60px';
-                            box.innerHTML = `<audio src="${base64data}" controls class="media-player"></audio>`;
+                            box.style.height = '60px'; box.innerHTML = `<audio src="${reader.result}" controls class="media-player"></audio>`;
                         }
                         saveNoteToDB(id);
                     };
-                    reader.readAsDataURL(blob);
+                    reader.readAsDataURL(new Blob(chunks, { type: type === 'video' ? 'video/webm' : 'audio/webm' }));
                 };
 
                 mediaRecorder.start();
                 activeRecorders[id] = mediaRecorder;
 
+                // 限制時間 15 秒倒數
+                let timeLeft = 15;
+                timerText.innerText = `${timeLeft}s`;
+                recordTimers[id] = setInterval(() => {
+                    timeLeft--;
+                    timerText.innerText = `${timeLeft}s`;
+                    if (timeLeft <= 0) stopRecording(id, type);
+                }, 1000);
+
             } catch (err) {
-                alert('無法存取麥克風或相機！請確認權限或確保在安全網域(https)下執行。');
-                console.error(err);
+                alert('無法開啟相機/麥克風！請確認權限是否開啟。');
             }
         }
 
-        // ================= 4. 畫布繪圖引擎 =================
+        function stopRecording(id, type) {
+            if(activeRecorders[id] && activeRecorders[id].state === 'recording') {
+                activeRecorders[id].stop();
+                document.getElementById(`btn-${type}-${id}`).style.color = "var(--text-light)";
+                document.getElementById(`badge-${id}`).style.display = 'none';
+            }
+        }
+
+        // ================= 6. 警告閃爍與時間檢查 =================
+        function resetNotification(id) {
+            const note = document.getElementById(id);
+            note.dataset.isNotified = 'false';
+            note.classList.remove('glowing');
+            saveNoteToDB(id);
+        }
+
+        function checkAlarms() {
+            const now = new Date();
+            const currentTimeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            
+            document.querySelectorAll('.note').forEach(note => {
+                const timeInput = note.querySelector('.date-input').value;
+                if (!timeInput) return;
+                
+                // 如果時間到了，且還沒被通知過
+                if (timeInput === currentTimeStr && note.dataset.isNotified === 'false') {
+                    note.classList.add('glowing');
+                    playBeep(); // 播放無版權合成音
+                    note.dataset.isNotified = 'true';
+                    saveNoteToDB(note.id);
+                } 
+                // 如果時間已經過了，但之前沒開網頁，補償閃爍但不發出聲音
+                else if (timeInput < currentTimeStr && note.dataset.isNotified === 'false') {
+                    note.classList.add('glowing');
+                }
+            });
+        }
+
+        // 每分鐘檢查一次時間
+        setInterval(checkAlarms, 60000);
+
+        // ================= 7. 畫布與拖曳 =================
         function initCanvas(cvs, id) {
             const ctx = cvs.getContext('2d');
             ctx.strokeStyle = '#C1A583'; ctx.lineWidth = 2.5; ctx.lineCap = 'round';
             let drawing = false;
+            const pos = e => { const r = cvs.getBoundingClientRect(); return { x: (e.touches ? e.touches[0].clientX : e.clientX) - r.left, y: (e.touches ? e.touches[0].clientY : e.clientY) - r.top }; };
             
-            const startDraw = (e) => { 
-                drawing = true; ctx.beginPath(); 
-                const rect = cvs.getBoundingClientRect();
-                const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-                const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
-                ctx.moveTo(x, y); 
-                e.preventDefault(); 
-            };
-            const draw = (e) => { 
-                if(!drawing) return;
-                const rect = cvs.getBoundingClientRect();
-                const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-                const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
-                ctx.lineTo(x, y); ctx.stroke(); 
-                e.preventDefault();
-            };
-            const stopDraw = () => { if(drawing) { drawing = false; saveNoteToDB(id); } };
+            const start = e => { drawing = true; ctx.beginPath(); const p = pos(e); ctx.moveTo(p.x, p.y); e.preventDefault(); };
+            const draw = e => { if(!drawing) return; const p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); e.preventDefault(); };
+            const stop = () => { if(drawing) { drawing = false; saveNoteToDB(id); } };
 
-            cvs.addEventListener('mousedown', startDraw); cvs.addEventListener('mousemove', draw); cvs.addEventListener('mouseup', stopDraw); cvs.addEventListener('mouseout', stopDraw);
-            cvs.addEventListener('touchstart', startDraw, {passive: false}); cvs.addEventListener('touchmove', draw, {passive: false}); cvs.addEventListener('touchend', stopDraw);
+            cvs.onmousedown = start; cvs.onmousemove = draw; cvs.onmouseup = stop; cvs.onmouseout = stop;
+            cvs.ontouchstart = start; cvs.ontouchmove = draw; cvs.ontouchend = stop;
         }
 
-        // ================= 5. 拖曳與UI互動 =================
         function makeDraggable(el, id) {
             let ox, oy;
             el.onpointerdown = e => {
-                if(e.target.contentEditable === 'true' || ['INPUT','BUTTON','CANVAS','VIDEO','AUDIO','svg','path'].includes(e.target.tagName)) return;
+                if(e.target.contentEditable==='true' || ['INPUT','BUTTON','CANVAS','VIDEO','AUDIO','svg','path','polyline','line','polygon','rect'].includes(e.target.tagName)) return;
+                if(el.classList.contains('expanded')) return; // 放大模式下禁止拖曳
+                
                 el.style.zIndex = 1500;
                 ox = e.clientX - el.offsetLeft; oy = e.clientY - el.offsetTop;
                 document.onpointermove = ev => { el.style.left = (ev.clientX - ox) + 'px'; el.style.top = (ev.clientY - oy) + 'px'; };
-                document.onpointerup = () => { document.onpointermove = null; document.onpointerup = null; el.style.zIndex = 1001; saveNoteToDB(id); };
+                document.onpointerup = () => { document.onpointermove = null; el.style.zIndex = 1001; saveNoteToDB(id); };
             };
         }
 
@@ -329,12 +400,7 @@
             document.getElementById('folder-svg').style.stroke = isVaultOpen ? "white" : "var(--accent-jade)";
         }
 
-        // 啟動程序
-        window.addEventListener('DOMContentLoaded', () => {
-            initDB(() => {
-                loadNotesFromDB();
-            });
-        });
+        window.addEventListener('DOMContentLoaded', () => { initDB(loadNotesFromDB); });
     </script>
 </body>
 </html>
