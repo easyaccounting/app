@@ -55,7 +55,7 @@
 
         .media-container { width: 100%; border-radius: 18px; margin-bottom: 12px; position: relative; overflow: hidden; height: 100px; background: rgba(255,255,255,0.4); display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.6); }
         .media-container.empty::after { content: ""; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent); }
-        .media-player { width: 100%; height: 100%; object-fit: cover; border-radius: 18px; z-index: 2; background: #000; }
+        .media-player { width: 100%; height: 100%; object-fit: cover; border-radius: 18px; z-index: 2; }
         .recording-badge { position: absolute; top: 10px; right: 10px; background: var(--accent-rose); color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; z-index: 10; display: none; align-items: center; gap: 4px; font-weight: bold; }
 
         .note-text { width: 100%; border: none; outline: none; background: transparent; font-size: 0.95rem; color: var(--text-main); min-height: 40px; margin-bottom: 10px; line-height: 1.5; flex-grow: 1; overflow-y: auto; }
@@ -201,13 +201,13 @@
                 }
             };
 
-            // 修正：將 badge 標籤獨立出來，保證覆蓋時不會被刪掉
             let mediaContent = `<svg class="empty-icon" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" opacity="0.6"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`;
             let boxClass = "media-container empty";
             let boxStyle = "";
 
-            if (data && data.mediaType === 'video') {
-                mediaContent = `<video src="${data.mediaData}" controls playsinline class="media-player"></video>`;
+            // 讀取相片或語音
+            if (data && data.mediaType === 'image') {
+                mediaContent = `<img src="${data.mediaData}" class="media-player" style="object-fit: cover;">`;
                 boxClass = "media-container"; boxStyle = "height: 120px;";
             } else if (data && data.mediaType === 'audio') {
                 mediaContent = `<audio src="${data.mediaData}" controls class="media-player"></audio>`;
@@ -221,7 +221,7 @@
                 </div>
                 
                 <div class="${boxClass}" id="media-box-${id}" style="${boxStyle}">
-                    <div class="recording-badge" id="badge-${id}"><span style="width:6px;height:6px;background:white;border-radius:50%;"></span> <span id="timer-text-${id}">15s</span></div>
+                    <div class="recording-badge" id="badge-${id}"><span style="width:6px;height:6px;background:white;border-radius:50%;"></span> <span id="timer-text-${id}">錄音中</span></div>
                     ${mediaContent}
                 </div>
                 
@@ -237,8 +237,10 @@
                     </div>
                     
                     <div class="tool-group">
-                        <button class="tool-icon" id="btn-video-${id}" onclick="toggleRecord('${id}', 'video')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg></button>
+                        <button class="tool-icon" onclick="triggerCamera('${id}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></button>
+                        
                         <button class="tool-icon" id="btn-audio-${id}" onclick="toggleRecord('${id}', 'audio')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path></svg></button>
+                        
                         <button class="tool-icon" onclick="clearCanvas('${id}')" title="清除畫布"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
                         <button class="tool-icon" onclick="toggleExpand('${id}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg></button>
                         <input type="time" class="date-input" value="${data && data.alarm ? data.alarm : ''}" onchange="resetNotification('${id}')">
@@ -327,37 +329,71 @@
             cvs.ontouchstart = start; cvs.ontouchmove = draw; cvs.ontouchend = stop;
         }
 
-        let activeRecorders = {}; let recordTimers = {};
+        // ================= 照相功能 (原生呼叫，100% 穩定) =================
+        function triggerCamera(id) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            // 手機會自動跳出「拍照」或「從相簿選取」的選單
+            
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    const base64Image = ev.target.result;
+                    document.getElementById(id).dataset.mediaType = 'image';
+                    document.getElementById(id).dataset.mediaData = base64Image;
+
+                    const box = document.getElementById(`media-box-${id}`);
+                    box.classList.remove('empty');
+                    box.style.height = '120px';
+                    
+                    const oldMedia = box.querySelector('.media-player');
+                    if (oldMedia) oldMedia.remove();
+                    const oldSvg = box.querySelector('.empty-icon');
+                    if (oldSvg) oldSvg.remove();
+
+                    const imgEl = document.createElement('img');
+                    imgEl.src = base64Image;
+                    imgEl.className = 'media-player';
+                    imgEl.style.objectFit = 'cover';
+                    box.appendChild(imgEl);
+
+                    saveNoteToDB(id);
+                };
+                reader.readAsDataURL(file);
+            };
+            input.click(); // 模擬點擊觸發
+        }
+
+        // ================= 錄音功能 (保留) =================
+        let activeRecorders = {}; 
         
         async function toggleRecord(id, type) {
             if (window.location.protocol === 'file:') {
-                alert('安全性限制：瀏覽器禁止在單機檔案中使用相機與麥克風。\n請推上 GitHub Pages 測試。');
+                alert('安全性限制：瀏覽器禁止在單機檔案中使用麥克風。\n請推上 GitHub Pages 測試。');
                 return;
             }
             const btn = document.getElementById(`btn-${type}-${id}`);
             if (activeRecorders[id]) { stopRecording(id, type); return; }
 
             try {
-                const constraints = type === 'video' 
-                    ? { video: { facingMode: 'user' }, audio: true } 
-                    : { audio: true };
-                    
-                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 const mediaRecorder = new MediaRecorder(stream);
                 const chunks = [];
 
                 btn.style.color = "var(--accent-rose)";
                 document.getElementById(`badge-${id}`).style.display = 'flex';
 
-                mediaRecorder.ondataavailable = e => {
-                    if (e.data && e.data.size > 0) chunks.push(e.data);
-                };
+                mediaRecorder.ondataavailable = e => { if (e.data && e.data.size > 0) chunks.push(e.data); };
                 
                 mediaRecorder.onstop = () => {
                     stream.getTracks().forEach(track => track.stop());
-                    delete activeRecorders[id]; clearInterval(recordTimers[id]);
+                    delete activeRecorders[id];
 
-                    const mimeType = mediaRecorder.mimeType || (type === 'video' ? 'video/mp4' : 'audio/mp4');
+                    const mimeType = mediaRecorder.mimeType || 'audio/mp4';
                     const blob = new Blob(chunks, { type: mimeType });
                     const reader = new FileReader();
                     
@@ -367,37 +403,26 @@
                         const box = document.getElementById(`media-box-${id}`);
                         box.classList.remove('empty');
                         
-                        // 修正：刪除舊的播放器或預設 SVG，但不刪除 badge
                         const oldMedia = box.querySelector('.media-player');
                         if (oldMedia) oldMedia.remove();
                         const oldSvg = box.querySelector('.empty-icon');
                         if (oldSvg) oldSvg.remove();
 
-                        // 建立新的播放器元素
-                        const mediaEl = document.createElement(type === 'video' ? 'video' : 'audio');
+                        const mediaEl = document.createElement('audio');
                         mediaEl.src = reader.result;
                         mediaEl.controls = true;
                         mediaEl.className = 'media-player';
+                        box.style.height = '60px'; 
                         
-                        if (type === 'video') { 
-                            mediaEl.playsInline = true;
-                            box.style.height = '120px'; 
-                        } else { 
-                            box.style.height = '60px'; 
-                        }
                         box.appendChild(mediaEl);
-                        
                         saveNoteToDB(id);
                     };
                     reader.readAsDataURL(blob);
                 };
 
                 mediaRecorder.start(); activeRecorders[id] = mediaRecorder;
-                let timeLeft = 15; document.getElementById(`timer-text-${id}`).innerText = `${timeLeft}s`;
-                recordTimers[id] = setInterval(() => { timeLeft--; document.getElementById(`timer-text-${id}`).innerText = `${timeLeft}s`; if (timeLeft <= 0) stopRecording(id, type); }, 1000);
-                
             } catch (err) { 
-                alert('無法開啟相機/麥克風！原因：' + err.message); 
+                alert('無法開啟麥克風！原因：' + err.message); 
             }
         }
         
