@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>去中心化房地產媒合</title>
+    <style>
+        body {
+            font-family: "PingFang TC", "Noto Sans TC", sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        h1 { text-align: center; color: #2c3e50; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, textarea {
+            width: 100%; padding: 10px; border: 1px solid #ccc;
+            border-radius: 5px; box-sizing: border-box;
+        }
+        button {
+            width: 100%; padding: 12px; background: #2c3e50;
+            color: white; border: none; border-radius: 5px;
+            font-size: 1rem; cursor: pointer;
+        }
+        button:hover { background: #1a252f; }
+        
+        /* 貼文列表樣式 */
+        .post-card {
+            background: white; margin-top: 20px; padding: 15px;
+            border-left: 5px solid #3498db; border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .post-meta { font-size: 0.85rem; color: #7f8c8d; margin-bottom: 10px; }
+        .price-tag { color: #e74c3c; font-weight: bold; font-size: 1.2rem; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>免仲介 ‧ 房屋媒合板</h1>
+        <p style="text-align: center; font-size: 0.9rem; color: #777;">貼文不留個資，30 天後自動銷毀</p>
+        
+        <div class="form-group">
+            <label>房屋地區 (如：新北市中和區)</label>
+            <input type="text" id="re-location" placeholder="輸入地區...">
+        </div>
+        <div class="form-group">
+            <label>期望價格 / 租金</label>
+            <input type="text" id="re-price" placeholder="如：1200萬 或 20000/月">
+        </div>
+        <div class="form-group">
+            <label>聯絡方式 (Email 或 Line ID)</label>
+            <input type="text" id="re-contact" placeholder="請留下買家能找到你的方式">
+        </div>
+        <div class="form-group">
+            <label>房屋簡介</label>
+            <textarea id="re-desc" rows="4" placeholder="簡單描述坪數、格局、樓層等..."></textarea>
+        </div>
+        <button id="btn-submit">發布物件</button>
+    </div>
+
+    <div id="re-board"></div>
+
+    <script>
+        // 這裡稍後會放入連接 Firebase 的程式碼
+        // 以及計算 30 天過期的邏輯
+        console.log("介面載入完成，等待寫入後端邏輯！");
+    </script>
+</body>
+</html>
